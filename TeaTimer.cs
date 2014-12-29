@@ -5,8 +5,7 @@
 // #contact andresalvivar@gmail.com - twitter.com/matnesis
 // #created 2014/12/26 12:21 am
 
-// #usage Just put TeaTimer.cs somewhere in your folders and call it in a MonoBehaviour 
-// using 'this'.
+// #usage Just put TeaTimer.cs somewhere in your folders and call it in a MonoBehaviour using 'this'.
 
 // ttAppend
 // Appends a timed callback into a queue to be executed in order.
@@ -22,9 +21,9 @@
 // Useful during cycles (e.g. Update) to avoid over appending callbacks.
 // void Update() 
 // {
-//     this.ttAppend("LockedQueue", 1, () => Debug.Log("LockedQueue " + Time.time));
-//     this.ttAppend("LockedQueue", 2, () => Debug.Log("LockedQueue " + Time.time));
-//     this.ttLock(); // 'LockedQueue' will run as a safe 2 steps timer.
+//     this.ttAppend("LockedQueue", 3, () => Debug.Log("LockedQueue " + Time.time));
+//     this.ttAppend("LockedQueue", 3, () => Debug.Log("LockedQueue " + Time.time));
+//     this.ttLock(); // 'LockedQueue' will run as a safe 2 step timer.
 // }
 
 // ttNow
