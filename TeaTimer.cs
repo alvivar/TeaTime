@@ -22,9 +22,9 @@
 // Useful during cycles (e.g. Update) to avoid over appending callbacks.
 // void Update() 
 // {
-//     this.ttAppend("LockedQueue", 3, () => Debug.Log("LockedQueue " + Time.time));
-//     this.ttAppend("LockedQueue", 3, () => Debug.Log("LockedQueue " + Time.time));
-//     this.ttLock(); // 'LockedQueue' will run as a safe permanent timer.
+//     this.ttAppend("LockedQueue", 1, () => Debug.Log("LockedQueue " + Time.time));
+//     this.ttAppend("LockedQueue", 2, () => Debug.Log("LockedQueue " + Time.time));
+//     this.ttLock(); // 'LockedQueue' will run as a safe 2 steps timer.
 // }
 
 // ttNow
@@ -57,7 +57,6 @@
 //     Debug.Log("AnotherQueue YieldInstruction " + Time.time); // Prints 3
 // })
 
-// append loop
 
 using System;
 using System.Collections;
@@ -66,7 +65,7 @@ using UnityEngine;
 
 
 /// <summary>
-/// Timed task data.
+/// Timed callback data.
 /// </summary>
 public class TeaTask
 {
@@ -95,17 +94,17 @@ public static class TeaTimer
     private static Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>> queue;
 
     /// <summary>
-    /// Holds the running queues by instance.
+    /// Holds the currently running queues.
     /// </summary>
     private static Dictionary<MonoBehaviour, List<string>> currentlyRunning;
 
     /// <summary>
-    /// Holds the last queue name used by instance.
+    /// Holds the last queue name used.
     /// </summary>
     private static Dictionary<MonoBehaviour, string> lastQueueName;
 
     /// <summary>
-    /// Holds the locked queues by instance.
+    /// Holds the locked queues.
     /// </summary>
     private static Dictionary<MonoBehaviour, List<string>> lockedQueue;
 
@@ -113,7 +112,7 @@ public static class TeaTimer
     /// <summary>
     /// Prepares the main queue for the instance.
     /// </summary>
-    private static void InitInstanceQueue(MonoBehaviour instance)
+    private static void PrepareInstanceQueue(MonoBehaviour instance)
     {
         if (queue == null)
             queue = new Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>>();
@@ -124,9 +123,9 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Prepares the last queue name dictionary for the instance.
+    /// Prepares the last queue name for the instance.
     /// </summary>
-    private static void InitInstanceLastQueueName(MonoBehaviour instance)
+    private static void PrepareInstanceLastQueueName(MonoBehaviour instance)
     {
         if (lastQueueName == null)
             lastQueueName = new Dictionary<MonoBehaviour, string>();
@@ -138,9 +137,9 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Prepares the locked queue dictionary for the instance.
+    /// Prepares the locked queue spot for the instance.
     /// </summary>
-    private static void InitInstanceLockedQueue(MonoBehaviour instance)
+    private static void PrepareInstanceLockedQueue(MonoBehaviour instance)
     {
         if (lockedQueue == null)
             lockedQueue = new Dictionary<MonoBehaviour, List<string>>();
@@ -151,12 +150,11 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Returns true if the queue is locked in the instance.
+    /// Returns true if the queue is currently locked.
     /// </summary>
-    /// <returns></returns>
     private static bool IsLocked(MonoBehaviour instance, string queueName)
     {
-        InitInstanceLockedQueue(instance);
+        PrepareInstanceLockedQueue(instance);
 
         // Is locked?
         if (lockedQueue[instance].Contains(queueName))
@@ -167,7 +165,7 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Appends a timed task into a default queue to be executed in order.
+    /// Appends a timed callback into a queue to be executed in order.
     /// </summary>
     private static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float atTime, YieldInstruction atYield, Action callback)
     {
@@ -175,15 +173,15 @@ public static class TeaTimer
         if (IsLocked(instance, queueName))
             return instance;
 
-        InitInstanceQueue(instance);
-        InitInstanceLastQueueName(instance);
+        PrepareInstanceQueue(instance);
+        PrepareInstanceLastQueueName(instance);
 
         // Adds callback list & last queue name 
         lastQueueName[instance] = queueName;
         if (queue[instance].ContainsKey(queueName) == false)
             queue[instance].Add(queueName, new List<TeaTask>());
 
-        // Append a new task
+        // Appends a new task
         List<TeaTask> taskList = queue[instance][queueName];
         taskList.Add(new TeaTask(atTime, atYield, callback));
 
@@ -195,7 +193,7 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Appends a timed task into a default queue to be executed in order.
+    /// Appends a timed callback into a queue to be executed in order.
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float atTime, Action callback)
     {
@@ -204,7 +202,7 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Appends a timed task into a default queue to be executed in order.
+    /// Appends a timed callback into a queue to be executed in order.
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, YieldInstruction atYield, Action callback)
     {
@@ -213,44 +211,62 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Appends a timed task into a default queue to be executed in order.
+    /// Appends a timed callback into the last named queue (or default) to be executed in order.
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, float atTime, Action callback)
     {
-        InitInstanceLastQueueName(instance);
+        PrepareInstanceLastQueueName(instance);
 
         return instance.ttAppend(lastQueueName[instance], atTime, null, callback);
     }
 
 
     /// <summary>
-    /// Appends a timed task into a default queue to be executed in order.
+    /// Appends a timed callback into the last named queue (or default) to be executed in order.
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, YieldInstruction atYield, Action callback)
     {
-        InitInstanceLastQueueName(instance);
+        PrepareInstanceLastQueueName(instance);
 
         return instance.ttAppend(lastQueueName[instance], 0, atYield, callback);
     }
 
 
     /// <summary>
-    /// Appends a timed task into a default queue to be executed in order.
+    /// Appends a timed interval into a queue.
+    /// </summary>
+    public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float atTime)
+    {
+        return instance.ttAppend(queueName, atTime, null, null);
+    }
+
+
+    /// <summary>
+    /// Appends a timed interval into the last named queue (or default).
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, float atTime)
     {
-        InitInstanceLastQueueName(instance);
+        PrepareInstanceLastQueueName(instance);
 
         return instance.ttAppend(lastQueueName[instance], atTime, null, null);
     }
 
 
     /// <summary>
-    /// Appends a timed task into a default queue to be executed in order.
+    /// Appends a timed callback into a queue to be executed in order.
+    /// </summary>
+    public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, Action callback)
+    {
+        return instance.ttAppend(queueName, 0, null, callback);
+    }
+
+
+    /// <summary>
+    /// Appends a timed callback into the last named queue (or default) to be executed in order.
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, Action callback)
     {
-        InitInstanceLastQueueName(instance);
+        PrepareInstanceLastQueueName(instance);
 
         return instance.ttAppend(lastQueueName[instance], 0, null, callback);
     }
@@ -286,12 +302,12 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Locks the current queue (it can't be used again until all current task are done).
+    /// Locks the current queue until all his callbacks are done.
     /// </summary>
     public static MonoBehaviour ttLock(this MonoBehaviour instance)
     {
-        InitInstanceQueue(instance);
-        InitInstanceLastQueueName(instance);
+        PrepareInstanceQueue(instance);
+        PrepareInstanceLastQueueName(instance);
 
         // Ignore if the queue is empty
         if (queue[instance].ContainsKey(lastQueueName[instance]) == false ||
@@ -302,12 +318,15 @@ public static class TeaTimer
         if (!IsLocked(instance, lastQueueName[instance]))
             lockedQueue[instance].Add(lastQueueName[instance]);
 
+        // Resets the current queue name
+        lastQueueName[instance] = lastQueueName[instance] + Time.time;
+
         return instance;
     }
 
 
     /// <summary>
-    /// Execute all callbacks in the instance queue.
+    /// Execute in order all timed callbacks in the instance queue.
     /// </summary>
     private static IEnumerator ExecuteQueue(MonoBehaviour instance, string queueName)
     {
@@ -357,7 +376,7 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Executes a timed coroutine.
+    /// Executes a timed callback.
     /// </summary>
     private static IEnumerator ExecuteOnce(float atTime, YieldInstruction atYield, Action callback)
     {
