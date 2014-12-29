@@ -1,4 +1,4 @@
-﻿// TeaTimer v0.3
+﻿// TeaTimer v0.3 Alpha
 // Unity Extension Set for a quick coroutine/callback timer in MonoBehaviours.
 
 // #author Andrés Villalobos
