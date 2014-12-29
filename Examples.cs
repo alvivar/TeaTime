@@ -22,8 +22,8 @@ this.ttAppend(2, () => Debug.Log("SomeQueue " + Time.time));  // Prints 5
 void Update() 
 {
     this.ttAppend("LockedQueue", 3, () => Debug.Log("LockedQueue " + Time.time));
-	this.ttAppend("LockedQueue", 3, () => Debug.Log("LockedQueue " + Time.time));
-	this.ttLock(); // 'LockedQueue' will run as a safe 2 step timer.
+    this.ttAppend("LockedQueue", 3, () => Debug.Log("LockedQueue " + Time.time));
+    this.ttLock(); // 'LockedQueue' will run as a safe 2 step timer.
 }
 
 // ttNow
