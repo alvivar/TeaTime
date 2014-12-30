@@ -71,8 +71,8 @@ public class TeaTask
     public float time = 0f;
     public YieldInstruction atYield = null;
     public Action callback = null;
-    public Action<LoopHandler> loopCallback = null;
     public bool isLoop = false;
+    public Action<LoopHandler> loopCallback = null;
 
 
     public TeaTask(float atTime, YieldInstruction atYield, Action callback)
@@ -80,21 +80,22 @@ public class TeaTask
         this.time = atTime;
         this.atYield = atYield;
         this.callback = callback;
-        isLoop = false;
+        this.isLoop = false;
     }
 
-    public TeaTask(float time, Action<LoopHandler> callback)
+
+    public TeaTask(float duration, Action<LoopHandler> callback)
     {
-        this.time = time;
+        this.time = duration;
         this.atYield = null;
-        isLoop = true;
+        this.isLoop = true;
         this.loopCallback = callback;
     }
 }
 
 
 /// <summary>
-/// Handler of loop appends 
+/// Handler for appended loops.
 /// </summary>
 public class LoopHandler
 {
@@ -219,30 +220,26 @@ public static class TeaTimer
         return instance;
     }
 
+
     /// <summary>
-    /// Appends a timed task into a default queue to be executed in order.
+    /// Appends a looped callback into a queue to be executed in order.
     /// </summary>
     private static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, string queueName, float duration, Action<LoopHandler> callback)
     {
-        // Create dictionary
-        if (queue == null)
-            queue = new Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>>();
+        // Ignore locked queues
+        if (IsLocked(instance, queueName))
+            return instance;
 
-        // Create key and value
-        if (queue.ContainsKey(instance) == false)
-            queue.Add(instance, new Dictionary<string, List<TeaTask>>());
+        PrepareInstanceQueue(instance);
+        PrepareInstanceLastQueueName(instance);
 
-        // Create task list & last name dictionary
-        if (lastQueueName == null)
-            lastQueueName = new Dictionary<MonoBehaviour, string>();
-
+        // Adds callback list & last queue name 
         lastQueueName[instance] = queueName;
         if (queue[instance].ContainsKey(queueName) == false)
             queue[instance].Add(queueName, new List<TeaTask>());
 
         // Append a new task
         List<TeaTask> taskList = queue[instance][queueName];
-
         taskList.Add(new TeaTask(duration, callback));
 
         // Execute queue
@@ -333,6 +330,28 @@ public static class TeaTimer
 
 
     /// <summary>
+    /// Appends a looped callback into a queue to be executed in order.
+    /// </summary>
+    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, Action<LoopHandler> callback)
+    {
+        PrepareInstanceLastQueueName(instance);
+
+        return instance.ttAppendLoop(lastQueueName[instance], 0, callback);
+    }
+
+
+    /// <summary>
+    /// Appends a looped callback into a queue to be executed in order.
+    /// </summary>
+    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, float duration, Action<LoopHandler> callback)
+    {
+        PrepareInstanceLastQueueName(instance);
+
+        return instance.ttAppendLoop(lastQueueName[instance], duration, callback);
+    }
+
+
+    /// <summary>
     /// Executes a timed callback ignoring queues.
     /// </summary>
     private static MonoBehaviour ttNow(this MonoBehaviour instance, float atTime, YieldInstruction atYield, Action callback)
@@ -360,28 +379,6 @@ public static class TeaTimer
         return instance.ttNow(0, atYield, callback);
     }
 
-    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, Action<LoopHandler> callback)
-    {
-        if (lastQueueName == null)
-            lastQueueName = new Dictionary<MonoBehaviour, string>();
-
-        if (lastQueueName.ContainsKey(instance) == false)
-            lastQueueName[instance] = "TEATIMER_DEFAULT_QUEUE_NAME";
-
-        return instance.ttAppendLoop(lastQueueName[instance], 0, callback);
-    }
-
-    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, float duration, Action<LoopHandler> callback)
-    {
-        if (lastQueueName == null)
-            lastQueueName = new Dictionary<MonoBehaviour, string>();
-
-        if (lastQueueName.ContainsKey(instance) == false)
-            lastQueueName[instance] = "TEATIMER_DEFAULT_QUEUE_NAME";
-
-        return instance.ttAppendLoop(lastQueueName[instance], duration, callback);
-    }
-
 
     /// <summary>
     /// Locks the current queue until all his callbacks are done.
@@ -397,18 +394,15 @@ public static class TeaTimer
             return instance;
 
         // Adds the lock
-        if (!IsLocked(instance, lastQueueName[instance]))
+        if (IsLocked(instance, lastQueueName[instance]) == false)
             lockedQueue[instance].Add(lastQueueName[instance]);
-
-        // Resets the current queue name
-        lastQueueName[instance] = lastQueueName[instance] + Time.time;
 
         return instance;
     }
 
 
     /// <summary>
-    /// Execute in order all timed callbacks in the instance queue.
+    /// Execute in order all timed callbacks and loops in the instance queue.
     /// </summary>
     private static IEnumerator ExecuteQueue(MonoBehaviour instance, string queueName)
     {
@@ -419,7 +413,7 @@ public static class TeaTimer
         if (queue[instance].ContainsKey(queueName) == false)
             yield break;
 
-        // Create runners list for the instace
+        // Create runners list for the instance
         if (currentlyRunning == null)
             currentlyRunning = new Dictionary<MonoBehaviour, List<string>>();
 
@@ -430,14 +424,16 @@ public static class TeaTimer
         if (currentlyRunning.ContainsKey(instance) && currentlyRunning[instance].Contains(queueName))
             yield break;
 
-        // Run a clone list of tasks until depleted
+        // Lock the queue
+        currentlyRunning[instance].Add(queueName);
+
+        // Run over a clone list of tasks until depleted
         List<TeaTask> batch = new List<TeaTask>();
         batch.AddRange(queue[instance][queueName]);
 
-        currentlyRunning[instance].Add(queueName);
         foreach (TeaTask c in batch)
         {
-            // Execute & remove tasks
+            // Select, execute & remove tasks
             if (c.isLoop)
             {
                 if (c.time > 0)
@@ -455,10 +451,12 @@ public static class TeaTimer
             }
             queue[instance][queueName].Remove(c);
         }
+
+        // Unlock the queue
         currentlyRunning[instance].Remove(queueName);
 
         // Try again is there are new items,
-        // or remove any current locks for the queue
+        // else, remove any current locks for the queue
         if (queue[instance][queueName].Count > 0)
         {
             instance.StartCoroutine(ExecuteQueue(instance, queueName));
@@ -490,7 +488,7 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Executes a timed coroutine.
+    /// Executes a looped callback.
     /// </summary>
     private static IEnumerator ExecuteLoop(float time, Action<LoopHandler> callback)
     {
