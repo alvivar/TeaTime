@@ -68,18 +68,47 @@ using UnityEngine;
 /// </summary>
 public class TeaTask
 {
-    public float atTime = 0;
+    public float time = 0f;
     public YieldInstruction atYield = null;
     public Action callback = null;
+	public Action<LoopHandler> loopCallback = null;
+	public bool isLoop = false;
 
 
     public TeaTask(float atTime, YieldInstruction atYield, Action callback)
     {
-        this.atTime = atTime;
+        this.time = atTime;
         this.atYield = atYield;
         this.callback = callback;
-    }
+		isLoop = false;
+	}
+	
+	public TeaTask(float time, Action<LoopHandler> callback)
+	{
+		this.time = time;
+		this.atYield = null;	
+		isLoop = true;
+		this.loopCallback = callback;
+	}
 }
+
+/// <summary>
+/// Handler of loop appends 
+/// </summary>
+public class LoopHandler
+{
+	public bool BreakLoop = false;
+	
+	public float t = 0f;
+	
+	public float timeSinceStart = 0f;
+	
+	public void ExitLoop()
+	{
+		BreakLoop = true;
+	}
+}
+
 
 
 /// <summary>
@@ -190,6 +219,38 @@ public static class TeaTimer
         return instance;
     }
 
+	/// <summary>
+	/// Appends a timed task into a default queue to be executed in order.
+	/// </summary>
+	private static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, string queueName, float duration, Action<LoopHandler> callback)
+	{
+		// Create dictionary
+		if (queue == null)
+			queue = new Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>>();
+		
+		// Create key and value
+		if (queue.ContainsKey(instance) == false)
+			queue.Add(instance, new Dictionary<string, List<TeaTask>>());
+		
+		// Create task list & last name dictionary
+		if (lastQueueName == null)
+			lastQueueName = new Dictionary<MonoBehaviour, string>();
+		
+		lastQueueName[instance] = queueName;
+		if (queue[instance].ContainsKey(queueName) == false)
+			queue[instance].Add(queueName, new List<TeaTask>());
+		
+		// Append a new task
+		List<TeaTask> taskList = queue[instance][queueName];
+		
+		taskList.Add(new TeaTask(duration, callback));
+		
+		// Execute queue
+		instance.StartCoroutine(ExecuteQueue(instance, queueName));
+		
+		return instance;
+	}
+
 
     /// <summary>
     /// Appends a timed callback into a queue to be executed in order.
@@ -299,6 +360,28 @@ public static class TeaTimer
         return instance.ttNow(0, atYield, callback);
     }
 
+	public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, Action<LoopHandler> callback)
+	{
+		if (lastQueueName == null)
+			lastQueueName = new Dictionary<MonoBehaviour, string>();
+		
+		if (lastQueueName.ContainsKey(instance) == false)
+			lastQueueName[instance] = "TEATIMER_DEFAULT_QUEUE_NAME";
+		
+		return instance.ttAppendLoop(lastQueueName[instance], 0, callback);
+	}
+	
+	public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, float duration, Action<LoopHandler> callback)
+	{
+		if (lastQueueName == null)
+			lastQueueName = new Dictionary<MonoBehaviour, string>();
+		
+		if (lastQueueName.ContainsKey(instance) == false)
+			lastQueueName[instance] = "TEATIMER_DEFAULT_QUEUE_NAME";
+		
+		return instance.ttAppendLoop(lastQueueName[instance], duration, callback);
+	}
+
 
     /// <summary>
     /// Locks the current queue until all his callbacks are done.
@@ -355,7 +438,21 @@ public static class TeaTimer
         foreach (TeaTask c in batch)
         {
             // Execute & remove tasks
-            yield return instance.StartCoroutine(ExecuteOnce(c.atTime, c.atYield, c.callback));
+			if(c.isLoop)
+			{
+				if(c.time > 0)
+				{
+					yield return instance.StartCoroutine(ExecuteLoop(c.time, c.loopCallback));
+				}
+				else
+				{
+					yield return instance.StartCoroutine(ExecuteInfiniteLoop(c.loopCallback));
+				}
+			}
+			else
+			{
+				yield return instance.StartCoroutine(ExecuteOnce(c.time, c.atYield, c.callback));
+			}
             queue[instance][queueName].Remove(c);
         }
         currentlyRunning[instance].Remove(queueName);
@@ -390,4 +487,88 @@ public static class TeaTimer
         if (callback != null)
             callback();
     }
+
+	/// <summary>
+	/// Executes a timed coroutine.
+	/// </summary>
+	private static IEnumerator ExecuteLoop(float time, Action<LoopHandler> callback)
+	{
+		float t = 0f;
+		
+		float rate = 0;
+		
+		float timeSinceStart = 0f;
+		
+		// if time is 0 the execute loop is infinite
+		
+		if (time > 0) 
+		{
+			rate = 1f / time;
+		}
+		
+		LoopHandler loopHandler = new LoopHandler();
+		
+		while(t < 1)
+		{
+			if(loopHandler.BreakLoop)
+			{
+				break;
+			}
+			
+			timeSinceStart += Time.deltaTime;
+			
+			if (time > 0)
+			{
+				t += Time.deltaTime * rate;
+				
+				loopHandler.t = t;
+			}
+			else
+			{
+				loopHandler.t = timeSinceStart;
+			}
+			
+			// t will return the delta value of the linear interpolation based in the duration time
+			// but if there is no duration the t value sent will be the time since start
+			
+			if (callback != null)
+			{
+				callback(loopHandler);
+			}
+			
+			yield return null;
+		}
+	}
+	
+	/// <summary>
+	/// Executes an infinite coroutine.
+	/// </summary>
+	private static IEnumerator ExecuteInfiniteLoop(Action<LoopHandler> callback)
+	{
+		float timeSinceStart = 0;
+		
+		LoopHandler loopHandler = new LoopHandler();
+		
+		while(true)
+		{
+			if(loopHandler.BreakLoop)
+			{
+				break;
+			}
+			
+			timeSinceStart += Time.deltaTime;
+			
+			loopHandler.timeSinceStart = timeSinceStart;
+			
+			// t will return the delta value of the linear interpolation based in the duration time
+			// but if there is no duration the t value sent will be the time since start
+			
+			if (callback != null)
+			{
+				callback(loopHandler);
+			}
+			
+			yield return null;
+		}
+	}
 }
