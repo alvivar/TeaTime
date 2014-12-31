@@ -27,7 +27,6 @@ MonoBehaviour using 'this.tt'.
 	})
 	.ttLock(); // Locks the queue, ignoring new appends until all callbacks are done.
 
-
 Some details
 - Execution starts immediately
 - Locking a queue ensures a safe run during continuous calls
@@ -35,7 +34,7 @@ Some details
 - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
 - Queues are unique to his MonoBehaviour
 
-And that's it!
+And that's it! (**Better examples and advanced patterns to come!**)
 
 By [Andrés Villalobos](http://twitter.com/matnesis) in collaboration with [Antonio Zamora](http://twitter.com/tzamora).
 
