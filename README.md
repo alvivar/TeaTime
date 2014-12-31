@@ -25,7 +25,7 @@ MonoBehaviour using 'this.tt'.
 	{
 		Debug.Log("ttInvoke is arbitrary and ignores the queue " + Time.time);
 	})
-	.ttLock(); // Locks the current queue, ignoring new appends until all callbacks are done.
+	.ttLock(); // Locks the queue, ignoring new appends until all callbacks are done.
 
 
 Some details
@@ -39,4 +39,4 @@ And that's it!
 
 By [Andrés Villalobos](http://twitter.com/matnesis) in collaboration with [Antonio Zamora](http://twitter.com/tzamora).
 
-> Created 2014/12/26 12:21 am
+> 2014/12/26 12:21 am

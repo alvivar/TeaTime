@@ -28,7 +28,7 @@
 // {
 //     Debug.Log("ttInvoke is arbitrary and ignores the queue " + Time.time);
 // })
-// .ttLock(); // Locks the current queue, ignoring new appends until all callbacks are done.
+// .ttLock(); // Locks the queue, ignoring new appends until all callbacks are done.
 
 // And that's it!
 
