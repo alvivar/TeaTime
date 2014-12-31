@@ -1,4 +1,4 @@
-#1 TeaTimer v0.4 Alpha
+##1 TeaTimer v0.4 Alpha
 
 TeaTimer is a fast & simple queue for timed callbacks, designed as a
 MonoBehaviour extension set, focused on solving common coroutines patterns.
@@ -37,7 +37,6 @@ Some details
 
 And that's it!
 
->By Andrés Villalobos > andresalvivar@gmail.com > twitter.com/matnesis
->In collaboration with Antonio Zamora > tzamora@gmail.com > twitter.com/tzamora
+By [Andrés Villalobos](http://twitter.com/matnesis) in collaboration with [Antonio Zamora](http://twitter.com/tzamora).
 
-2014/12/26 12:21 am
+> Created 2014/12/26 12:21 am
