@@ -3,7 +3,7 @@
 TeaTimer is a fast & simple queue for timed callbacks, designed as a
 MonoBehaviour extension set, focused on solving common coroutines patterns.
 
-Just put 'TeaTimer.cs' somewhere in your folders and call it inside any
+Just put 'TeaTimer.cs' somewhere in your project and call it inside any
 MonoBehaviour using 'this.tt'.
 
 
