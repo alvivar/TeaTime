@@ -4,8 +4,9 @@
 // In collaboration with Antonio Zamora > tzamora@gmail.com > twitter.com/tzamora
 // Created 2014/12/26 12:21 am
 
-// TeaTimer is a fast & simple queue for timed callbacks, designed as a
-// MonoBehaviour extension set, focused on solving common coroutines patterns.
+// TeaTimer is a fast & simple queue for timed callbacks, fashioned as a
+// MonoBehaviour extension set, focused on solving common coroutines patterns in
+// Unity games.
 
 // Just put 'TeaTimer.cs' somewhere in your project and call it inside any
 // MonoBehaviour using 'this.tt'.
