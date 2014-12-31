@@ -33,7 +33,7 @@
 // And that's it!
 
 // Some details
-// - Execution starts inmediatly
+// - Execution starts immediately
 // - Locking a queue ensures a safe run during continuous calls
 // - Naming a queue is recommended, but optional
 // - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
