@@ -34,7 +34,7 @@ Some details
 - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
 - Queues are unique to his MonoBehaviour
 
-And that's it! (**Better examples and advanced patterns to come!**)
+And that's it! (*Better examples and advanced patterns to come!*)
 
 By [Andrés Villalobos](http://twitter.com/matnesis) in collaboration with [Antonio Zamora](http://twitter.com/tzamora).
 
