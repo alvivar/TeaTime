@@ -37,7 +37,7 @@ Some details
 
 And that's it!
 
-By Andrés Villalobos > andresalvivar@gmail.com > twitter.com/matnesis
-In collaboration with Antonio Zamora > tzamora@gmail.com > twitter.com/tzamora
+>By Andrés Villalobos > andresalvivar@gmail.com > twitter.com/matnesis
+>In collaboration with Antonio Zamora > tzamora@gmail.com > twitter.com/tzamora
 
 2014/12/26 12:21 am
