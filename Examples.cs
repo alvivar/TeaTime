@@ -1,57 +1,49 @@
-// TeaTimer v0.3 Alpha
-// Unity Extension Set for a quick coroutine/callback timer in MonoBehaviours.
+using UnityEngine;
 
-// #author Andrés Villalobos
-// #contact andresalvivar@gmail.com - twitter.com/matnesis
-// #created 2014/12/26 12:21 am
 
-// #usage Just put TeaTimer.cs somewhere in your folders and call it in a MonoBehaviour using 'this'.
-
-// ttAppend
-// Appends a timed callback into a queue to be executed in order.
-this.ttAppend("SomeQueue", 1, () => Debug.Log("SomeQueue " + Time.time)); // Prints 1
-this.ttAppend("SomeQueue", 2, () => Debug.Log("SomeQueue " + Time.time)); // Prints 3
-
-// When called without a queue name, 
-// the task is appended to the last named queue (or default).
-this.ttAppend(2, () => Debug.Log("SomeQueue " + Time.time));  // Prints 5
-
-// ttLock
-// Locks the current queue until all his previous callbacks are done.
-// Useful during cycles (e.g. Update) to avoid over appending callbacks.
-void Update() 
+public class Examples : MonoBehaviour
 {
-    this.ttAppend("LockedQueue", 3, () => Debug.Log("LockedQueue " + Time.time));
-    this.ttAppend("LockedQueue", 3, () => Debug.Log("LockedQueue " + Time.time));
-    this.ttLock(); // 'LockedQueue' will run as a safe 2 step timer.
+    void Start()
+    {
+        // TeaTimer v0.4 Alpha
+
+        // By Andrés Villalobos > andresalvivar@gmail.com > twitter.com/matnesis
+        // In collaboration with Antonio Zamora > tzamora@gmail.com > twitter.com/tzamora
+        // Created 2014/12/26 12:21 am
+
+        // TeaTimer is a fast & simple queue for timed callbacks, designed as a
+        // MonoBehaviour extension set, focused on solving common coroutines patterns.
+
+        // Just put 'TeaTimer.cs' somewhere in your folders and call it inside any
+        // MonoBehaviour using 'this.tt'.
+
+        this.ttAppend("Queue name", 2, () =>
+        {
+            Debug.Log("2 second since start " + Time.time);
+        })
+        .ttAppendLoop(3, delegate(LoopHandler loop)
+        {
+            // An append loop will run frame by frame for all his duration.
+            // loop.t holds the fraction of time by frame.
+            Camera.main.backgroundColor = Color.Lerp(Color.black, Color.white, loop.t);
+        })
+        .ttAppend(2, () =>
+        {
+            Debug.Log("The append loop started 5 seconds ago  " + Time.time);
+        })
+        .ttInvoke(1, () =>
+        {
+            Debug.Log("ttInvoke is arbitrary and ignores the queue " + Time.time);
+        })
+        .ttLock(); // Locks the queue, ignoring new appends until all callbacks are done.
+
+        // And that's it!
+
+        // Some details
+        // - Execution starts inmediatly
+        // - Locking a queue ensures a safe run during continuous calls
+        // - Naming a queue is recommended, but optional
+        // - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
+        // - Queues are unique to his MonoBehaviour
+    }
 }
-
-// ttNow
-// Executes a timed callback ignoring queues.
-this.ttNow(3, () => Debug.Log("ttNow " + Time.time)); // Prints 3
-
-// Some details
-// #1 Execution starts inmediatly
-// #2 You can chain methods
-// #3 You can use a YieldInstruction instead of time (e.g Dotween!)
-// #4 Locking a queue ensures a safe timer during continuous calls
-// #5 Queues are unique to his MonoBehaviour
-// #6 If you never name a queue, an internal default will be used
-
-// A classic chain example.
-this.ttAppend("AnotherQueue", 1, () =>
-{
-    Debug.Log("AnotherQueue " + Time.time); // Prints 1
-})
-.ttNow(1, () =>
-{
-    Debug.Log("AnotherQueue ttNow ignores queues " + Time.time); // Prints 1
-})
-.ttAppend(0, () =>
-{
-    Debug.Log("AnotherQueue " + Time.time); // Prints 1
-})
-.ttAppend(transform.DOMoveX(1, 3).WaitForCompletion(), () => // Dotween WaitFor instead of time
-{
-    Debug.Log("AnotherQueue YieldInstruction " + Time.time); // Prints 3
-})
