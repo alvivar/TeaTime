@@ -1,4 +1,4 @@
-﻿// TeaTimer v0.4 Alpha
+﻿// TeaTimer v0.4 alpha
 
 // By Andrés Villalobos > andresalvivar@gmail.com > twitter.com/matnesis
 // In collaboration with Antonio Zamora > tzamora@gmail.com > twitter.com/tzamora
