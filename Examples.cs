@@ -1,37 +1,76 @@
+﻿using DG.Tweening;
 using UnityEngine;
 
 
 public class Examples : MonoBehaviour
 {
+    private Sequence myTween;
+
+
     void Start()
     {
-        this.ttAppend("Queue name", 2, () =>
+        myTween = DOTween.Sequence();
+
+        this.ttInvoke(10, () =>
         {
-            Debug.Log("2 second since start " + Time.time);
+            Debug.Log("ttInvoke +10 secs " + Time.time);
+        });
+
+        Test();
+    }
+
+
+    void Update()
+    {
+        Test();
+    }
+
+
+    void Test()
+    {
+        this.ttAppend("> Every second", 1, () =>
+        {
+            Debug.Log("+1 second " + Time.time);
+        })
+        .ttLock();
+
+
+        this.ttAppendLoop("> Background change", 3, delegate(LoopHandler loop)
+        {
+            Camera.main.backgroundColor = Color.Lerp(Color.white, Color.black, loop.t);
+        })
+        .ttAppend(() =>
+        {
+            Debug.Log("Black, +3 secs " + Time.time);
         })
         .ttAppendLoop(3, delegate(LoopHandler loop)
         {
-            // An append loop will run frame by frame for all his duration.
-            // loop.t holds the fraction of time by frame.
             Camera.main.backgroundColor = Color.Lerp(Color.black, Color.white, loop.t);
         })
-        .ttAppend(2, () =>
+        .ttAppend(() =>
         {
-            Debug.Log("The append loop started 5 seconds ago  " + Time.time);
+            Debug.Log("White, +3 secs " + Time.time);
         })
-        .ttInvoke(1, () =>
+        .ttLock();
+
+
+        this.ttAppend("> myTween", myTween.WaitForCompletion(), () =>
         {
-            Debug.Log("ttInvoke is arbitrary and ignores the queue " + Time.time);
+            myTween = DOTween.Sequence();
+            myTween.Append(transform.DOMoveX(10, 2.5f));
+            myTween.Append(transform.DOMoveX(-10, 2.5f));
         })
-        .ttLock(); // Locks the queue, ignoring new appends until all callbacks are done.
+        .ttAppend(() =>
+        {
+            Debug.Log("myTween end, +5 secs " + Time.time);
+        })
+        .ttLock();
 
-        // And that's it!
 
-        // Some details
-        // - Execution starts immediately
-        // - Locking a queue ensures a safe run during continuous calls
-        // - Naming a queue is recommended, but optional
-        // - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
-        // - Queues are unique to his MonoBehaviour
+        this.ttAppend("> Every 4 secs", 4, delegate()
+        {
+            Debug.Log("+4 secs " + Time.time);
+        })
+        .ttLock();
     }
 }
