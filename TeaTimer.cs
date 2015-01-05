@@ -1,4 +1,4 @@
-﻿// TeaTimer v0.4 alpha
+﻿// TeaTimer v0.5 alpha
 
 // By Andrés Villalobos > andresalvivar@gmail.com > twitter.com/matnesis
 // In collaboration with Antonio Zamora > tzamora@gmail.com > twitter.com/tzamora
@@ -53,44 +53,58 @@ using UnityEngine;
 public class TeaTask
 {
     public float time = 0f;
-    public YieldInstruction y = null;
+    public YieldInstruction yieldInstruction = null;
     public Action callback = null;
+    public Action<ttHandler> callbackWithHandler = null;
     public bool isLoop = false;
-    public Action<LoopHandler> loopCallback = null;
 
 
-    public TeaTask(float time, YieldInstruction y, Action callback)
+    public TeaTask(float time, YieldInstruction yield, Action callback, Action<ttHandler> callbackWithHandler, bool isLoop)
     {
         this.time = time;
-        this.y = y;
+        this.yieldInstruction = yield;
         this.callback = callback;
-        this.isLoop = false;
-    }
-
-
-    public TeaTask(float duration, Action<LoopHandler> callback)
-    {
-        this.time = duration;
-        this.y = null;
-        this.isLoop = true;
-        this.loopCallback = callback;
+        this.callbackWithHandler = callbackWithHandler;
+        this.isLoop = isLoop;
     }
 }
 
 
 /// <summary>
-/// Handler for appended loops.
+/// TeaTimer Handler.
 /// </summary>
-public class LoopHandler
+public class ttHandler
 {
     public float t = 0f;
     public float timeSinceStart = 0f;
-    public bool exitLoop = false;
+    public bool isBroken = false;
+    public YieldInstruction yieldToWait = null;
 
 
-    public void Exit()
+    /// <summary>
+    /// Breaks the current AppendLoop.
+    /// </summary>
+    public void Break()
     {
-        exitLoop = true;
+        this.isBroken = true;
+    }
+
+
+    /// <summary>
+    /// Waits for a time interval after the current callback.
+    /// </summary>
+    public void WaitFor(float interval)
+    {
+        this.yieldToWait = new WaitForSeconds(interval);
+    }
+
+
+    /// <summary>
+    /// Waits for a YieldInstruction after the current callback.
+    /// </summary>
+    public void WaitFor(YieldInstruction yieldToWait)
+    {
+        this.yieldToWait = yieldToWait;
     }
 }
 
@@ -169,7 +183,7 @@ public static class TeaTimer
     {
         PrepareInstanceLockedQueue(instance);
 
-        // Is locked?
+        // It is?
         if (lockedQueue[instance].Contains(queueName))
             return true;
 
@@ -180,13 +194,25 @@ public static class TeaTimer
     /// <summary>
     /// Appends a timed callback into a queue.
     /// </summary>
-    private static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float timeDelay, YieldInstruction yieldDelay, Action callback)
+    private static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float timeDelay, YieldInstruction yieldDelay,
+        Action callback, Action<ttHandler> callbackWithHandler, bool isLoop)
     {
         // Ignore locked queues
         if (IsLocked(instance, queueName))
+        {
             return instance;
+        }
         else
-            Debug.Log(queueName);
+        {
+            if (isLoop)
+            {
+                Debug.Log("ttAppendLoop " + queueName);
+            }
+            else
+            {
+                Debug.Log("ttAppend " + queueName);
+            }
+        }
 
         PrepareInstanceQueue(instance);
         PrepareInstanceLastQueueName(instance);
@@ -198,37 +224,7 @@ public static class TeaTimer
 
         // Appends a new task
         List<TeaTask> taskList = queue[instance][queueName];
-        taskList.Add(new TeaTask(timeDelay, yieldDelay, callback));
-
-        // Execute queue
-        instance.StartCoroutine(ExecuteQueue(instance, queueName));
-
-        return instance;
-    }
-
-
-    /// <summary>
-    /// Appends a callback that runs frame by frame for his duration into a queue.
-    /// </summary>
-    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, string queueName, float duration, Action<LoopHandler> callback)
-    {
-        // Ignore locked queues
-        if (IsLocked(instance, queueName))
-            return instance;
-        else
-            Debug.Log(queueName);
-
-        PrepareInstanceQueue(instance);
-        PrepareInstanceLastQueueName(instance);
-
-        // Adds callback list & last queue name 
-        lastQueueName[instance] = queueName;
-        if (queue[instance].ContainsKey(queueName) == false)
-            queue[instance].Add(queueName, new List<TeaTask>());
-
-        // Append a new task
-        List<TeaTask> taskList = queue[instance][queueName];
-        taskList.Add(new TeaTask(duration, callback));
+        taskList.Add(new TeaTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
 
         // Execute queue
         instance.StartCoroutine(ExecuteQueue(instance, queueName));
@@ -242,7 +238,16 @@ public static class TeaTimer
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float timeDelay, Action callback)
     {
-        return instance.ttAppend(queueName, timeDelay, null, callback);
+        return instance.ttAppend(queueName, timeDelay, null, callback, null, false);
+    }
+
+
+    /// <summary>
+    /// Appends a timed callback into a queue.
+    /// </summary>
+    public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float timeDelay, Action<ttHandler> callback)
+    {
+        return instance.ttAppend(queueName, timeDelay, null, null, callback, false);
     }
 
 
@@ -251,7 +256,16 @@ public static class TeaTimer
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, YieldInstruction yieldToWait, Action callback)
     {
-        return instance.ttAppend(queueName, 0, yieldToWait, callback);
+        return instance.ttAppend(queueName, 0, yieldToWait, callback, null, false);
+    }
+
+
+    /// <summary>
+    /// Appends a timed callback into a queue.
+    /// </summary>
+    public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, YieldInstruction yieldToWait, Action<ttHandler> callback)
+    {
+        return instance.ttAppend(queueName, 0, yieldToWait, null, callback, false);
     }
 
 
@@ -262,7 +276,18 @@ public static class TeaTimer
     {
         PrepareInstanceLastQueueName(instance);
 
-        return instance.ttAppend(lastQueueName[instance], timeDelay, null, callback);
+        return instance.ttAppend(lastQueueName[instance], timeDelay, null, callback, null, false);
+    }
+
+
+    /// <summary>
+    /// Appends a timed callback into the last used queue (or default).
+    /// </summary>
+    public static MonoBehaviour ttAppend(this MonoBehaviour instance, float timeDelay, Action<ttHandler> callback)
+    {
+        PrepareInstanceLastQueueName(instance);
+
+        return instance.ttAppend(lastQueueName[instance], timeDelay, null, null, callback, false);
     }
 
 
@@ -273,27 +298,38 @@ public static class TeaTimer
     {
         PrepareInstanceLastQueueName(instance);
 
-        return instance.ttAppend(lastQueueName[instance], 0, yieldToWait, callback);
+        return instance.ttAppend(lastQueueName[instance], 0, yieldToWait, callback, null, false);
+    }
+
+
+    /// <summary>
+    /// Appends a timed callback into the last used queue (or default).
+    /// </summary>
+    public static MonoBehaviour ttAppend(this MonoBehaviour instance, YieldInstruction yieldToWait, Action<ttHandler> callback)
+    {
+        PrepareInstanceLastQueueName(instance);
+
+        return instance.ttAppend(lastQueueName[instance], 0, yieldToWait, null, callback, false);
     }
 
 
     /// <summary>
     /// Appends a timed interval into a queue.
     /// </summary>
-    public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float duration)
+    public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float interval)
     {
-        return instance.ttAppend(queueName, duration, null, null);
+        return instance.ttAppend(queueName, interval, null, null, null, false);
     }
 
 
     /// <summary>
     /// Appends a timed interval into the last used queue (or default).
     /// </summary>
-    public static MonoBehaviour ttAppend(this MonoBehaviour instance, float duration)
+    public static MonoBehaviour ttAppend(this MonoBehaviour instance, float interval)
     {
         PrepareInstanceLastQueueName(instance);
 
-        return instance.ttAppend(lastQueueName[instance], duration, null, null);
+        return instance.ttAppend(lastQueueName[instance], interval, null, null, null, false);
     }
 
 
@@ -302,7 +338,16 @@ public static class TeaTimer
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, Action callback)
     {
-        return instance.ttAppend(queueName, 0, null, callback);
+        return instance.ttAppend(queueName, 0, null, callback, null, false);
+    }
+
+
+    /// <summary>
+    /// Appends a timed callback into a queue.
+    /// </summary>
+    public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, Action<ttHandler> callback)
+    {
+        return instance.ttAppend(queueName, 0, null, null, callback, false);
     }
 
 
@@ -313,38 +358,58 @@ public static class TeaTimer
     {
         PrepareInstanceLastQueueName(instance);
 
-        return instance.ttAppend(lastQueueName[instance], 0, null, callback);
+        return instance.ttAppend(lastQueueName[instance], 0, null, callback, null, false);
+    }
+
+
+    /// <summary>
+    /// Appends a timed callback into the last used queue (or default).
+    /// </summary>
+    public static MonoBehaviour ttAppend(this MonoBehaviour instance, Action<ttHandler> callback)
+    {
+        PrepareInstanceLastQueueName(instance);
+
+        return instance.ttAppend(lastQueueName[instance], 0, null, null, callback, false);
     }
 
 
     /// <summary>
     /// Appends a callback that runs frame by frame (until his exit is forced) into a queue.
     /// </summary>
-    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, string queueName, Action<LoopHandler> callback)
+    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, string queueName, float duration, Action<ttHandler> callback)
     {
-        return instance.ttAppendLoop(queueName, 0, callback);
+        return instance.ttAppend(queueName, duration, null, null, callback, true);
+    }
+
+
+    /// <summary>
+    /// Appends a callback that runs frame by frame (until his exit is forced) into a queue.
+    /// </summary>
+    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, string queueName, Action<ttHandler> callback)
+    {
+        return instance.ttAppend(queueName, 0, null, null, callback, true);
     }
 
 
     /// <summary>
     /// Appends a callback that runs frame by frame for his duration into the last used queue.
     /// </summary>
-    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, float duration, Action<LoopHandler> callback)
+    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, float duration, Action<ttHandler> callback)
     {
         PrepareInstanceLastQueueName(instance);
 
-        return instance.ttAppendLoop(lastQueueName[instance], duration, callback);
+        return instance.ttAppend(lastQueueName[instance], duration, null, null, callback, true);
     }
 
 
     /// <summary>
     /// Appends a callback that runs frame by frame (until his exit is forced) into the last used queue.
     /// </summary>
-    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, Action<LoopHandler> callback)
+    public static MonoBehaviour ttAppendLoop(this MonoBehaviour instance, Action<ttHandler> callback)
     {
         PrepareInstanceLastQueueName(instance);
 
-        return instance.ttAppendLoop(lastQueueName[instance], 0, callback);
+        return instance.ttAppend(lastQueueName[instance], 0, null, null, callback, true);
     }
 
 
@@ -353,7 +418,7 @@ public static class TeaTimer
     /// </summary>
     private static MonoBehaviour ttInvoke(this MonoBehaviour instance, float timeDelay, YieldInstruction yieldToWait, Action callback)
     {
-        instance.StartCoroutine(ExecuteOnce(timeDelay, yieldToWait, callback));
+        instance.StartCoroutine(ExecuteOnce(timeDelay, yieldToWait, callback, null));
 
         return instance;
     }
@@ -435,16 +500,16 @@ public static class TeaTimer
             {
                 if (c.time > 0)
                 {
-                    yield return instance.StartCoroutine(ExecuteLoop(c.time, c.loopCallback));
+                    yield return instance.StartCoroutine(ExecuteLoop(c.time, c.callbackWithHandler));
                 }
                 else
                 {
-                    yield return instance.StartCoroutine(ExecuteInfiniteLoop(c.loopCallback));
+                    yield return instance.StartCoroutine(ExecuteInfiniteLoop(c.callbackWithHandler));
                 }
             }
             else
             {
-                yield return instance.StartCoroutine(ExecuteOnce(c.time, c.y, c.callback));
+                yield return instance.StartCoroutine(ExecuteOnce(c.time, c.yieldInstruction, c.callback, c.callbackWithHandler));
             }
 
             queue[instance][queueName].Remove(c);
@@ -468,9 +533,10 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Executes a timed callback.
+    /// Executes a timed callback with or without handler.
     /// </summary>
-    private static IEnumerator ExecuteOnce(float timeToWait, YieldInstruction yieldToWait, Action callback)
+    private static IEnumerator ExecuteOnce(float timeToWait, YieldInstruction yieldToWait,
+        Action callback, Action<ttHandler> callbackWithHandler)
     {
         // Wait until
         if (timeToWait > 0)
@@ -479,61 +545,77 @@ public static class TeaTimer
         if (yieldToWait != null)
             yield return yieldToWait;
 
-        // Task
+        // Executes the normal handler
         if (callback != null)
             callback();
+
+        // Executes the callback with handler (and waits his yield)
+        if (callbackWithHandler != null)
+        {
+            ttHandler t = new ttHandler();
+            callbackWithHandler(t);
+
+            if (t.yieldToWait != null)
+                yield return t.yieldToWait;
+        }
+        else
+        {
+            yield return null;
+        }
     }
 
 
     /// <summary>
-    /// Executes a callback inside a loop during time.
+    /// Executes a callback inside a loop until time.
     /// </summary>
-    private static IEnumerator ExecuteLoop(float time, Action<LoopHandler> callback)
+    private static IEnumerator ExecuteLoop(float time, Action<ttHandler> callback)
     {
         float t = 0f;
-
-        float rate = 0;
-
+        float rate = 0f;
         float timeSinceStart = 0f;
 
-        // if time is 0 the execute loop is infinite
-
+        // Only for positive values
         if (time > 0)
         {
             rate = 1f / time;
         }
+        else
+        {
+            yield break;
+        }
 
-        LoopHandler loopHandler = new LoopHandler();
+        ttHandler loopHandler = new ttHandler();
 
+        // Run until t is 1 again
         while (t < 1)
         {
-            if (loopHandler.exitLoop)
-            {
+            if (loopHandler.isBroken)
                 break;
+
+            // t will return the delta value of the linear interpolation based in the duration time
+            // but if there is no duration the t value sent will be the time since start
+            if (time > 0)
+            {
+                t += Time.deltaTime * rate;
+                loopHandler.t = t;
             }
 
             timeSinceStart += Time.deltaTime;
 
-            if (time > 0)
-            {
-                t += Time.deltaTime * rate;
+            // Execute
+            if (callback != null)
+                callback(loopHandler);
 
-                loopHandler.t = t;
+            // Yields once and resets
+            if (loopHandler.yieldToWait != null)
+            {
+                yield return loopHandler.yieldToWait;
+                loopHandler.yieldToWait = null;
             }
             else
             {
-                loopHandler.t = timeSinceStart;
+                yield return null;
             }
-
-            // t will return the delta value of the linear interpolation based in the duration time
-            // but if there is no duration the t value sent will be the time since start
-
-            if (callback != null)
-            {
-                callback(loopHandler);
-            }
-
-            yield return null;
         }
     }
 
@@ -541,32 +623,33 @@ public static class TeaTimer
     /// <summary>
     /// Executes a callback inside an infinite loop.
     /// </summary>
-    private static IEnumerator ExecuteInfiniteLoop(Action<LoopHandler> callback)
+    private static IEnumerator ExecuteInfiniteLoop(Action<ttHandler> callback)
     {
-        float timeSinceStart = 0;
+        ttHandler loopHandler = new ttHandler();
 
-        LoopHandler loopHandler = new LoopHandler();
-
+        // Infinite
         while (true)
         {
-            if (loopHandler.exitLoop)
-            {
+            if (loopHandler.isBroken)
                 break;
-            }
 
-            timeSinceStart += Time.deltaTime;
+            loopHandler.t = Time.deltaTime;
+            loopHandler.timeSinceStart += Time.deltaTime;
 
-            loopHandler.timeSinceStart = timeSinceStart;
-
-            // t will return the delta value of the linear interpolation based in the duration time
-            // but if there is no duration the t value sent will be the time since start
-
+            // Execute
             if (callback != null)
-            {
                 callback(loopHandler);
-            }
 
-            yield return null;
+            // Yields once and resets
+            if (loopHandler.yieldToWait != null)
+            {
+                yield return loopHandler.yieldToWait;
+                loopHandler.yieldToWait = null;
+            }
+            else
+            {
+                yield return null;
+            }
         }
     }
 }
