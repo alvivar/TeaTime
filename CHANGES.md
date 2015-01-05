@@ -3,7 +3,7 @@
 - **NEW**: ttHandler 'WaitFor(', waits for a yield or time after the current
   callback execution, just before the next queued callback.
 
-- **Minor optimizations.**
+- Minor optimizations.
 
 ####v0.5
 
