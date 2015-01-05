@@ -1,5 +1,17 @@
+- **NEW**: ttHandler now supports Append.
+
+- **NEW**: ttHandler 'WaitFor(', waits for a yield or time after the current
+  callback execution, just before the next queued callback.
+
+- **Minor optimizations.**
+
+####v0.5
+
 - **NEW**: AppendLoop, appends a callback that runs frame by frame for his
-  duration into a queue.
+  duration (or infinite) into a queue.
+
+- **NEW**: ttHandler, supports and manages AppendLoop with 'timeSinceStart'
+  and 'Break()'.
 
 - **CHANGE**: ttNow renamed to ttInvoke.
 
