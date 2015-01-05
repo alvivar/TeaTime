@@ -1,4 +1,4 @@
-###TeaTimer v0.4 alpha
+###TeaTimer v0.5 alpha
 
 TeaTimer is a fast & simple queue for timed callbacks, fashioned as a
 MonoBehaviour extension set, focused on solving common coroutines patterns in
@@ -28,6 +28,7 @@ MonoBehaviour using 'this.tt'.
 	})
 	.ttLock(); // Locks the queue, ignoring new appends until all callbacks are done.
 
+
 Some details
 - Execution starts immediately
 - Locking a queue ensures a safe run during continuous calls
@@ -35,8 +36,9 @@ Some details
 - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
 - Queues are unique to his MonoBehaviour
 
-And that's it! (*Better examples and advanced patterns to come!*)
+And that's it! (*Check out Examples.cs! More tips and patterns to come.*)
 
-By [Andrés Villalobos](http://twitter.com/matnesis) in collaboration with [Antonio Zamora](http://twitter.com/tzamora).
+By [Andrés Villalobos](http://twitter.com/matnesis) in collaboration with
+[Antonio Zamora](http://twitter.com/tzamora).
 
 > 2014/12/26 12:21 am
