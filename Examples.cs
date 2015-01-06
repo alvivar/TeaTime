@@ -1,4 +1,4 @@
-﻿using DG.Tweening; // This example requires DOTween.
+﻿using DG.Tweening; // If you don't have DOTween, feel free to remove this line and his example.
 using UnityEngine;
 
 
