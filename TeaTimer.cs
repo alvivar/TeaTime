@@ -193,7 +193,7 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Appends a timed callback into a queue.
+    ///// Appends a callback (timed or looped) into a queue.
     /// </summary>
     private static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float timeDelay, YieldInstruction yieldDelay,
         Action callback, Action<ttHandler> callbackWithHandler, bool isLoop)
