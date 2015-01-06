@@ -1,4 +1,4 @@
-﻿// TeaTimer v0.5 alpha
+﻿// TeaTimer v0.5.1 alpha
 
 // By Andrés Villalobos > andresalvivar@gmail.com > twitter.com/matnesis
 // In collaboration with Antonio Zamora > tzamora@gmail.com > twitter.com/tzamora
@@ -78,7 +78,7 @@ public class ttHandler
 {
     public float t = 0f;
     public float timeSinceStart = 0f;
-    public bool isBroken = false;
+    public bool isActive = true;
     public YieldInstruction yieldToWait = null;
 
 
@@ -87,7 +87,7 @@ public class ttHandler
     /// </summary>
     public void Break()
     {
-        this.isBroken = true;
+        this.isActive = false;
     }
 
 
@@ -198,9 +198,10 @@ public static class TeaTimer
     private static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float timeDelay, YieldInstruction yieldDelay,
         Action callback, Action<ttHandler> callbackWithHandler, bool isLoop)
     {
-        // Ignore locked queues
+        // Ignore locked queues (but remember in his name)
         if (IsLocked(instance, queueName))
         {
+            lastQueueName[instance] = queueName;
             return instance;
         }
         //else
@@ -538,11 +539,6 @@ public static class TeaTimer
     private static IEnumerator ExecuteOnce(float timeToWait, YieldInstruction yieldToWait,
         Action callback, Action<ttHandler> callbackWithHandler)
     {
-        // The minimun safe time to wait
-        // #bug To avoid an Append faster than his previous AppendLoop.
-        if (timeToWait < Time.deltaTime)
-            yield return null;
-
         // Wait until
         if (timeToWait > 0)
             yield return new WaitForSeconds(timeToWait);
@@ -589,11 +585,8 @@ public static class TeaTimer
         ttHandler loopHandler = new ttHandler();
 
         // Run until t is 1 again
-        while (t < 1)
+        while (t < 1 && loopHandler.isActive)
         {
-            if (loopHandler.isBroken)
-                break;
-
             // t will return the delta value of the linear interpolation based in the duration time
             // but if there is no duration the t value sent will be the time since start
             t += Time.deltaTime * rate;
@@ -624,11 +617,8 @@ public static class TeaTimer
         ttHandler loopHandler = new ttHandler();
 
         // Infinite
-        while (true)
+        while (loopHandler.isActive)
         {
-            if (loopHandler.isBroken)
-                break;
-
             //loopHandler.t = Time.deltaTime;
             loopHandler.timeSinceStart += Time.deltaTime;
 
