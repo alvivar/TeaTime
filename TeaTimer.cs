@@ -315,7 +315,7 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Appends a timed interval into a queue.
+    /// Appends a time interval into a queue.
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, string queueName, float interval)
     {
@@ -324,7 +324,7 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Appends a timed interval into the last used queue (or default).
+    /// Appends a time interval into the last used queue (or default).
     /// </summary>
     public static MonoBehaviour ttAppend(this MonoBehaviour instance, float interval)
     {
