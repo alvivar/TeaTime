@@ -1,10 +1,10 @@
-###TeaTimer v0.5.1 alpha
+###TeaTime v0.5.1 alpha
 
-TeaTimer is a fast & simple queue for timed callbacks, fashioned as a
+TeaTime is a fast & simple queue for timed callbacks, fashioned as a
 MonoBehaviour extension set, focused on solving common coroutines patterns in
 Unity games.
 
-Just put 'TeaTimer.cs' somewhere in your project and call it inside any
+Just put 'TeaTime.cs' somewhere in your project and call it inside any
 MonoBehaviour using 'this.tt'.
 
 

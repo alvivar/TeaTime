@@ -1,14 +1,14 @@
-﻿// TeaTimer v0.5.1 alpha
+﻿// TeaTime v0.5.1 alpha
 
 // By Andrés Villalobos > andresalvivar@gmail.com > twitter.com/matnesis
 // In collaboration with Antonio Zamora > tzamora@gmail.com > twitter.com/tzamora
 // Created 2014/12/26 12:21 am
 
-// TeaTimer is a fast & simple queue for timed callbacks, fashioned as a
+// TeaTime is a fast & simple queue for timed callbacks, fashioned as a
 // MonoBehaviour extension set, focused on solving common coroutines patterns in
 // Unity games.
 
-// Just put 'TeaTimer.cs' somewhere in your project and call it inside any
+// Just put 'TeaTime.cs' somewhere in your project and call it inside any
 // MonoBehaviour using 'this.tt'.
 
 // this.ttAppend("Queue name", 2, () =>
@@ -72,7 +72,7 @@ public class TeaTask
 
 
 /// <summary>
-/// TeaTimer Handler.
+/// TeaTime Handler.
 /// </summary>
 public class ttHandler
 {
@@ -111,10 +111,11 @@ public class ttHandler
 
 
 /// <summary>
-/// TeaTimer is a fast & simple queue for timed callbacks, designed as a
-/// MonoBehaviour extension set, focused on solving common coroutines patterns.
+/// TeaTime is a fast & simple queue for timed callbacks, fashioned as a
+/// MonoBehaviour extension set, focused on solving common coroutines patterns in
+/// Unity games.
 /// </summary>
-public static class TeaTimer
+public static class TeaTime
 {
     /// <summary>
     /// Main queue for all the timed callbacks.
@@ -160,7 +161,7 @@ public static class TeaTimer
 
         // Default name
         if (lastQueueName.ContainsKey(instance) == false)
-            lastQueueName[instance] = "TEATIMER_DEFAULT_QUEUE_NAME";
+            lastQueueName[instance] = "TEATIME_DEFAULT_QUEUE_NAME";
     }
 
 
