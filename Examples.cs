@@ -106,7 +106,7 @@ public class Examples : MonoBehaviour
         .ttLock();
 
 
-        // Some important details
+        // Some details to remember:
         // - Execution starts immediately
         // - Locking a queue ensures a safe run during continuous calls
         // - Naming a queue is highly recommended (but optional)

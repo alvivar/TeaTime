@@ -33,7 +33,7 @@
 
 // And that's it!
 
-// Some important details
+// Some important details:
 // - Execution starts immediately
 // - Locking a queue ensures a safe run during continuous calls
 // - Naming a queue is highly recommended (but optional)

@@ -29,7 +29,7 @@ MonoBehaviour using 'this.tt'.
 	.ttLock(); // Locks the queue, ignoring new appends until all callbacks are done.
 
 
-Some important details
+Some important details:
 - Execution starts immediately
 - Locking a queue ensures a safe run during continuous calls
 - Naming a queue is highly recommended (but optional)
