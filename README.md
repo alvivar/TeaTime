@@ -29,14 +29,19 @@ MonoBehaviour using 'this.tt'.
 	.ttLock(); // Locks the queue, ignoring new appends until all callbacks are done.
 
 
-Some details
+Some important details
 - Execution starts immediately
 - Locking a queue ensures a safe run during continuous calls
-- Naming a queue is recommended, but optional
+- Naming a queue is highly recommended (but optional)
 - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
+- ttHandler adds special control features to your callbacks
 - Queues are unique to his MonoBehaviour
 
-And that's it! (*Check out [Examples.cs](http://github.com/alvivar/TeaTimer/blob/master/Examples.cs)! Improved examples and patterns to come.*)
+Check out
+[Examples.cs](http://github.com/alvivar/TeaTimer/blob/master/Examples.cs) for
+a more depth explanation. (*More patterns and examples to come.*)
+
+And that's it!
 
 By [Andrés Villalobos](http://twitter.com/matnesis) in collaboration with
 [Antonio Zamora](http://twitter.com/tzamora).
