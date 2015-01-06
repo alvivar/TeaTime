@@ -36,7 +36,7 @@ Some details
 - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
 - Queues are unique to his MonoBehaviour
 
-And that's it! (*Check out [Examples.cs](http://github.com/alvivar/TeaTimer/blob/master/Examples.cs)! More tips and patterns to come.*)
+And that's it! (*Check out [Examples.cs](http://github.com/alvivar/TeaTimer/blob/master/Examples.cs)! More examples and patterns to come.*)
 
 By [Andrés Villalobos](http://twitter.com/matnesis) in collaboration with
 [Antonio Zamora](http://twitter.com/tzamora).
