@@ -1,4 +1,4 @@
-###TeaTimer v0.5 alpha
+###TeaTimer v0.5.1 alpha
 
 TeaTimer is a fast & simple queue for timed callbacks, fashioned as a
 MonoBehaviour extension set, focused on solving common coroutines patterns in

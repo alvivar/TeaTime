@@ -1,3 +1,8 @@
+- **BUG FIXED**: Sometimes, on concurrent environments, AppendLoop with a
+  manual Break() used to append wrong his next chained callback.
+
+####v0.5.1
+
 - **NEW**: ttHandler now supports Append.
 
 - **NEW**: ttHandler 'WaitFor(', waits for a yield or time after the current
