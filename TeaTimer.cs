@@ -33,11 +33,12 @@
 
 // And that's it!
 
-// Some details
+// Some important details
 // - Execution starts immediately
 // - Locking a queue ensures a safe run during continuous calls
-// - Naming a queue is recommended, but optional
+// - Naming a queue is highly recommended (but optional)
 // - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
+// - ttHandler adds special control features to your callbacks
 // - Queues are unique to his MonoBehaviour
 
 
