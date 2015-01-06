@@ -104,5 +104,14 @@ public class Examples : MonoBehaviour
             Debug.Log("Break Loop, +2 " + Time.time);
         })
         .ttLock();
+
+
+        // Some important details
+        // - Execution starts immediately
+        // - Locking a queue ensures a safe run during continuous calls
+        // - Naming a queue is highly recommended (but optional)
+        // - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
+        // - ttHandler adds special control features to your callbacks
+        // - Queues are unique to his MonoBehaviour
     }
 }
