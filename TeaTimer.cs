@@ -533,7 +533,7 @@ public static class TeaTimer
 
 
     /// <summary>
-    /// Executes a timed callback with or without handler.
+    /// Executes a timed callback.
     /// </summary>
     private static IEnumerator ExecuteOnce(float timeToWait, YieldInstruction yieldToWait,
         Action callback, Action<ttHandler> callbackWithHandler)
