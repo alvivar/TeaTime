@@ -202,17 +202,17 @@ public static class TeaTimer
         {
             return instance;
         }
-        else
-        {
-            if (isLoop)
-            {
-                Debug.Log("ttAppendLoop " + queueName);
-            }
-            else
-            {
-                Debug.Log("ttAppend " + queueName);
-            }
-        }
+        //else
+        //{
+        //    if (isLoop)
+        //    {
+        //        Debug.Log("Queue < ttAppendLoop " + queueName);
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("Queue < ttAppend " + queueName);
+        //    }
+        //}
 
         PrepareInstanceQueue(instance);
         PrepareInstanceLastQueueName(instance);
@@ -452,7 +452,7 @@ public static class TeaTimer
 
         // Ignore if the queue is empty
         if (queue[instance].ContainsKey(lastQueueName[instance]) == false ||
-            queue[instance][lastQueueName[instance]].Count <= 0)
+            queue[instance][lastQueueName[instance]].Count < 1)
             return instance;
 
         // Adds the lock
@@ -518,8 +518,7 @@ public static class TeaTimer
         // Unlocks the queue
         currentlyRunning[instance].Remove(queueName);
 
-        // Try again is there are new items,
-        // else, remove the lock
+        // Try again is there are new items, else, remove the lock
         if (queue[instance][queueName].Count > 0)
         {
             instance.StartCoroutine(ExecuteQueue(instance, queueName));
@@ -538,6 +537,11 @@ public static class TeaTimer
     private static IEnumerator ExecuteOnce(float timeToWait, YieldInstruction yieldToWait,
         Action callback, Action<ttHandler> callbackWithHandler)
     {
+        // The minimun safe time to wait
+        // #bug To avoid an Append faster than his previous AppendLoop.
+        if (timeToWait < Time.deltaTime)
+            yield return null;
+
         // Wait until
         if (timeToWait > 0)
             yield return new WaitForSeconds(timeToWait);
@@ -558,10 +562,8 @@ public static class TeaTimer
             if (t.yieldToWait != null)
                 yield return t.yieldToWait;
         }
-        else
-        {
-            yield return null;
-        }
+
+        yield return null;
     }
 
 
@@ -572,7 +574,6 @@ public static class TeaTimer
     {
         float t = 0f;
         float rate = 0f;
-        float timeSinceStart = 0f;
 
         // Only for positive values
         if (time > 0)
@@ -594,13 +595,9 @@ public static class TeaTimer
 
             // t will return the delta value of the linear interpolation based in the duration time
             // but if there is no duration the t value sent will be the time since start
-            if (time > 0)
-            {
-                t += Time.deltaTime * rate;
-                loopHandler.t = t;
-            }
-
-            timeSinceStart += Time.deltaTime;
+            t += Time.deltaTime * rate;
+            loopHandler.t = t;
+            loopHandler.timeSinceStart += Time.deltaTime;
 
             // Execute
             if (callback != null)
@@ -612,10 +609,8 @@ public static class TeaTimer
                 yield return loopHandler.yieldToWait;
                 loopHandler.yieldToWait = null;
             }
-            else
-            {
-                yield return null;
-            }
+
+            yield return null;
         }
     }
 
@@ -633,7 +628,7 @@ public static class TeaTimer
             if (loopHandler.isBroken)
                 break;
 
-            loopHandler.t = Time.deltaTime;
+            //loopHandler.t = Time.deltaTime;
             loopHandler.timeSinceStart += Time.deltaTime;
 
             // Execute
@@ -646,10 +641,8 @@ public static class TeaTimer
                 yield return loopHandler.yieldToWait;
                 loopHandler.yieldToWait = null;
             }
-            else
-            {
-                yield return null;
-            }
+
+            yield return null;
         }
     }
 }
