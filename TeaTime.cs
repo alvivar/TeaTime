@@ -13,17 +13,27 @@
 
 // this.ttAppend("Queue name", 2, () =>
 // {
-//     Debug.Log("2 second since start " + Time.time);
+//     Debug.Log("2 seconds since start " + Time.time);
 // })
 // .ttAppendLoop(3, delegate(LoopHandler loop)
 // {
 //     // An append loop will run frame by frame for all his duration.
-//     // loop.t holds the fraction of time by frame.
+//     // loop.t holds a custom delta for interpolation.
 //     Camera.main.backgroundColor = Color.Lerp(Color.black, Color.white, loop.t);
 // })
-// .ttAppend(2, () =>
+// this.ttAppend("DOTween example", delegate(ttHandler tt)
 // {
-//     Debug.Log("The append loop started 5 seconds ago  " + Time.time);
+//     Sequence myTween = DOTween.Sequence();
+//     myTween.Append(transform.DOMoveX(5, 2.5f));
+//     myTween.Append(transform.DOMoveX(-5, 2.5f));
+
+//     // Waits after this callback is done and before the next append
+//     // for a time or YieldInstruction.
+//     tt.WaitFor(myTween.WaitForCompletion());
+// })
+// .ttAppend(() =>
+// {
+//     Debug.Log("myTween end, +5 secs " + Time.time);
 // })
 // .ttInvoke(1, () =>
 // {
@@ -35,11 +45,12 @@
 
 // Some important details:
 // - Execution starts immediately
-// - Locking a queue ensures a safe run during continuous calls
 // - Naming a queue is highly recommended (but optional)
-// - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
+// - Locking a queue ensures a safe run during continuous calls
 // - ttHandler adds special control features to your callbacks
+// - You can use a YieldInstruction instead of time (i.e. WaitForEndOfFrame)
 // - Queues are unique to his MonoBehaviour
+// - Below the sugar, everything runs with coroutines
 
 
 using System;
