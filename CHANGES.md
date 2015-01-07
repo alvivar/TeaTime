@@ -1,7 +1,7 @@
 - TeaTimer is now to TeaTime :)
 
-- **BUG FIXED**: Sometimes, on concurrent environments, AppendLoop with a
-  manual Break() used to append wrong his next chained callback.
+- **BUG FIXED**: On concurrent environments, AppendLoop with a manual Break()
+  used to append wrong his next chained callback.
 
 - Minor optimizations.
 
