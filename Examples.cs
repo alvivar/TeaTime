@@ -108,10 +108,11 @@ public class Examples : MonoBehaviour
 
         // Some details to remember:
         // - Execution starts immediately
-        // - Locking a queue ensures a safe run during continuous calls
         // - Naming a queue is highly recommended (but optional)
-        // - You can use a YieldInstruction instead of time in ttAppend (Dotween!)
+        // - Locking a queue ensures a safe run during continuous calls
         // - ttHandler adds special control features to your callbacks
+        // - You can use a YieldInstruction instead of time (i.e. WaitForEndOfFrame)
         // - Queues are unique to his MonoBehaviour
+        // - Below the sugar, everything runs with coroutines
     }
 }
