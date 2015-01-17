@@ -1,4 +1,5 @@
 *.csproj
+*.meta
 *.pidb
 *.sln
 *.suo
@@ -6,5 +7,5 @@
 *.userprefs
 .DS_Store
 /Library/
-/Temp/
 /obj/
+/Temp/
