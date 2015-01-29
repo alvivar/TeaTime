@@ -42,8 +42,8 @@ MonoBehaviour using **'this.tt'**.
 
 
 Check out
-[Examples.cs](http://github.com/alvivar/TeaTime/blob/master/Examples.cs) for a
-more depth explanation. (*More patterns and examples to come.*)
+**[Examples.cs](http://github.com/alvivar/TeaTime/blob/master/Examples.cs)**
+for a more depth explanation. (*More patterns and examples to come.*)
 
 Some important details:
 - Execution starts immediately
