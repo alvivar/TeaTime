@@ -41,7 +41,8 @@
 //    {
 //        Debug.Log("ttNow is arbitrary and ignores the queue " + Time.time);
 //    })
-//    .ttWaitForCompletion(); // Locks the current queue, ignoring new appends until all callbacks are done.
+//    .ttWaitForCompletion(); 
+//    // Locks the current queue, ignoring new appends until all callbacks are done.
 
 
 // Some important details:
