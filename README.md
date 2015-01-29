@@ -58,7 +58,7 @@ Some important details:
 
 And that's it!
 
-By [Andrés Villalobos](http://twitter.com/matnesis), special thanks to
-[Antonio Zamora](http://twitter.com/tzamora).
+By **[Andrés Villalobos](http://twitter.com/matnesis)**, special thanks to
+**[Antonio Zamora](http://twitter.com/tzamora)**.
 
 > 2014/12/26 12:21 am
