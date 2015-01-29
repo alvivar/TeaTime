@@ -4,8 +4,8 @@ TeaTime is a fast & simple queue for timed callbacks, fashioned as a
 MonoBehaviour extension set, focused on solving common coroutines patterns in
 Unity games.
 
-Just put 'TeaTime.cs' somewhere in your project and call it inside any
-MonoBehaviour using 'this.tt'.
+Just put **'TeaTime.cs'** somewhere in your project and call it inside any
+MonoBehaviour using **'this.tt'**.
 
 
 	this.ttAdd("Queue name", 2, () =>
