@@ -1,3 +1,13 @@
+- **CHANGE**: ttAppend renamed to ttAdd.
+
+- **CHANGE**: ttAppendLoop renamed to ttLoop.
+
+- **CHANGE**: ttInvoke renamed to ttNow.
+
+- **CHANGE8**: ttLock renamed to ttWaitForCompletion.
+
+####v0.5.2
+
 - TeaTimer was renamed to TeaTime! :D +1
 
 - **BUG FIXED**: On concurrent environments, AppendLoop with a manual Break()
