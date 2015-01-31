@@ -41,7 +41,7 @@ public class Examples : MonoBehaviour
         {
             Debug.Log("+1 +4 seconds " + Time.time);
         })
-        .ttWaitForCompletion();
+        .ttWait();
 
         // 'ttWaitForCompletion' locks the current queue ignoring new appends until all his
         // current callbacks are completed. That's why they are safe to run during Update
@@ -71,7 +71,7 @@ public class Examples : MonoBehaviour
         {
             Debug.Log("White, +3 secs " + Time.time);
         })
-        .ttWaitForCompletion();
+        .ttWait();
 
 
         // You can also use 'ttHandler' in a normal 'ttAdd' for extra features. In this
@@ -89,7 +89,7 @@ public class Examples : MonoBehaviour
         {
             Debug.Log("myTween end, +5 secs " + Time.time);
         })
-        .ttWaitForCompletion();
+        .ttWait();
 
 
         // If you call 'ttLoop' without time (or negative) the loop will be infinite. In
@@ -104,7 +104,7 @@ public class Examples : MonoBehaviour
         {
             Debug.Log("Break Loop, +2 " + Time.time);
         })
-        .ttWaitForCompletion();
+        .ttWait();
 
 
         // Some important details:
