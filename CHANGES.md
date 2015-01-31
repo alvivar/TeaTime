@@ -1,3 +1,8 @@
+- **CHANGE**: ttHandler.t renamed to ttHandler.deltaTime. Also, his algorithm
+  was greatly improved.
+
+####v0.5.4
+
 - **CHANGE**: ttAppend renamed to ttAdd.
 
 - **CHANGE**: ttAppendLoop renamed to ttLoop.
@@ -27,8 +32,8 @@
 - **NEW**: AppendLoop, appends a callback that runs frame by frame for his
   duration (or infinite) into a queue.
 
-- **NEW**: ttHandler, supports and manages AppendLoop with 'timeSinceStart'
-  and 'Break()'.
+- **NEW**: ttHandler, supports and manage AppendLoop with 't' (custom delta),
+  'timeSinceStart' and 'Break()'.
 
 - **CHANGE**: ttNow renamed to ttInvoke.
 
