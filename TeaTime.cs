@@ -1,4 +1,4 @@
-﻿// TeaTime v0.5.2 alpha
+﻿// TeaTime v0.5.4 alpha
 
 // By Andrés Villalobos > andresalvivar@gmail.com > twitter.com/matnesis
 // Special thanks to Antonio Zamora > twitter.com/tzamora
@@ -17,21 +17,22 @@
 //        Debug.Log("2 seconds since start " + Time.time);
 //    })
 //    .ttLoop(3, delegate(ttHandler loop)
-//    {		
+//    {       
 //        // A loop will run frame by frame for all his duration. 
-//        // loop.t holds a custom delta for interpolation.
+//        // loop.deltaTime holds a custom delta for interpolation.
 
-//        Camera.main.backgroundColor = Color.Lerp(Color.black, Color.white, loop.t);
+//        Camera.main.backgroundColor 
+//            = Color.Lerp(Camera.main.backgroundColor, Color.white, loop.t);
 //    })
-//    this.ttAdd("DOTween example", delegate(ttHandler tt)
+//    this.ttAdd("DOTween example", delegate(ttHandler t)
 //    {
 //        Sequence myTween = DOTween.Sequence();
 //        myTween.Append(transform.DOMoveX(5, 2.5f));
 //        myTween.Append(transform.DOMoveX(-5, 2.5f));
 
-//        // Waits for a time or YieldInstruction after the current callback is
-//        // done and before the next queued callback.
-//        tt.WaitFor(myTween.WaitForCompletion());
+//        // WaitFor waits for a time or YieldInstruction after the current
+//        // callback is done and before the next queued callback.
+//        t.WaitFor(myTween.WaitForCompletion());
 //    })
 //    .ttAdd(() =>
 //    {
@@ -39,7 +40,7 @@
 //    })
 //    .ttNow(1, () =>
 //    {
-//        Debug.Log("ttNow is arbitrary and ignores the queue " + Time.time);
+//        Debug.Log("ttNow is arbitrary and ignores the queue order " + Time.time);
 //    })
 //    .ttWaitForCompletion(); 
 //    // Locks the current queue, ignoring new appends until all callbacks are done.
@@ -50,10 +51,11 @@
 // - Queues are unique to his MonoBehaviour (this is an extension after all)
 // - Naming your queue is recommended if you want to use more than one queue with safety
 // - You can use a YieldInstruction instead of time (i.e. WaitForEndOfFrame)
-// - ttWaitForCompletion ensures a safe run during continuous calls
+// - ttWaitForCompletion ensures a complete and safe run during continuous calls
 // - ttHandler adds special control features to your callbacks
-// - waitFor from ttHandler applies only once at the end of the current callback
-// - ttNow will always ignore queues, it's a sexier Invoke(
+// - You can create tween-like behaviours mixing loops, ttHandler.deltaTime and Lerp functions
+// - ttHandler.waitFor applies only once and at the end of the current callback
+// - ttNow will always ignore queues (it's inmune to ttWaitForCompletion)
 // - Below the sugar, everything runs on coroutines!
 
 
@@ -112,14 +114,14 @@ public class TeaTask
 /// </summary>
 public class ttHandler
 {
-    public float t = 0f;
-    public float timeSinceStart = 0f;
     public bool isActive = true;
+    public float deltaTime = 0f;
+    public float timeSinceStart = 0f;
     public YieldInstruction yieldToWait = null;
 
 
     /// <summary>
-    /// Breaks the current AppendLoop.
+    /// Breaks the current loop.
     /// </summary>
     public void Break()
     {
@@ -605,29 +607,19 @@ public static class TeaTime
     /// <summary>
     /// Executes a callback inside a loop until time.
     /// </summary>
-    private static IEnumerator ExecuteLoop(float time, Action<ttHandler> callback)
+    private static IEnumerator ExecuteLoop(float duration, Action<ttHandler> callback)
     {
-        float t = 0f;
-        float rate = 0f;
-
         // Only for positive values
-        if (time > 0)
-        {
-            rate = 1f / time;
-        }
-        else
-        {
+        if (duration <= 0)
             yield break;
-        }
 
         ttHandler loopHandler = new ttHandler();
 
-        // Run until t is 1 again
-        while (t < 1 && loopHandler.isActive)
+        // Run while active until duration
+        while (loopHandler.isActive && loopHandler.timeSinceStart < duration)
         {
-            // t will return the delta value of the linear interpolation based in the duration time
-            t += Time.deltaTime * rate;
-            loopHandler.t = t;
+            // Custom delta time
+            loopHandler.deltaTime = 1 / (duration - loopHandler.timeSinceStart) * Time.deltaTime;
             loopHandler.timeSinceStart += Time.deltaTime;
 
             // Execute
@@ -653,10 +645,10 @@ public static class TeaTime
     {
         ttHandler loopHandler = new ttHandler();
 
-        // Infinite
+        // Run while active
         while (loopHandler.isActive)
         {
-            //loopHandler.t = Time.deltaTime;
+            loopHandler.deltaTime = Time.deltaTime;
             loopHandler.timeSinceStart += Time.deltaTime;
 
             // Execute
