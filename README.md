@@ -1,6 +1,4 @@
-###TeaTime v0.5.4 alpha
-
-[Download](http://github.com/alvivar/TeaTime/raw/master/TeaTime.zip)
+###TeaTime v0.5.4 alpha >[Download](http://github.com/alvivar/TeaTime/raw/master/TeaTime.zip)<
 
 
 TeaTime is a fast & simple queue for timed callbacks, fashioned as a
