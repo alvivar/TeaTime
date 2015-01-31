@@ -1,4 +1,4 @@
-###TeaTime v0.5.2 alpha
+###TeaTime v0.5.4 alpha
 
 TeaTime is a fast & simple queue for timed callbacks, fashioned as a
 MonoBehaviour extension set, focused on solving common coroutines patterns in
@@ -15,19 +15,20 @@ MonoBehaviour using **'this.tt'**.
 	.ttLoop(3, delegate(ttHandler loop)
 	{		
 		// A loop will run frame by frame for all his duration. 
-		// loop.t holds a custom delta for interpolation.
+		// loop.deltaTime holds a custom delta for interpolation.
 
-		Camera.main.backgroundColor = Color.Lerp(Color.black, Color.white, loop.t);
+		Camera.main.backgroundColor 
+			= Color.Lerp(Camera.main.backgroundColor, Color.white, loop.t);
 	})
-	this.ttAdd("DOTween example", delegate(ttHandler tt)
+	this.ttAdd("DOTween example", delegate(ttHandler t)
 	{
 		Sequence myTween = DOTween.Sequence();
 		myTween.Append(transform.DOMoveX(5, 2.5f));
 		myTween.Append(transform.DOMoveX(-5, 2.5f));
 
-		// Waits for a time or YieldInstruction after the current callback is
-		// done and before the next queued callback.
-		tt.WaitFor(myTween.WaitForCompletion());
+		// WaitFor waits for a time or YieldInstruction after the current
+		// callback is done and before the next queued callback.
+		t.WaitFor(myTween.WaitForCompletion());
 	})
 	.ttAdd(() =>
 	{
@@ -35,7 +36,7 @@ MonoBehaviour using **'this.tt'**.
 	})
 	.ttNow(1, () =>
 	{
-		Debug.Log("ttNow is arbitrary and ignores the queue " + Time.time);
+		Debug.Log("ttNow is arbitrary and ignores the queue order " + Time.time);
 	})
 	.ttWaitForCompletion(); 
 	// Locks the current queue, ignoring new appends until all callbacks are done.
@@ -50,10 +51,11 @@ Some important details:
 - Queues are unique to his MonoBehaviour (this is an extension after all)
 - Naming your queue is recommended if you want to use more than one queue with safety
 - You can use a YieldInstruction instead of time (i.e. WaitForEndOfFrame)
-- ttWaitForCompletion ensures a safe run during continuous calls
+- ttWaitForCompletion ensures a complete and safe run during continuous calls
 - ttHandler adds special control features to your callbacks
-- waitFor from ttHandler applies only once at the end of the current callback
-- ttNow will always ignore queues, it's a sexier Invoke(
+- You can create tween-like behaviours mixing loops, ttHandler.deltaTime and Lerp functions
+- ttHandler.waitFor applies only once and at the end of the current callback
+- ttNow will always ignore queues (it's inmune to ttWaitForCompletion)
 - Below the sugar, everything runs on coroutines!
 
 And that's it!
