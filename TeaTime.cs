@@ -184,13 +184,19 @@ public static class TeaTime
     /// <summary>
     /// Prepares the main queue for the instance.
     /// </summary>
-    private static void PrepareInstanceMainQueue(MonoBehaviour instance)
+    private static void PrepareInstanceMainQueue(MonoBehaviour instance, string queueName = null)
     {
         if (mainQueue == null)
             mainQueue = new Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>>();
 
         if (mainQueue.ContainsKey(instance) == false)
             mainQueue.Add(instance, new Dictionary<string, List<TeaTask>>());
+
+        if (queueName != null)
+        {
+            if (mainQueue[instance].ContainsKey(queueName) == false)
+                mainQueue[instance].Add(queueName, new List<TeaTask>());
+        }
     }
 
 
@@ -256,6 +262,8 @@ public static class TeaTime
     /// </summary>
     private static bool IsLocked(MonoBehaviour instance, string queueName)
     {
+        PrepareInstanceLockedQueues(instance);
+
         if (lockedQueues[instance].Contains(queueName))
             return true;
 
@@ -288,13 +296,11 @@ public static class TeaTime
         //    }
         //}
 
-        PrepareInstanceMainQueue(instance);
+        PrepareInstanceMainQueue(instance, queueName);
         PrepareInstanceCurrentQueue(instance);
 
-        // Adds callback list and sets the active queue
+        // Sets the active queue
         currentQueue[instance] = queueName;
-        if (mainQueue[instance].ContainsKey(queueName) == false)
-            mainQueue[instance].Add(queueName, new List<TeaTask>());
 
         // Appends a new task
         List<TeaTask> taskList = mainQueue[instance][queueName];
@@ -538,24 +544,31 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Resets and stops all coroutines in the queue.
+    /// Resets the queue and stops his coroutines.
     /// </summary>
     public static MonoBehaviour ttReset(this MonoBehaviour instance, string queueName)
     {
         PrepareInstanceRunningCoroutines(instance, queueName);
 
-        // Sets everything
-        PrepareInstanceMainQueue(instance);
+        // Initialize all
+        PrepareInstanceMainQueue(instance, queueName);
         PrepareInstanceRunningQueues(instance);
         PrepareInstanceCurrentQueue(instance);
         PrepareInstanceLockedQueues(instance);
         PrepareInstanceRunningCoroutines(instance, queueName);
 
+        // Delete all
+        mainQueue[instance][queueName].Clear();
+        runningQueues[instance].Clear();
+        currentQueue[instance] = queueName;
+        lockedQueues[instance].Clear();
 
-        foreach(IEnumerator c in runningCoroutines[instance][queueName])
+        // Stop coroutines
+        foreach (IEnumerator c in runningCoroutines[instance][queueName])
         {
             instance.StopCoroutine(c);
         }
+        runningCoroutines[instance][queueName].Clear();
 
         return instance;
     }
@@ -582,28 +595,39 @@ public static class TeaTime
         // Locks the queue
         runningQueues[instance].Add(queueName);
 
+        // Coroutines registry
+        PrepareInstanceRunningCoroutines(instance, queueName);
+        IEnumerator coroutine = null;
+
         // Run until depleted (over a clone)
         List<TeaTask> batch = new List<TeaTask>();
         batch.AddRange(mainQueue[instance][queueName]);
 
         foreach (TeaTask task in batch)
         {
-            // Select, execute & remove tasks
+            // Select and prepare
             if (task.isLoop)
             {
                 if (task.time > 0)
                 {
-                    yield return instance.StartCoroutine(ExecuteLoop(task.time, task.callbackWithHandler));
+                    coroutine = ExecuteLoop(task.time, task.callbackWithHandler);
                 }
                 else
                 {
-                    yield return instance.StartCoroutine(ExecuteInfiniteLoop(task.callbackWithHandler));
+                    coroutine = ExecuteInfiniteLoop(task.callbackWithHandler);
                 }
             }
             else
             {
-                yield return instance.StartCoroutine(ExecuteOnce(task.time, task.yieldInstruction, task.callback, task.callbackWithHandler));
+                coroutine = ExecuteOnce(task.time, task.yieldInstruction, task.callback, task.callbackWithHandler);
             }
+
+            // Register and execute
+            runningCoroutines[instance][queueName].Add(coroutine);
+            yield return instance.StartCoroutine(coroutine);
+            runningCoroutines[instance][queueName].Remove(coroutine);
+
+            // Done
             mainQueue[instance][queueName].Remove(task);
         }
 
