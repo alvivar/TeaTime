@@ -494,7 +494,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Executes a timed callback ignoring queues.
+    /// Executes a timed callback immediately (this function is not queueable).
     /// </summary>
     private static MonoBehaviour ttNow(this MonoBehaviour instance, float timeDelay, YieldInstruction yieldToWait, Action callback)
     {
@@ -505,7 +505,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Executes a timed callback ignoring queues.
+    /// Executes a timed callback immediately (this function is not queueable).
     /// </summary>
     public static MonoBehaviour ttNow(this MonoBehaviour instance, float timeDelay, Action callback)
     {
@@ -514,7 +514,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Executes a timed callback ignoring queues.
+    /// Executes a timed callback immediately (this function is not queueable).
     /// </summary>
     public static MonoBehaviour ttNow(this MonoBehaviour instance, YieldInstruction yieldToWait, Action callback)
     {
@@ -530,12 +530,12 @@ public static class TeaTime
         PrepareInstanceMainQueue(instance);
         PrepareInstanceCurrentQueue(instance);
 
-        // Ignore if the queue is empty
+        // Ignore if the queue if empty
         if (mainQueue[instance].ContainsKey(currentQueue[instance]) == false ||
             mainQueue[instance][currentQueue[instance]].Count < 1)
             return instance;
 
-        // Adds the lock
+        // Locks the queue
         if (IsLocked(instance, currentQueue[instance]) == false)
             lockedQueues[instance].Add(currentQueue[instance]);
 
@@ -544,7 +544,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Resets the queue and stops his coroutines.
+    /// Stop and reset the queue immediately (this function is not queueable).
     /// </summary>
     public static MonoBehaviour ttReset(this MonoBehaviour instance, string queueName)
     {
