@@ -107,7 +107,7 @@ public class Examples : MonoBehaviour
         .ttWait();
 
 
-        // And finally, 'ttReset' let's you stop a running queue, and just like 'ttNow', is
+        // And finally, 'ttReset' let you stop a running queue, and just like 'ttNow', is
         // immediate and ignores the queue order.
         this.ttReset("QueueName");
 

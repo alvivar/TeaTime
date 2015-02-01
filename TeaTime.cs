@@ -45,7 +45,7 @@
 //    // ttWait locks the current queue, ignoring new appends until all callbacks are
 //    // done.
 
-//    // And finally, ttReset let's you stop a running queue, and just like ttNow,
+//    // And finally, ttReset let you stop a running queue, and just like ttNow,
 //    // is immediate and ignores the queue order.
 //    this.ttReset("QueueName");
 
