@@ -494,7 +494,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Executes a timed callback immediately (this function is not queueable).
+    /// Executes a timed callback ignoring queues (this function is not queueable).
     /// </summary>
     private static MonoBehaviour ttNow(this MonoBehaviour instance, float timeDelay, YieldInstruction yieldToWait, Action callback)
     {
@@ -505,7 +505,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Executes a timed callback immediately (this function is not queueable).
+    /// Executes a timed callback ignoring queues (this function is not queueable).
     /// </summary>
     public static MonoBehaviour ttNow(this MonoBehaviour instance, float timeDelay, Action callback)
     {
@@ -514,7 +514,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Executes a timed callback immediately (this function is not queueable).
+    /// Executes a timed callback ignoring queues (this function is not queueable).
     /// </summary>
     public static MonoBehaviour ttNow(this MonoBehaviour instance, YieldInstruction yieldToWait, Action callback)
     {
