@@ -1,4 +1,4 @@
-###TeaTime v0.5.4 alpha 
+###TeaTime v0.5.7 alpha 
 
 _[DOWNLOAD](http://github.com/alvivar/TeaTime/raw/master/TeaTime.zip)_
 
@@ -11,19 +11,18 @@ Just put **'TeaTime.cs'** somewhere in your project and call it inside any
 MonoBehaviour using **'this.tt'**.
 
 
-	this.ttAdd("Queue name", 2, () =>
+	this.ttAdd("QueueName", 2, () =>
 	{
-		Debug.Log("2 seconds since start " + Time.time);
+		Debug.Log("2 seconds since QueueName started " + Time.time);
 	})
 	.ttLoop(3, delegate(ttHandler loop)
-	{		
-		// A loop will run frame by frame for all his duration. 
-		// loop.deltaTime holds a custom delta for interpolation.
-
+	{
+		// This loop will run frame by frame for all his duration (3s) using
+		// loop.deltaTime (a custom delta) for a timed interpolation.
 		Camera.main.backgroundColor 
-			= Color.Lerp(Camera.main.backgroundColor, Color.white, loop.t);
+			= Color.Lerp(Camera.main.backgroundColor, Color.white, loop.deltaTime);
 	})
-	this.ttAdd("DOTween example", delegate(ttHandler t)
+	this.ttAdd("delegate(ttHandler t)
 	{
 		Sequence myTween = DOTween.Sequence();
 		myTween.Append(transform.DOMoveX(5, 2.5f));
@@ -35,31 +34,36 @@ MonoBehaviour using **'this.tt'**.
 	})
 	.ttAdd(() =>
 	{
-		Debug.Log("myTween end, +5 secs " + Time.time);
+		Debug.Log("10 seconds since QueueName started " + Time.time);
 	})
 	.ttNow(1, () =>
 	{
 		Debug.Log("ttNow is arbitrary and ignores the queue order " + Time.time);
 	})
-	.ttWaitForCompletion(); 
-	// Locks the current queue, ignoring new appends until all callbacks are done.
+	.ttWait(); 
+	// ttWait locks the current queue, ignoring new appends until all callbacks are
+	// done.
+
+	// And finally, ttReset let's you stop a running queue, and just like ttNow,
+	// is immediate and ignores the queue order.
+	this.ttReset("QueueName");
 
 
 Check out
 **[Examples.cs](http://github.com/alvivar/TeaTime/blob/master/Examples.cs)**
-for a more depth explanation. (*More patterns and examples to come.*)
+for a more depth explanation. *(More patterns and examples to come)*
 
-Some important details:
+Important details to remember:
 - Execution starts immediately
 - Queues are unique to his MonoBehaviour (this is an extension after all)
 - Naming your queue is recommended if you want to use more than one queue with safety
 - You can use a YieldInstruction instead of time (i.e. WaitForEndOfFrame)
-- ttWaitForCompletion ensures a complete and safe run during continuous calls
+- ttWait ensures a complete and safe run during continuous calls
 - ttHandler adds special control features to your callbacks
-- You can create tween-like behaviours mixing loops, ttHandler.deltaTime and Lerp functions
+- You can create tween-like behaviours mixing loops, ttHandler.deltaTime and lerp functions
 - ttHandler.waitFor applies only once and at the end of the current callback
-- ttNow will always ignore queues (it's inmune to ttWaitForCompletion)
-- Below the sugar, everything runs on coroutines!
+- Both ttNow & ttReset runs immediately (ignoring the queue order)
+- Below the sugar, everything runs on Unity coroutines!
 
 And that's it!
 

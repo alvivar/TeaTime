@@ -1,3 +1,9 @@
+- **NEW**: ttReset stops and resets a queue.
+
+- **CHANGE**: ttWaitForCompletion renamed to ttWait.
+
+####v0.5.7
+
 - **CHANGE**: ttHandler.t renamed to ttHandler.deltaTime. Also, his algorithm
   was greatly improved.
 
@@ -9,7 +15,7 @@
 
 - **CHANGE**: ttInvoke renamed to ttNow.
 
-- **CHANGE8**: ttLock renamed to ttWaitForCompletion.
+- **CHANGE**: ttLock renamed to ttWaitForCompletion.
 
 ####v0.5.2
 
