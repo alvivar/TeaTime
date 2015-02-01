@@ -121,6 +121,7 @@ public class TeaTask
 public class ttHandler
 {
     public bool isActive = true;
+    public float t = 0f;
     public float deltaTime = 0f;
     public float timeSinceStart = 0f;
     public YieldInstruction yieldToWait = null;
@@ -694,13 +695,19 @@ public static class TeaTime
             yield break;
 
         ttHandler loopHandler = new ttHandler();
+        float tRate = 1 / duration;
 
         // Run while active until duration
         while (loopHandler.isActive && loopHandler.timeSinceStart < duration)
         {
-            // Custom delta time
-            loopHandler.deltaTime = 1 / (duration - loopHandler.timeSinceStart) * Time.deltaTime;
-            loopHandler.timeSinceStart += Time.deltaTime;
+            float delta = Time.deltaTime;
+
+            // Completion from 0 to 1
+            loopHandler.t = tRate * delta;
+
+            // Custom delta based on duration
+            loopHandler.deltaTime = 1 / (duration - loopHandler.timeSinceStart) * delta;
+            loopHandler.timeSinceStart += delta;
 
             // Execute
             if (callback != null)
@@ -728,8 +735,9 @@ public static class TeaTime
         // Run while active
         while (loopHandler.isActive)
         {
-            loopHandler.deltaTime = Time.deltaTime;
-            loopHandler.timeSinceStart += Time.deltaTime;
+            float delta = Time.deltaTime;
+            loopHandler.deltaTime = delta;
+            loopHandler.timeSinceStart += delta;
 
             // Execute
             if (callback != null)
