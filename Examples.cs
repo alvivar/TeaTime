@@ -43,7 +43,7 @@ public class Examples : MonoBehaviour
         })
         .ttWait();
 
-        // 'ttWaitForCompletion' locks the current queue ignoring new appends until all his
+        // 'ttWait' locks the current queue ignoring new appends until all his
         // current callbacks are completed. That's why they are safe to run during Update
         // without over-appending, they just keep repeating themselves in order.
 
@@ -107,16 +107,21 @@ public class Examples : MonoBehaviour
         .ttWait();
 
 
-        // Some important details:
+        // And finally, 'ttReset' let's you stop a running queue, and just like 'ttNow', is
+        // immediate and ignores the queue order.
+        this.ttReset("QueueName");
+
+
+        // Important details to remember:
         // - Execution starts immediately
         // - Queues are unique to his MonoBehaviour (this is an extension after all)
         // - Naming your queue is recommended if you want to use more than one queue with safety
         // - You can use a YieldInstruction instead of time (i.e. WaitForEndOfFrame)
-        // - ttWaitForCompletion ensures a complete and safe run during continuous calls
+        // - ttWait ensures a complete and safe run during continuous calls
         // - ttHandler adds special control features to your callbacks
-        // - You can create tween-like behaviours mixing loops, ttHandler.deltaTime and Lerp functions
+        // - You can create tween-like behaviours mixing loops, ttHandler.deltaTime and lerp functions
         // - ttHandler.waitFor applies only once and at the end of the current callback
-        // - ttNow will always ignore queues (it's inmune to ttWaitForCompletion)
-        // - Below the sugar, everything runs on coroutines!
+        // - Both ttNow & ttReset runs immediately (ignoring the queue order)
+        // - Below the sugar, everything runs on Unity coroutines!
     }
 }
