@@ -130,5 +130,12 @@ public class Examples : MonoBehaviour
         // - .deltaTime contains a customized deltaTime that represents the precise loop duration
         // - .t contains the completion percentage expresed from 0 to 1 based on the loop duration
         // - .waitFor( applies only once and at the end of the current callback
+
+        // And that's it!
+
+
+        // By Andrés Villalobos [andresalvivar@gmail.com twitter.com/matnesis]
+        // Special thanks to Antonio Zamora [twitter.com/tzamora] for the loop idea and testing.
+        // Created 2014/12/26 12:21 am
     }
 }

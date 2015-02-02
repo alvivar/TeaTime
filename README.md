@@ -54,25 +54,26 @@ Check out
 for a more depth explanation. *(More patterns and examples to come)*
 
 
-Details to remember
+**Details to remember**
 - Execution starts immediately
 - Queues are unique to his MonoBehaviour (this is an extension after all)
 - Both ttNow & ttReset runs immediately (ignoring the queue order)
 - Below the sugar, everything runs on Unity coroutines!
 
-Tips
+**Tips**
 - Always name your queue if you want to use more than one queue with safety 
 - You can use a YieldInstruction instead of time (e.g. WaitForEndOfFrame)
 - You can create tween-like behaviours by mixing loops, ttHandler properties, and lerp functions
 - ttWait ensures a complete and safe run during continuous calls
 
-About ttHandler
+**About ttHandler**
 - ttHandler adds special control features to your callbacks
 - .deltaTime contains a customized deltaTime that represents the precise loop duration
 - .t contains the completion percentage expresed from 0 to 1 based on the loop duration
 - .waitFor( applies only once and at the end of the current callback
 
 And that's it!
+
 
 By **[Andrés Villalobos](http://twitter.com/matnesis)**, special thanks to
 **[Antonio Zamora](http://twitter.com/tzamora)** for the loop idea and
