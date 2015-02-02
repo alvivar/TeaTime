@@ -703,7 +703,7 @@ public static class TeaTime
             float delta = Time.deltaTime;
 
             // Completion from 0 to 1
-            loopHandler.t = tRate * delta;
+            loopHandler.t += tRate * delta;
 
             // Custom delta based on duration
             loopHandler.deltaTime = 1 / (duration - loopHandler.timeSinceStart) * delta;
