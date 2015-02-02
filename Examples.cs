@@ -1,5 +1,4 @@
 ﻿using DG.Tweening; // If you don't have DOTween, feel free to remove this line and his example.
-using System.Collections;
 using UnityEngine;
 
 
@@ -42,7 +41,6 @@ public class Examples : MonoBehaviour
             Debug.Log("+1 +4 seconds " + Time.time);
         })
         .ttWait();
-
         // 'ttWait' locks the current queue ignoring new appends until all his
         // current callbacks are completed. That's why they are safe to run during Update
         // without over-appending, they just keep repeating themselves in order.
@@ -53,8 +51,8 @@ public class Examples : MonoBehaviour
         // custom delta for interpolations during the loop duration.
 
         // 'ttAdd' and 'ttLoop' can be mixed. In this example, a 3 seconds 'ttLoop' will
-        // run using Lerp and the custom 'deltaTime' to change a color, then a 'ttAdd'
-        // without time (0) marks the loop end. After that the same but backwards.
+        // run a Lerp using a special 'deltaTime' from 'ttHandler', customized to
+        // represent the loop duration, then a 'ttAdd' (0s) marks the loop end.
         this.ttLoop("Background change", 3, delegate(ttHandler loop)
         {
             Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
@@ -65,13 +63,16 @@ public class Examples : MonoBehaviour
         })
         .ttLoop(3, delegate(ttHandler loop)
         {
-            Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.white, loop.deltaTime);
+            Camera.main.backgroundColor = Color.Lerp(Color.black, Color.white, loop.t);
         })
         .ttAdd(() =>
         {
             Debug.Log("White, +3 secs " + Time.time);
         })
         .ttWait();
+        // In the second 'Lerp' loop, instead of 'loop.deltaTime' we are using 'loop.t',
+        // because 't' contains the completion percentage from 0 to 1 based on duration.
+        // This is the precise value required when using a constant in the 'Lerp' 'from'.
 
 
         // You can also use 'ttHandler' in a normal 'ttAdd' for extra features. In this
@@ -107,21 +108,27 @@ public class Examples : MonoBehaviour
         .ttWait();
 
 
-        // And finally, 'ttReset' let you stop a running queue, and just like 'ttNow', is
-        // immediate and ignores the queue order.
+        // And finally, ttReset let you stop and clean a running queue, and just like
+        // ttNow, it's immediate and always ignores the queue order.
         this.ttReset("QueueName");
 
 
-        // Important details to remember:
+        // Details to remember
         // - Execution starts immediately
         // - Queues are unique to his MonoBehaviour (this is an extension after all)
-        // - Naming your queue is recommended if you want to use more than one queue with safety
-        // - You can use a YieldInstruction instead of time (i.e. WaitForEndOfFrame)
-        // - ttWait ensures a complete and safe run during continuous calls
-        // - ttHandler adds special control features to your callbacks
-        // - You can create tween-like behaviours mixing loops, ttHandler.deltaTime and lerp functions
-        // - ttHandler.waitFor applies only once and at the end of the current callback
         // - Both ttNow & ttReset runs immediately (ignoring the queue order)
         // - Below the sugar, everything runs on Unity coroutines!
+
+        // Tips
+        // - Always name your queue if you want to use more than one queue with safety 
+        // - You can use a YieldInstruction instead of time (e.g. WaitForEndOfFrame)
+        // - You can create tween-like behaviours by mixing loops, ttHandler properties, and lerp functions
+        // - ttWait ensures a complete and safe run during continuous calls
+
+        // About ttHandler
+        // - ttHandler adds special control features to your callbacks
+        // - .deltaTime contains a customized deltaTime that represents the precise loop duration
+        // - .t contains the completion percentage expresed from 0 to 1 based on the loop duration
+        // - .waitFor( applies only once and at the end of the current callback
     }
 }

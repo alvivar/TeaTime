@@ -1,3 +1,8 @@
+- **NEW**: ttHandler.t has returned. It contains the completion percentage
+  expresed from 0 to 1 for timed loops (i.e. On half duration t = 0.5).
+
+####v0.5.8
+
 - **NEW**: ttReset stops and resets a queue.
 
 - **CHANGE**: ttWaitForCompletion renamed to ttWait.
@@ -38,8 +43,8 @@
 - **NEW**: AppendLoop, appends a callback that runs frame by frame for his
   duration (or infinite) into a queue.
 
-- **NEW**: ttHandler, supports and manage AppendLoop with 't' (custom delta),
-  'timeSinceStart' and 'Break()'.
+- **NEW**: ttHandler, supports and manage AppendLoop with 't' (completion rate
+  from 0 to 1), 'timeSinceStart' and 'Break()'.
 
 - **CHANGE**: ttNow renamed to ttInvoke.
 
