@@ -1,4 +1,4 @@
-﻿// TeaTime v0.5.8.3 alpha
+﻿// TeaTime v0.5.8.4 alpha
 
 // By Andrés Villalobos [andresalvivar@gmail.com twitter.com/matnesis]
 // Special thanks to Antonio Zamora [twitter.com/tzamora] for the loop idea and testing.
@@ -37,10 +37,6 @@
 //    {
 //        Debug.Log("10 seconds since QueueName started " + Time.time);
 //    })
-//    .ttNow(1, () =>
-//    {
-//        Debug.Log("ttNow is arbitrary and ignores the queue order " + Time.time);
-//    })
 //    .ttWait(); 
 //    // ttWait locks the current queue, ignoring new appends until all his callbacks
 //    // are done.
@@ -57,7 +53,6 @@
 // Details to remember
 // - Execution starts immediately
 // - Queues are unique to his MonoBehaviour (this is an extension after all)
-// - Both ttNow & ttReset runs immediately (ignoring the queue order)
 // - Below the sugar, everything runs on Unity coroutines!
 
 // Tips
@@ -309,17 +304,6 @@ public static class TeaTime
             currentQueue[instance] = queueName;
             return instance;
         }
-        //else
-        //{
-        //    if (isLoop)
-        //    {
-        //        Debug.Log("Queue < ttAppendLoop " + queueName);
-        //    }
-        //    else
-        //    {
-        //        Debug.Log("Queue < ttAppend " + queueName);
-        //    }
-        //}
 
         PrepareInstanceMainQueue(instance, queueName);
         PrepareInstanceCurrentQueue(instance);
@@ -519,31 +503,14 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Executes a timed callback immediately (this function ignores the queue order).
+    /// Creates an empty queue with an unique identifier.
     /// </summary>
-    private static MonoBehaviour ttNow(this MonoBehaviour instance, float timeDelay, YieldInstruction yieldToWait, Action callback)
+    public static MonoBehaviour ttNew(this MonoBehaviour instance)
     {
-        instance.StartCoroutine(ExecuteOnce(timeDelay, yieldToWait, callback, null));
+        PrepareInstanceCurrentQueue(instance);
+        currentQueue[instance] = DEFAULT_QUEUE_NAME + "_" + Time.time + "_" + UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 
         return instance;
-    }
-
-
-    /// <summary>
-    /// Executes a timed callback immediately (this function ignores the queue order).
-    /// </summary>
-    public static MonoBehaviour ttNow(this MonoBehaviour instance, float timeDelay, Action callback)
-    {
-        return instance.ttNow(timeDelay, null, callback);
-    }
-
-
-    /// <summary>
-    /// Executes a timed callback immediately (this function ignores the queue order).
-    /// </summary>
-    public static MonoBehaviour ttNow(this MonoBehaviour instance, YieldInstruction yieldToWait, Action callback)
-    {
-        return instance.ttNow(0, yieldToWait, callback);
     }
 
 

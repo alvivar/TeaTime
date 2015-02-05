@@ -6,13 +6,6 @@ public class Examples : MonoBehaviour
 {
     void Start()
     {
-        // 'ttNow' executes a timed callback ignoring queues. It's the fast bullet.
-        this.ttNow(10, () =>
-        {
-            Debug.Log("ttInvoke +10 secs " + Time.time);
-        });
-
-
         Test();
     }
 
@@ -117,7 +110,6 @@ public class Examples : MonoBehaviour
         // Details to remember
         // - Execution starts immediately
         // - Queues are unique to his MonoBehaviour (this is an extension after all)
-        // - ttNow runs immediately (ignoring the queue order)
         // - Below the sugar, everything runs on Unity coroutines!
 
         // Tips

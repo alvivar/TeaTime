@@ -1,4 +1,4 @@
-###TeaTime v0.5.8.3 alpha 
+###TeaTime v0.5.8.4 alpha 
 
 _[DOWNLOAD](http://github.com/alvivar/TeaTime/raw/master/TeaTime.zip)_
 
@@ -36,10 +36,6 @@ MonoBehaviour using **'this.tt'**.
 	{
 		Debug.Log("10 seconds since QueueName started " + Time.time);
 	})
-	.ttNow(1, () =>
-	{
-		Debug.Log("ttNow is arbitrary and ignores the queue order " + Time.time);
-	})
 	.ttWait(); 
 	// ttWait locks the current queue, ignoring new appends until all his callbacks
 	// are done.
@@ -57,7 +53,6 @@ for a more depth explanation. *(More patterns and examples to come)*
 **Details to remember**
 - Execution starts immediately
 - Queues are unique to his MonoBehaviour (this is an extension after all)
-- ttNow runs immediately (ignoring the queue order)
 - Below the sugar, everything runs on Unity coroutines!
 
 **Tips**

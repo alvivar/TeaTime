@@ -1,3 +1,10 @@
+- **NEW**: ttNew creates an empty queue with an unique identifier.
+
+- **CHANGE**: ttNow does not exists anymore, you can create fast & safe timers
+  using ttNew at the beginning of the queue (for both ttAdd & ttLoop).
+
+####v0.5.8.4
+
 - **CHANGE**: ttReset upgraded to TeaTime.Reset(, able to stop and reset
   queues.
 
