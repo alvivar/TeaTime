@@ -110,7 +110,7 @@ public class Examples : MonoBehaviour
 
         // And finally, ttReset let you stop and clean a running queue, and just like
         // ttNow, it's immediate and always ignores the queue order.
-        this.ttReset("QueueName");
+        TeaTime.Reset(this, "QueueName");
 
 
         // Details to remember
