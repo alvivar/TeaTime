@@ -172,29 +172,34 @@ public class ttHandler
 public static class TeaTime
 {
     /// <summary>
+    /// Default name for unnamed queues.
+    /// </summary>
+    private const string DEFAULT_QUEUE_NAME = "TEATIME_DEFAULT_QUEUE_NAME";
+
+    /// <summary>
     /// Main queue for all the timed callbacks.
     /// </summary>
-    private static Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>> mainQueue;
+    private static Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>> mainQueue = null;
 
     /// <summary>
-    /// Contains the running queues in the MonoBehaviour.
+    /// Contains the running queues in the instance.
     /// </summary>
-    private static Dictionary<MonoBehaviour, List<string>> runningQueues;
+    private static Dictionary<MonoBehaviour, List<string>> runningQueues = null;
 
     /// <summary>
-    /// Contains the current queue (last used) in the MonoBehaviour.
+    /// Contains the current queue (last used) in the instance.
     /// </summary>
-    private static Dictionary<MonoBehaviour, string> currentQueue;
+    private static Dictionary<MonoBehaviour, string> currentQueue = null;
 
     /// <summary>
-    /// Contains the queues locked in the MonoBehaviour.
+    /// Contains the queues locked in the instance.
     /// </summary>
-    private static Dictionary<MonoBehaviour, List<string>> lockedQueues;
+    private static Dictionary<MonoBehaviour, List<string>> lockedQueues = null;
 
     /// <summary>
-    /// Contains the coroutines running in the MonoBehaviour, by queue.
+    /// Contains the coroutines running in the instance, by queue.
     /// </summary>
-    private static Dictionary<MonoBehaviour, Dictionary<string, List<IEnumerator>>> runningCoroutines;
+    private static Dictionary<MonoBehaviour, Dictionary<string, List<IEnumerator>>> runningCoroutines = null;
 
 
     /// <summary>
@@ -240,7 +245,7 @@ public static class TeaTime
 
         // Default name
         if (currentQueue.ContainsKey(instance) == false)
-            currentQueue[instance] = "TEATIME_DEFAULT_QUEUE_NAME";
+            currentQueue[instance] = DEFAULT_QUEUE_NAME;
     }
 
 
@@ -260,7 +265,7 @@ public static class TeaTime
     /// <summary>
     /// Prepares the dictionary for the coroutines running in the instance.
     /// </summary>
-    private static void PrepareInstanceRunningCoroutines(MonoBehaviour instance, string queueName)
+    private static void PrepareInstanceRunningCoroutines(MonoBehaviour instance, string queueName = null)
     {
         if (runningCoroutines == null)
             runningCoroutines = new Dictionary<MonoBehaviour, Dictionary<string, List<IEnumerator>>>();
@@ -268,8 +273,11 @@ public static class TeaTime
         if (runningCoroutines.ContainsKey(instance) == false)
             runningCoroutines.Add(instance, new Dictionary<string, List<IEnumerator>>());
 
-        if (runningCoroutines[instance].ContainsKey(queueName) == false)
-            runningCoroutines[instance].Add(queueName, new List<IEnumerator>());
+        if (queueName != null)
+        {
+            if (runningCoroutines[instance].ContainsKey(queueName) == false)
+                runningCoroutines[instance].Add(queueName, new List<IEnumerator>());
+        }
     }
 
 
@@ -560,12 +568,94 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Stop and reset the queue immediately (this function ignores the queue order).
+    /// Stop and resets all queues in all instances.
     /// </summary>
-    public static MonoBehaviour ttReset(this MonoBehaviour instance, string queueName)
+    public static void Reset()
     {
-        PrepareInstanceRunningCoroutines(instance, queueName);
+        // Delete all
 
+        // Main queue clear
+        foreach (KeyValuePair<MonoBehaviour, Dictionary<string, List<TeaTask>>> instanceDict in mainQueue)
+        {
+            foreach (KeyValuePair<string, List<TeaTask>> taskList in instanceDict.Value)
+            {
+                taskList.Value.Clear();
+            }
+        }
+
+        // Running queues clear
+        foreach (KeyValuePair<MonoBehaviour, List<string>> runningList in runningQueues)
+        {
+            runningList.Value.Clear();
+        }
+
+        // Queues names clear
+        List<MonoBehaviour> keys = new List<MonoBehaviour>(currentQueue.Keys);
+        foreach (MonoBehaviour key in keys)
+        {
+            currentQueue[key] = DEFAULT_QUEUE_NAME;
+        }
+
+        // Locked queues clear
+        foreach (KeyValuePair<MonoBehaviour, List<string>> lockedList in lockedQueues)
+        {
+            lockedList.Value.Clear();
+        }
+
+        // Stop all coroutines & clean
+        foreach (KeyValuePair<MonoBehaviour, Dictionary<string, List<IEnumerator>>> instanceDict in runningCoroutines)
+        {
+            foreach (KeyValuePair<string, List<IEnumerator>> coroutineList in instanceDict.Value)
+            {
+                foreach (IEnumerator coroutine in coroutineList.Value)
+                {
+                    instanceDict.Key.StopCoroutine(coroutine);
+                }
+                coroutineList.Value.Clear();
+            }
+        }
+        runningCoroutines.Clear();
+    }
+
+
+    /// <summary>
+    /// Stop and reset all queues in the instance.
+    /// </summary>
+    public static void Reset(MonoBehaviour instance)
+    {
+        // Initialize all
+        PrepareInstanceMainQueue(instance);
+        PrepareInstanceRunningQueues(instance);
+        PrepareInstanceCurrentQueue(instance);
+        PrepareInstanceLockedQueues(instance);
+        PrepareInstanceRunningCoroutines(instance);
+
+        // Delete all
+        foreach (KeyValuePair<string, List<TeaTask>> taskList in mainQueue[instance])
+            taskList.Value.Clear();
+
+        runningQueues[instance].Clear();
+        currentQueue[instance] = DEFAULT_QUEUE_NAME;
+        lockedQueues[instance].Clear();
+
+        // Stop coroutines & clean
+        foreach (KeyValuePair<string, List<IEnumerator>> coroutineList in runningCoroutines[instance])
+        {
+            foreach (IEnumerator coroutine in coroutineList.Value)
+            {
+                instance.StopCoroutine(coroutine);
+            }
+            coroutineList.Value.Clear();
+        }
+        runningCoroutines[instance].Clear();
+    }
+
+
+    /// <summary>
+    /// Stop and reset the queue in the instance.
+    /// </summary>
+    public static void Reset(MonoBehaviour instance, string queueName)
+    {
         // Initialize all
         PrepareInstanceMainQueue(instance, queueName);
         PrepareInstanceRunningQueues(instance);
@@ -575,18 +665,21 @@ public static class TeaTime
 
         // Delete all
         mainQueue[instance][queueName].Clear();
-        runningQueues[instance].Clear();
-        currentQueue[instance] = queueName;
-        lockedQueues[instance].Clear();
 
-        // Stop coroutines
-        foreach (IEnumerator c in runningCoroutines[instance][queueName])
+        if (runningQueues[instance].Contains(queueName))
+            runningQueues[instance].Remove(queueName);
+
+        currentQueue[instance] = queueName;
+
+        if (lockedQueues[instance].Contains(queueName))
+            lockedQueues[instance].Remove(queueName);
+
+        // Stop coroutines & clean
+        foreach (IEnumerator coroutine in runningCoroutines[instance][queueName])
         {
-            instance.StopCoroutine(c);
+            instance.StopCoroutine(coroutine);
         }
         runningCoroutines[instance][queueName].Clear();
-
-        return instance;
     }
 
 
