@@ -1,3 +1,10 @@
+- **CHANGE**: ttReset upgraded to TeaTime.Reset(, able to stop and reset
+  queues.
+
+- **NEW**: TeaTime.ResetAll( stop and clean all queues in all instances.
+
+####v0.5.8.3
+
 - **NEW**: ttHandler.t has returned. It contains the completion percentage
   expresed from 0 to 1 for timed loops (i.e. On half duration t = 0.5).
 

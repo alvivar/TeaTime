@@ -1,4 +1,4 @@
-﻿// TeaTime v0.5.8 alpha
+﻿// TeaTime v0.5.8.3 alpha
 
 // By Andrés Villalobos [andresalvivar@gmail.com twitter.com/matnesis]
 // Special thanks to Antonio Zamora [twitter.com/tzamora] for the loop idea and testing.
@@ -45,9 +45,10 @@
 //    // ttWait locks the current queue, ignoring new appends until all his callbacks
 //    // are done.
 
-//    // And finally, ttReset let you stop and clean a running queue, and just like
-//    // ttNow, it's immediate and always ignores the queue order.
-//    this.ttReset("QueueName");
+//    // And finally, TeaTime.Reset( let you stop and clean a running queue or all
+//    // queues from an instance, and there is a TeaTime.ResetAll() that cleans
+//    // everything.
+//    TeaTime.Reset(this, "QueueName");
 
 // Check out Examples.cs http://github.com/alvivar/TeaTime/blob/master/Examples.cs
 // for a more depth explanation.
@@ -570,7 +571,7 @@ public static class TeaTime
     /// <summary>
     /// Stop and resets all queues in all instances.
     /// </summary>
-    public static void Reset()
+    public static void ResetAll()
     {
         // Delete all
 

@@ -1,4 +1,4 @@
-###TeaTime v0.5.8 alpha 
+###TeaTime v0.5.8.3 alpha 
 
 _[DOWNLOAD](http://github.com/alvivar/TeaTime/raw/master/TeaTime.zip)_
 
@@ -44,10 +44,10 @@ MonoBehaviour using **'this.tt'**.
 	// ttWait locks the current queue, ignoring new appends until all his callbacks
 	// are done.
 
-	// And finally, ttReset let you stop and clean a running queue, and just like
-	// ttNow, it's immediate and always ignores the queue order.
-	this.ttReset("QueueName");
-
+	// And finally, TeaTime.Reset( let you stop and clean a running queue or all
+	// queues from an instance, and there is a TeaTime.ResetAll() that cleans
+	// everything.
+	TeaTime.Reset(this, "QueueName");
 
 Check out
 **[Examples.cs](http://github.com/alvivar/TeaTime/blob/master/Examples.cs)**
@@ -57,7 +57,7 @@ for a more depth explanation. *(More patterns and examples to come)*
 **Details to remember**
 - Execution starts immediately
 - Queues are unique to his MonoBehaviour (this is an extension after all)
-- Both ttNow & ttReset runs immediately (ignoring the queue order)
+- ttNow runs immediately (ignoring the queue order)
 - Below the sugar, everything runs on Unity coroutines!
 
 **Tips**
