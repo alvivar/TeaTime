@@ -6,7 +6,7 @@ public class Examples : MonoBehaviour
 {
     void Start()
     {
-        Test();
+
     }
 
 
@@ -89,6 +89,7 @@ public class Examples : MonoBehaviour
         // If you call 'ttLoop' without time (or negative) the loop will be infinite. In
         // this case you can use 'timeSinceStart' and 'Break(' from ttHandler to control
         // the loop.
+
         this.ttLoop("Timed by break", delegate(ttHandler t)
         {
             if (t.timeSinceStart > 2)
@@ -101,8 +102,27 @@ public class Examples : MonoBehaviour
         .ttWait();
 
 
-        // And finally, TeaTime.Reset( let you stop and clean a running queue or all
-        // queues from an instance, and there is a TeaTime.ResetAll() that cleans
+        // Alternatively to create or change your current queue using the name parameter
+        // in 'ttAdd(' or 'ttLoop(', there is also 'tt(' that does the same.
+        this.tt("Queue named by tt").ttAdd(3, delegate()
+        {
+            // But, If you use 'tt()' without name, TeaTime will use an unknown and unique
+            // identifier instead. The current queue will be anonymous and untrackable
+            // (immune to 'ttWait'). Pretty useful to create simple timers.
+            this.tt().ttAdd(4, () =>
+            {
+                Debug.Log("Out of sync two step timer +4 " + Time.time);
+            })
+            .ttAdd(() =>
+            {
+                Debug.Log(Time.time);
+            });
+        })
+        .ttWait();
+
+
+        // And finally, 'TeaTime.Reset(' let you stop and clean a running queue or all
+        // queues from an instance, and there is a 'TeaTime.ResetAll()' that cleans
         // everything.
         TeaTime.Reset(this, "QueueName");
 
