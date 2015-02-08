@@ -170,7 +170,7 @@ public static class TeaTime
     /// <summary>
     /// Default name for anonymous queues.
     /// </summary>
-    private const string DEFAULT_QUEUE_NAME = "TEATIME_DEFAULT_QUEUE_NAME";
+    private const string DEFAULT_QUEUE_NAME = "ANONYMOUS_QUEUE_NAME";
 
     /// <summary>
     /// Main queue for all the timed callbacks.
@@ -502,7 +502,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Create or select a queue as the current. When used without name the queue will be untrackable (immune to ttWait).
+    /// Create or select a queue as the current. When used without name the queue will be anonymous (and immune to ttWait).
     /// </summary>
     public static MonoBehaviour tt(this MonoBehaviour instance, string queueName = null)
     {
@@ -538,7 +538,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Stop and reset a queue in an instance.
+    /// Stop and reset an instance queue.
     /// </summary>
     public static void Reset(MonoBehaviour instance, string queueName)
     {
@@ -570,7 +570,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Stop and reset all queues in an instance.
+    /// Stop and reset all instance queues.
     /// </summary>
     public static void Reset(MonoBehaviour instance)
     {
@@ -701,12 +701,12 @@ public static class TeaTime
                 coroutine = ExecuteOnce(task.time, task.yieldInstruction, task.callback, task.callbackWithHandler);
             }
 
-            // Register and execute
+            // Register and execute coroutines
             runningCoroutines[instance][queueName].Add(coroutine);
             yield return instance.StartCoroutine(coroutine);
             runningCoroutines[instance][queueName].Remove(coroutine);
 
-            // Done
+            // Done!
             mainQueue[instance][queueName].Remove(task);
         }
 
@@ -739,7 +739,7 @@ public static class TeaTime
         if (yieldToWait != null)
             yield return yieldToWait;
 
-        // Executes the normal handler
+        // Executes the normal callback
         if (callback != null)
             callback();
 
@@ -766,11 +766,12 @@ public static class TeaTime
         if (duration <= 0)
             yield break;
 
+        // Handler data
         ttHandler loopHandler = new ttHandler();
         float tRate = 1 / duration;
 
         // Run while active until duration
-        while (loopHandler.isActive && loopHandler.timeSinceStart < duration)
+        while (loopHandler.isActive && loopHandler.t < 1)
         {
             float delta = Time.deltaTime;
 
