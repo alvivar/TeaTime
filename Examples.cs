@@ -4,12 +4,6 @@ using UnityEngine;
 
 public class Examples : MonoBehaviour
 {
-    void Start()
-    {
-
-    }
-
-
     void Update()
     {
         Test();
@@ -18,8 +12,8 @@ public class Examples : MonoBehaviour
 
     void Test()
     {
-        // 'ttAdd' appends a timed callback into a queue, execution starts immediately and
-        // all 'ttAdd' without a name will be appended in the last used queue (or default)
+        // 'ttAdd(' appends a timed callback into a queue, execution starts immediately and
+        // all 'ttAdd(' without a name will be appended in the last used queue (or default)
         // to be executed one after another.
 
         // In this example, the first callback is called after 1 second, and the second
@@ -34,18 +28,18 @@ public class Examples : MonoBehaviour
             Debug.Log("+1 +4 seconds " + Time.time);
         })
         .ttWait();
-        // 'ttWait' locks the current queue ignoring new appends until all his
+        // 'ttWait()' locks the current queue ignoring new appends until all his
         // current callbacks are completed. That's why they are safe to run during Update
         // without over-appending, they just keep repeating themselves in order.
 
 
-        // 'ttLoop' executes his callback frame by frame for all his duration. It
+        // 'ttLoop(' executes his callback frame by frame for all his duration. It
         // requires 'ttHandler' to work, where you can access special properties, like a
         // custom delta for interpolations during the loop duration.
 
-        // 'ttAdd' and 'ttLoop' can be mixed. In this example, a 3 seconds 'ttLoop' will
+        // 'ttAdd(' and 'ttLoop(' can be mixed. In this example, a 3 seconds 'ttLoop(' will
         // run a Lerp using a special 'deltaTime' from 'ttHandler', customized to
-        // represent the loop duration, then a 'ttAdd' (0s) marks the loop end.
+        // represent the loop duration, then a 'ttAdd(' (0s) marks the loop end.
         this.ttLoop("Background change", 3, delegate(ttHandler loop)
         {
             Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
@@ -68,7 +62,7 @@ public class Examples : MonoBehaviour
         // This is the precise value required when using a constant in the 'Lerp' 'from'.
 
 
-        // You can also use 'ttHandler' in a normal 'ttAdd' for extra features. In this
+        // You can also use 'ttHandler' in a normal 'ttAdd(' for extra features. In this
         // example we are using 'WaitFor(' to wait for a YieldInstruction (e.g DOTween,
         // WaitForSeconds) after the callback is done and before the next queued callback.
         this.ttAdd("DOTween example", delegate(ttHandler t)
@@ -86,10 +80,9 @@ public class Examples : MonoBehaviour
         .ttWait();
 
 
-        // If you call 'ttLoop' without time (or negative) the loop will be infinite. In
+        // If you call 'ttLoop(' without time (or negative) the loop will be infinite. In
         // this case you can use 'timeSinceStart' and 'Break(' from ttHandler to control
         // the loop.
-
         this.ttLoop("Timed by break", delegate(ttHandler t)
         {
             if (t.timeSinceStart > 2)
@@ -102,8 +95,8 @@ public class Examples : MonoBehaviour
         .ttWait();
 
 
-        // Alternatively to create or change your current queue using the name parameter
-        // in 'ttAdd(' or 'ttLoop(', there is also 'tt(' that does the same.
+        // Alternatively to create or change your current queue by using the name
+        // parameter in 'ttAdd(' or 'ttLoop(', there is also 'tt(' that does the same.
         this.tt("Queue named by tt").ttAdd(3, delegate()
         {
             // But, If you use 'tt()' without name, TeaTime will use an unknown and unique
@@ -111,11 +104,11 @@ public class Examples : MonoBehaviour
             // (immune to 'ttWait'). Pretty useful to create simple timers.
             this.tt().ttAdd(4, () =>
             {
-                Debug.Log("Out of sync two step timer +4 " + Time.time);
+                Debug.Log("Out of sync timer, step 1 +4 " + Time.time);
             })
-            .ttAdd(() =>
+            .ttAdd(1, () =>
             {
-                Debug.Log(Time.time);
+                Debug.Log("Step 2 +1 " + Time.time);
             });
         })
         .ttWait();
@@ -132,17 +125,19 @@ public class Examples : MonoBehaviour
         // - Queues are unique to his MonoBehaviour (this is an extension after all)
         // - Below the sugar, everything runs on Unity coroutines!
 
+        // About ttHandler
+        // - ttHandler adds special control features to all your callbacks
+        // - ttHandler.deltaTime contains a customized deltaTime that represents the precise loop duration
+        // - ttHandler.t contains the completion percentage expressed from 0 to 1 based on the loop duration
+        // - ttHandler.waitFor( applies a wait interval once, at the end of the current callback
+
         // Tips
+        // - You can create tween-like behaviours with loops and lerp functions
         // - Always name your queue if you want to use more than one queue with safety 
         // - You can use a YieldInstruction instead of time (e.g. WaitForEndOfFrame)
-        // - You can create tween-like behaviours by mixing loops, ttHandler properties, and lerp functions
-        // - ttWait ensures a complete and safe run during continuous calls
-
-        // About ttHandler
-        // - ttHandler adds special control features to your callbacks
-        // - .deltaTime contains a customized deltaTime that represents the precise loop duration
-        // - .t contains the completion percentage expresed from 0 to 1 based on the loop duration
-        // - .waitFor( applies only once and at the end of the current callback
+        // - ttWait() ensures a complete and safe run of the current queue (wait for completion)
+        // - tt("queueName") change your current queue, and tt() creates an anonymous queue
+        // - TeaTime.Reset( stops running queues
 
         // And that's it!
 

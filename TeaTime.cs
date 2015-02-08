@@ -1,4 +1,4 @@
-﻿// TeaTime v0.5.8.4 alpha
+﻿// TeaTime v0.5.9 alpha
 
 // By Andrés Villalobos [andresalvivar@gmail.com twitter.com/matnesis]
 // Special thanks to Antonio Zamora [twitter.com/tzamora] for the loop idea and testing.
@@ -17,37 +17,19 @@
 //        Debug.Log("2 seconds since QueueName started " + Time.time);
 //    })
 //    .ttLoop(3, delegate(ttHandler loop)
-//    {	
+//    {   
 //        // ttLoop runs frame by frame for all his duration (3s) and his handler have a
 //        // customized delta (loop.deltaTime) that represents the precise loop duration.
 //        Camera.main.backgroundColor 
-//            = Color.Lerp(Camera.main.backgroundColor, Color.white, loop.deltaTime);
-//    })
-//    this.ttAdd("delegate(ttHandler t)
-//    {
-//        Sequence myTween = DOTween.Sequence();
-//        myTween.Append(transform.DOMoveX(5, 2.5f));
-//        myTween.Append(transform.DOMoveX(-5, 2.5f));
-
-//        // WaitFor waits for a time or YieldInstruction after the current callback is
-//        // done and before the next queued callback.		
-//        t.WaitFor(myTween.WaitForCompletion());
+//            = Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
 //    })
 //    .ttAdd(() =>
 //    {
-//        Debug.Log("10 seconds since QueueName started " + Time.time);
+//        Debug.Log("5 seconds since QueueName started " + Time.time);
 //    })
-//    .ttWait(); 
-//    // ttWait locks the current queue, ignoring new appends until all his callbacks
-//    // are done.
 
-//    // And finally, TeaTime.Reset( let you stop and clean a running queue or all
-//    // queues from an instance, and there is a TeaTime.ResetAll() that cleans
-//    // everything.
-//    TeaTime.Reset(this, "QueueName");
-
-// Check out Examples.cs http://github.com/alvivar/TeaTime/blob/master/Examples.cs
-// for a more depth explanation.
+// Check out Examples.cs [http://github.com/alvivar/TeaTime/blob/master/Examples.cs]
+// for all the features and explained examples.
 
 
 // Details to remember
@@ -55,17 +37,19 @@
 // - Queues are unique to his MonoBehaviour (this is an extension after all)
 // - Below the sugar, everything runs on Unity coroutines!
 
+// About ttHandler
+// - ttHandler adds special control features to all your callbacks
+// - ttHandler.deltaTime contains a customized deltaTime that represents the precise loop duration
+// - ttHandler.t contains the completion percentage expressed from 0 to 1 based on the loop duration
+// - ttHandler.waitFor( applies a wait interval once, at the end of the current callback
+
 // Tips
+// - You can create tween-like behaviours with loops and lerp functions
 // - Always name your queue if you want to use more than one queue with safety 
 // - You can use a YieldInstruction instead of time (e.g. WaitForEndOfFrame)
-// - You can create tween-like behaviours by mixing loops, ttHandler properties, and lerp functions
-// - ttWait ensures a complete and safe run during continuous calls
-
-// About ttHandler
-// - ttHandler adds special control features to your callbacks
-// - .deltaTime contains a customized deltaTime that represents the precise loop duration
-// - .t contains the completion percentage expresed from 0 to 1 based on the loop duration
-// - .waitFor( applies only once and at the end of the current callback
+// - ttWait() ensures a complete and safe run of the current queue (wait for completion)
+// - tt("queueName") change your current queue, and tt() creates an anonymous queue
+// - TeaTime.Reset( stops running queues
 
 // And that's it!
 
@@ -603,7 +587,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Stop and resets all queues in all instances.
+    /// Stops and resets ALL.
     /// </summary>
     public static void ResetAll()
     {

@@ -1,4 +1,10 @@
-- **NEW**: ttNew creates an empty queue with an unique identifier.
+- **CHANGE**: ttNew renamed to tt, and now is able to create or change the
+  current queue if you use a name.
+
+####v0.5.9
+
+- **NEW**: ttNew create or change a queue the current queue, using an unique
+  anonymous identifier.
 
 - **CHANGE**: ttNow does not exists anymore, you can create fast & safe timers
   using ttNew at the beginning of the queue (for both ttAdd & ttLoop).
