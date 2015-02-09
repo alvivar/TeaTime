@@ -1,5 +1,6 @@
-- **CHANGE**: ttNew renamed to tt, and now is able to create or change the
-  current queue if you use a name.
+- **CHANGE**: ttNew upgraded to tt and now is able to change the current
+  queue. It can also reset the content of an existent queue (optional). When
+  used without name, the queue will be anonymous (i.e. immune to ttWait).
 
 ####v0.5.9
 
