@@ -32,24 +32,26 @@
 // for all the features and explained examples.
 
 
-// Details to remember
+// **Details to remember**
 // - Execution starts immediately
 // - Queues are unique to his MonoBehaviour (this is an extension after all)
 // - Below the sugar, everything runs on Unity coroutines!
 
-// About ttHandler
+// **Tips**
+// - You can create tween-like behaviours with loops and lerp functions
+// - Always name your queue if you want to use more than one queue with safety 
+// - You can use a YieldInstruction instead of time (e.g. WaitForEndOfFrame)
+
+// **About ttHandler**
 // - ttHandler adds special control features to all your callbacks
 // - ttHandler.deltaTime contains a customized deltaTime that represents the precise loop duration
 // - ttHandler.t contains the completion percentage expressed from 0 to 1 based on the loop duration
 // - ttHandler.waitFor( applies a wait interval once, at the end of the current callback
 
-// Tips
-// - You can create tween-like behaviours with loops and lerp functions
-// - Always name your queue if you want to use more than one queue with safety 
-// - You can use a YieldInstruction instead of time (e.g. WaitForEndOfFrame)
-// - ttWait() ensures a complete and safe run of the current queue (wait for completion)
-// - tt("queueName") change your current queue, and tt() creates an anonymous queue
-// - TeaTime.Reset( stops running queues
+// **Moar**
+// - tt( allows to change the current queue, reset it or create an anonymous queue
+// - ttWait() ensures a complete and safe run of the current queue (waits for completion)
+// - TeaTime.Reset( stops and resets queues and instances, TeaTime.ResetAll( resets everything
 
 // And that's it!
 
@@ -486,21 +488,6 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Create or select a queue as the current. When used without name the queue will be anonymous (and immune to ttWait).
-    /// </summary>
-    public static MonoBehaviour tt(this MonoBehaviour instance, string queueName = null)
-    {
-        if (queueName == null)
-            queueName = DEFAULT_QUEUE_NAME + "_" + Time.time + "_" + UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-
-        PrepareInstanceCurrentQueue(instance);
-        currentQueue[instance] = queueName;
-
-        return instance;
-    }
-
-
-    /// <summary>
     /// Waits for completion, locks the current queue ignoring new appends until all his callbacks are completed.
     /// </summary>
     public static MonoBehaviour ttWait(this MonoBehaviour instance)
@@ -522,7 +509,27 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Stop and reset an instance queue.
+    /// Creates or changes the current queue.
+    /// When used without name the queue will be anonymous and untrackable (immune to ttWait).
+    /// If 'resetQueue = true' the queue will be stopped and cleaned, just like with 'TeaTime.Reset('.
+    /// </summary>
+    public static MonoBehaviour tt(this MonoBehaviour instance, string queueName = null, bool resetQueue = false)
+    {
+        if (queueName == null)
+            queueName = DEFAULT_QUEUE_NAME + "_" + Time.time + "_" + UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+
+        PrepareInstanceCurrentQueue(instance);
+        currentQueue[instance] = queueName;
+
+        if (resetQueue == true)
+            Reset(instance, queueName);
+
+        return instance;
+    }
+
+
+    /// <summary>
+    /// Stops and resets a queue from an instance.
     /// </summary>
     public static void Reset(MonoBehaviour instance, string queueName)
     {
@@ -539,7 +546,7 @@ public static class TeaTime
         if (runningQueues[instance].Contains(queueName))
             runningQueues[instance].Remove(queueName);
 
-        currentQueue[instance] = queueName;
+        //currentQueue[instance] = queueName;
 
         if (lockedQueues[instance].Contains(queueName))
             lockedQueues[instance].Remove(queueName);
@@ -554,7 +561,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Stop and reset all instance queues.
+    /// Stops and resets all queues from an instance.
     /// </summary>
     public static void Reset(MonoBehaviour instance)
     {
@@ -570,7 +577,7 @@ public static class TeaTime
             taskList.Value.Clear();
 
         runningQueues[instance].Clear();
-        currentQueue[instance] = DEFAULT_QUEUE_NAME;
+        //currentQueue[instance] = DEFAULT_QUEUE_NAME;
         lockedQueues[instance].Clear();
 
         // Stop coroutines & clean
@@ -587,7 +594,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Stops and resets ALL.
+    /// Stops and resets all queues in all instances.
     /// </summary>
     public static void ResetAll()
     {
@@ -638,7 +645,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Execute all timed callbacks and loops for an instance queue.
+    /// Executes all timed callbacks and loops for an instance queue.
     /// </summary>
     private static IEnumerator ExecuteQueue(MonoBehaviour instance, string queueName)
     {
