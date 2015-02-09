@@ -510,8 +510,8 @@ public static class TeaTime
 
     /// <summary>
     /// Creates or changes the current queue.
-    /// When used without name the queue will be anonymous and untrackable (immune to ttWait).
-    /// If 'resetQueue = true' the queue will be stopped and cleaned, just like with 'TeaTime.Reset('.
+    /// When used without name the queue will be anonymous and untrackable.
+    /// If 'resetQueue = true' the queue will be stopped and cleaned first, just like with 'TeaTime.Reset('.
     /// </summary>
     public static MonoBehaviour tt(this MonoBehaviour instance, string queueName = null, bool resetQueue = false)
     {
