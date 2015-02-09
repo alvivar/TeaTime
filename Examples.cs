@@ -120,24 +120,26 @@ public class Examples : MonoBehaviour
         TeaTime.Reset(this, "QueueName");
 
 
-        // Details to remember
+        // **Details to remember**
         // - Execution starts immediately
         // - Queues are unique to his MonoBehaviour (this is an extension after all)
         // - Below the sugar, everything runs on Unity coroutines!
 
-        // About ttHandler
+        // **Tips**
+        // - You can create tween-like behaviours with loops and lerp functions
+        // - Always name your queue if you want to use more than one queue with safety 
+        // - You can use a YieldInstruction instead of time (e.g. WaitForEndOfFrame)
+
+        // **About ttHandler**
         // - ttHandler adds special control features to all your callbacks
         // - ttHandler.deltaTime contains a customized deltaTime that represents the precise loop duration
         // - ttHandler.t contains the completion percentage expressed from 0 to 1 based on the loop duration
         // - ttHandler.waitFor( applies a wait interval once, at the end of the current callback
 
-        // Tips
-        // - You can create tween-like behaviours with loops and lerp functions
-        // - Always name your queue if you want to use more than one queue with safety 
-        // - You can use a YieldInstruction instead of time (e.g. WaitForEndOfFrame)
-        // - ttWait() ensures a complete and safe run of the current queue (wait for completion)
-        // - tt("queueName") change your current queue, and tt() creates an anonymous queue
-        // - TeaTime.Reset( stops running queues
+        // **Moar**
+        // - tt( allows to change the current queue, reset it or create an anonymous queue
+        // - ttWait() ensures a complete and safe run of the current queue (waits for completion)
+        // - TeaTime.Reset( stops and resets queues and instances, TeaTime.ResetAll( resets everything
 
         // And that's it!
 
