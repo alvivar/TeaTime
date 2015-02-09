@@ -50,7 +50,7 @@ for all the features and explained examples. (*More to come!*)
 - ttHandler.waitFor( applies a wait interval once, at the end of the current callback
 
 **Moar**
-- tt( allows to change the current queue, reset it or create an anonymous queue
+- tt( changes the current queue, reset it or create an anonymous queue
 - ttWait() ensures a complete and safe run of the current queue (waits for completion)
 - TeaTime.Reset( stops and resets queues and instances, TeaTime.ResetAll( resets everything
 
