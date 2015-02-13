@@ -156,7 +156,7 @@ public static class TeaTime
     /// <summary>
     /// Default name for anonymous queues.
     /// </summary>
-    private const string DEFAULT_QUEUE_NAME = "ANONYMOUS_QUEUE_NAME";
+    private const string DEFAULT_QUEUE_NAME = "DEFAULT_QUEUE_NAME";
 
     /// <summary>
     /// Main queue for all the timed callbacks.
