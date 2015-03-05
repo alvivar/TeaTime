@@ -164,6 +164,11 @@ public static class TeaTime
     private static Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>> mainQueue = null;
 
     /// <summary>
+    /// Contains a healthy copy of all queues and their respective timed callbacks.
+    /// </summary>
+    private static Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>> blueprints = null;
+
+    /// <summary>
     /// Running queues in the instance.
     /// </summary>
     private static Dictionary<MonoBehaviour, List<string>> runningQueues = null;
@@ -185,20 +190,32 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Prepares the main queue for the instance.
+    /// Prepares the main queue for the instance (and the blueprints registry).
     /// </summary>
     private static void PrepareInstanceMainQueue(MonoBehaviour instance, string queueName = null)
     {
+        // Main queue
         if (mainQueue == null)
             mainQueue = new Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>>();
 
         if (mainQueue.ContainsKey(instance) == false)
             mainQueue.Add(instance, new Dictionary<string, List<TeaTask>>());
 
+        // Blueprints
+        if (blueprints == null)
+            blueprints = new Dictionary<MonoBehaviour, Dictionary<string, List<TeaTask>>>();
+
+        if (blueprints.ContainsKey(instance) == false)
+            blueprints.Add(instance, new Dictionary<string, List<TeaTask>>());
+
+        // Task list for both
         if (queueName != null)
         {
             if (mainQueue[instance].ContainsKey(queueName) == false)
                 mainQueue[instance].Add(queueName, new List<TeaTask>());
+
+            if (blueprints[instance].ContainsKey(queueName) == false)
+                blueprints[instance].Add(queueName, new List<TeaTask>());
         }
     }
 
@@ -283,22 +300,23 @@ public static class TeaTime
         Action callback, Action<ttHandler> callbackWithHandler,
         bool isLoop)
     {
-        // Ignore locked queues (but remember in his name)
+        // Always remember the name
+        PrepareInstanceCurrentQueue(instance);
+        currentQueue[instance] = queueName;
+
+        // Ignore locked
         if (IsLocked(instance, queueName))
-        {
-            currentQueue[instance] = queueName;
             return instance;
-        }
 
         PrepareInstanceMainQueue(instance, queueName);
-        PrepareInstanceCurrentQueue(instance);
-
-        // Sets the active queue
-        currentQueue[instance] = queueName;
 
         // Appends a new task
         List<TeaTask> taskList = mainQueue[instance][queueName];
         taskList.Add(new TeaTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
+
+        // Construct the queue blueprint
+        List<TeaTask> blueprintTaskList = blueprints[instance][queueName];
+        blueprintTaskList.Add(new TeaTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
 
         // Execute queue
         instance.StartCoroutine(ExecuteQueue(instance, queueName));
@@ -504,6 +522,15 @@ public static class TeaTime
         if (IsLocked(instance, currentQueue[instance]) == false)
             lockedQueues[instance].Add(currentQueue[instance]);
 
+        return instance;
+    }
+
+
+    /// <summary>
+    /// TODO!
+    /// </summary>
+    public static MonoBehaviour ttRepeat(this MonoBehaviour instance, int times = -1)
+    {
         return instance;
     }
 
