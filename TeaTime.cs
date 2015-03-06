@@ -543,7 +543,7 @@ public static class TeaTime
     public static MonoBehaviour tt(this MonoBehaviour instance, string queueName = null, bool resetQueue = false)
     {
         if (queueName == null)
-            queueName = DEFAULT_QUEUE_NAME + "_" + Time.time + "_" + UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+            queueName = DEFAULT_QUEUE_NAME + "_" + Time.time + "_" + UnityEngine.Random.Range(0, int.MaxValue);
 
         PrepareInstanceCurrentQueue(instance);
         currentQueue[instance] = queueName;
