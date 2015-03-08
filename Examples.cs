@@ -27,7 +27,7 @@ public class Examples : MonoBehaviour
         {
             Debug.Log("+1 +4 seconds " + Time.time);
         })
-        .ttWait();
+        .ttLock();
         // 'ttWait()' locks the current queue ignoring new appends until all his
         // current callbacks are completed. That's why they are safe to run during Update
         // without over-appending, they just keep repeating themselves in order.
@@ -56,7 +56,7 @@ public class Examples : MonoBehaviour
         {
             Debug.Log("White, +3 secs " + Time.time);
         })
-        .ttWait();
+        .ttLock();
         // In the second 'Lerp' loop, instead of 'loop.deltaTime' we are using 'loop.t',
         // because 't' contains the completion percentage from 0 to 1 based on duration.
         // This is the precise value required when using a constant in the 'Lerp' 'from'.
@@ -77,7 +77,7 @@ public class Examples : MonoBehaviour
         {
             Debug.Log("myTween end, +5 secs " + Time.time);
         })
-        .ttWait();
+        .ttLock();
 
 
         // If you call 'ttLoop(' without time (or negative) the loop will be infinite. In
@@ -92,7 +92,7 @@ public class Examples : MonoBehaviour
         {
             Debug.Log("Break Loop, +2 " + Time.time);
         })
-        .ttWait();
+        .ttLock();
 
 
         // Alternatively to create or change your current queue by using the name
@@ -111,7 +111,7 @@ public class Examples : MonoBehaviour
                 Debug.Log("Step 2 +1 " + Time.time);
             });
         })
-        .ttWait();
+        .ttLock();
 
 
         // And finally, 'TeaTime.Reset(' let you stop and clean a running queue or all
