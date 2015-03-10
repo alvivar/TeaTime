@@ -48,15 +48,15 @@ public class Examples : MonoBehaviour
 
 
 
-        // > ttLoop(
+        // > ttLoop(float duration, Action<ttHandler> callback)
         // Appends into the current queue a callback that runs frame by frame for all his duration.
 
-        // > ttHandler .deltaTime
-        // Special delta customized for the loop duration
+        // > ttHandler loop; loop.deltaTime
+        // Special delta customized to represent the loop duration.
 
         // EXAMPLE
         // Tween-like Color Transition
-        // Changes the camera background color to black in 3s, then to white in 4s, and repeat 2 more times.
+        // Changes the camera background color to black in 3s, then to white in 4s, and repeats 2 more times.
 
         this.tt().ttLoop(3, delegate(ttHandler loop)
         {
