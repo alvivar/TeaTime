@@ -868,14 +868,14 @@ public static class TeaTime
         // Run while active until duration
         while (loopHandler.isActive && loopHandler.t < 1)
         {
-            float delta = Time.deltaTime;
+            float unityTimeDelta = Time.deltaTime;
 
             // Completion % from 0 to 1
-            loopHandler.t += tRate * delta;
+            loopHandler.t += tRate * unityTimeDelta;
 
             // Customized delta that represents the loop duration
-            loopHandler.deltaTime = 1 / (duration - loopHandler.timeSinceStart) * delta;
-            loopHandler.timeSinceStart += delta;
+            loopHandler.deltaTime = 1 / (duration - loopHandler.timeSinceStart) * unityTimeDelta;
+            loopHandler.timeSinceStart += unityTimeDelta;
 
             // Execute
             if (callback != null)
