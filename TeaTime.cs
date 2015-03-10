@@ -30,7 +30,7 @@
 
 
 // Check out Examples.cs [http://github.com/alvivar/TeaTime/blob/master/Examples.cs]
-// for practical patterns! (*More to come*)
+// to learn with practical patterns! (*More to come*)
 
 
 // Copyright (c) 2014/12/26 andresalvivar@gmail.com
