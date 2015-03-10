@@ -154,37 +154,38 @@ public class ttHandler
 public static class TeaTime
 {
     /// <summary>
-    /// Default name for anonymous queues.
+    /// Default queue name.
     /// </summary>
     private const string DEFAULT_QUEUE_NAME = "DEFAULT_QUEUE_NAME";
 
     /// <summary>
     /// Main queue for all the timed callbacks.
+    /// #todo This can be optimized by using blueprints, maybe.
     /// </summary>
     private static Dictionary<MonoBehaviour, Dictionary<string, List<ttTask>>> mainQueue = null;
 
     /// <summary>
-    /// Contains a healthy copy of all queues and their respective timed callbacks.
+    /// Contains a complete copy of every queue and their respective callbacks.
     /// </summary>
     private static Dictionary<MonoBehaviour, Dictionary<string, List<ttTask>>> blueprints = null;
 
     /// <summary>
-    /// Running queues in the instance.
+    /// Queues currently running.
     /// </summary>
     private static Dictionary<MonoBehaviour, List<string>> runningQueues = null;
 
     /// <summary>
-    /// Current queue (last used) in the instance.
+    /// Current queue.
     /// </summary>
-    private static Dictionary<MonoBehaviour, string> currentQueue = null;
+    private static Dictionary<MonoBehaviour, string> currentQueueName = null;
 
     /// <summary>
-    /// Locked queues in the instance.
+    /// Locked queues, by ttLock().
     /// </summary>
     private static Dictionary<MonoBehaviour, List<string>> lockedQueues = null;
 
     /// <summary>
-    /// Infinite queues in the instante, by ttRepeat(-1).
+    /// Infinite queues, by ttRepeat(-1).
     /// </summary>
     private static Dictionary<MonoBehaviour, List<string>> infiniteQueues = null;
 
@@ -241,14 +242,14 @@ public static class TeaTime
     /// <summary>
     /// Prepares the dictionary for the current queue (last used) in the instance.
     /// </summary>
-    private static void PrepareCurrentQueue(MonoBehaviour instance)
+    private static void PrepareCurrentQueueName(MonoBehaviour instance)
     {
-        if (currentQueue == null)
-            currentQueue = new Dictionary<MonoBehaviour, string>();
+        if (currentQueueName == null)
+            currentQueueName = new Dictionary<MonoBehaviour, string>();
 
         // Default name
-        if (currentQueue.ContainsKey(instance) == false)
-            currentQueue[instance] = DEFAULT_QUEUE_NAME;
+        if (currentQueueName.ContainsKey(instance) == false)
+            currentQueueName[instance] = DEFAULT_QUEUE_NAME;
     }
 
 
@@ -333,8 +334,8 @@ public static class TeaTime
         bool isLoop)
     {
         // Always remember the name
-        PrepareCurrentQueue(instance);
-        currentQueue[instance] = queueName;
+        PrepareCurrentQueueName(instance);
+        currentQueueName[instance] = queueName;
 
         // Ignore locked
         if (IsLocked(instance, queueName))
@@ -342,7 +343,7 @@ public static class TeaTime
 
         PrepareMainQueue(instance, queueName);
 
-        // Appends a new task + Blueprint clone
+        // Appends a new task (+ Blueprint clone)
         mainQueue[instance][queueName].Add(new ttTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
         blueprints[instance][queueName].Add(new ttTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
 
@@ -390,46 +391,46 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Appends a timed callback into the current queue (or default).
+    /// Appends a timed callback into the current queue.
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, float timeDelay, Action callback)
     {
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
-        return instance.ttAdd(currentQueue[instance], timeDelay, null, callback, null, false);
+        return instance.ttAdd(currentQueueName[instance], timeDelay, null, callback, null, false);
     }
 
 
     /// <summary>
-    /// Appends a timed callback into the current queue (or default).
+    /// Appends a timed callback into the current queue.
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, float timeDelay, Action<ttHandler> callback)
     {
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
-        return instance.ttAdd(currentQueue[instance], timeDelay, null, null, callback, false);
+        return instance.ttAdd(currentQueueName[instance], timeDelay, null, null, callback, false);
     }
 
 
     /// <summary>
-    /// Appends a timed callback into the current queue (or default).
+    /// Appends a timed callback into the current queue.
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, YieldInstruction yieldToWait, Action callback)
     {
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
-        return instance.ttAdd(currentQueue[instance], 0, yieldToWait, callback, null, false);
+        return instance.ttAdd(currentQueueName[instance], 0, yieldToWait, callback, null, false);
     }
 
 
     /// <summary>
-    /// Appends a timed callback into the current queue (or default).
+    /// Appends a timed callback into the current queue.
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, YieldInstruction yieldToWait, Action<ttHandler> callback)
     {
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
-        return instance.ttAdd(currentQueue[instance], 0, yieldToWait, null, callback, false);
+        return instance.ttAdd(currentQueueName[instance], 0, yieldToWait, null, callback, false);
     }
 
 
@@ -443,13 +444,13 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Appends a time interval into the current queue (or default).
+    /// Appends a time interval into the current queue.
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, float interval)
     {
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
-        return instance.ttAdd(currentQueue[instance], interval, null, null, null, false);
+        return instance.ttAdd(currentQueueName[instance], interval, null, null, null, false);
     }
 
 
@@ -472,24 +473,24 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Appends a callback into the current queue (or default).
+    /// Appends a callback into the current queue.
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, Action callback)
     {
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
-        return instance.ttAdd(currentQueue[instance], 0, null, callback, null, false);
+        return instance.ttAdd(currentQueueName[instance], 0, null, callback, null, false);
     }
 
 
     /// <summary>
-    /// Appends a callback into the current queue (or default).
+    /// Appends a callback into the current queue.
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, Action<ttHandler> callback)
     {
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
-        return instance.ttAdd(currentQueue[instance], 0, null, null, callback, false);
+        return instance.ttAdd(currentQueueName[instance], 0, null, null, callback, false);
     }
 
 
@@ -503,7 +504,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Appends into a queue a callback that runs frame by frame until his exit is forced.
+    /// Appends into a queue a callback that runs frame by frame until ttHandler.Break().
     /// </summary>
     public static MonoBehaviour ttLoop(this MonoBehaviour instance, string queueName, Action<ttHandler> callback)
     {
@@ -516,79 +517,79 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttLoop(this MonoBehaviour instance, float duration, Action<ttHandler> callback)
     {
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
-        return instance.ttAdd(currentQueue[instance], duration, null, null, callback, true);
+        return instance.ttAdd(currentQueueName[instance], duration, null, null, callback, true);
     }
 
 
     /// <summary>
-    /// Appends into the current queue a callback that runs frame by frame until his exit is forced.
+    /// Appends into the current queue a callback that runs frame by frame until ttHandler.Break().
     /// </summary>
     public static MonoBehaviour ttLoop(this MonoBehaviour instance, Action<ttHandler> callback)
     {
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
-        return instance.ttAdd(currentQueue[instance], 0, null, null, callback, true);
+        return instance.ttAdd(currentQueueName[instance], 0, null, null, callback, true);
     }
 
 
     /// <summary>
-    /// Locks the current queue ignoring new appends until all his callbacks are completed (locks until completion).
+    /// Locks the current queue ignoring new appends until all his callbacks are done (locks until completion).
     /// </summary>
     public static MonoBehaviour ttLock(this MonoBehaviour instance)
     {
         PrepareMainQueue(instance);
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
         // Ignore if the queue if empty
-        if (mainQueue[instance].ContainsKey(currentQueue[instance]) == false ||
-            mainQueue[instance][currentQueue[instance]].Count < 1)
+        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false ||
+            mainQueue[instance][currentQueueName[instance]].Count < 1)
             return instance;
 
         // Locks the queue
-        if (IsLocked(instance, currentQueue[instance]) == false)
-            lockedQueues[instance].Add(currentQueue[instance]);
+        if (IsLocked(instance, currentQueueName[instance]) == false)
+            lockedQueues[instance].Add(currentQueueName[instance]);
 
         return instance;
     }
 
 
     /// <summary>
-    /// Repeat the current queue n times or infinite (-1).
+    /// Repeat the current queue n times or infinite (n <= -1).
     /// </summary>
-    public static MonoBehaviour ttRepeat(this MonoBehaviour instance, int n = 1)
+    public static MonoBehaviour ttRepeat(this MonoBehaviour instance, int nTimes = 1)
     {
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
 
         // Ignore locked
-        if (IsLocked(instance, currentQueue[instance]))
+        if (IsLocked(instance, currentQueueName[instance]))
             return instance;
 
         PrepareMainQueue(instance);
 
         // Ignore if the queue if empty
-        if (mainQueue[instance].ContainsKey(currentQueue[instance]) == false ||
-            mainQueue[instance][currentQueue[instance]].Count < 1)
+        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false ||
+            mainQueue[instance][currentQueueName[instance]].Count < 1)
             return instance;
 
         // If infinite
-        if (n < 0)
+        if (nTimes < 0)
         {
-            instance.tt(currentQueue[instance]).ttLock();
+            instance.tt(currentQueueName[instance]).ttLock();
 
             PrepareInfiniteQueues(instance);
 
-            if (infiniteQueues[instance].Contains(currentQueue[instance]) == false)
-                infiniteQueues[instance].Add(currentQueue[instance]);
+            if (infiniteQueues[instance].Contains(currentQueueName[instance]) == false)
+                infiniteQueues[instance].Add(currentQueueName[instance]);
 
             return instance;
         }
 
         // Repeat n 
-        while (n-- > 0)
+        while (nTimes-- > 0)
         {
-            mainQueue[instance][currentQueue[instance]].AddRange(blueprints[instance][currentQueue[instance]]);
+            mainQueue[instance][currentQueueName[instance]].AddRange(blueprints[instance][currentQueueName[instance]]);
         }
 
         return instance;
@@ -605,8 +606,8 @@ public static class TeaTime
         if (queueName == null)
             queueName = DEFAULT_QUEUE_NAME + "_" + Time.time + "_" + UnityEngine.Random.Range(0, int.MaxValue);
 
-        PrepareCurrentQueue(instance);
-        currentQueue[instance] = queueName;
+        PrepareCurrentQueueName(instance);
+        currentQueueName[instance] = queueName;
 
         if (resetQueue == true)
             Reset(instance, queueName);
@@ -623,7 +624,7 @@ public static class TeaTime
         // Initialize all
         PrepareMainQueue(instance, queueName);
         PrepareRunningQueues(instance);
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
         PrepareLockedQueues(instance);
         PrepareInfiniteQueues(instance);
         PrepareRunningCoroutines(instance, queueName);
@@ -659,7 +660,7 @@ public static class TeaTime
         // Initialize all
         PrepareMainQueue(instance);
         PrepareRunningQueues(instance);
-        PrepareCurrentQueue(instance);
+        PrepareCurrentQueueName(instance);
         PrepareLockedQueues(instance);
         PrepareInfiniteQueues(instance);
         PrepareRunningCoroutines(instance);
@@ -713,12 +714,12 @@ public static class TeaTime
         }
 
         // Queues names clear
-        if (currentQueue != null)
+        if (currentQueueName != null)
         {
-            List<MonoBehaviour> keys = new List<MonoBehaviour>(currentQueue.Keys);
+            List<MonoBehaviour> keys = new List<MonoBehaviour>(currentQueueName.Keys);
             foreach (MonoBehaviour key in keys)
             {
-                currentQueue[key] = DEFAULT_QUEUE_NAME;
+                currentQueueName[key] = DEFAULT_QUEUE_NAME;
             }
         }
 
@@ -875,7 +876,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Executes a callback inside a loop for all his duration.
+    /// Executes a callback inside a loop for all his duration, or until ttHandler.Break().
     /// </summary>
     private static IEnumerator ExecuteLoop(float duration, Action<ttHandler> callback)
     {
@@ -916,7 +917,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Executes a callback inside an infinite loop.
+    /// Executes a callback inside an infinite loop until ttHandler.Break().
     /// </summary>
     private static IEnumerator ExecuteInfiniteLoop(Action<ttHandler> callback)
     {
