@@ -1,11 +1,26 @@
+# Unity folders
+[Bb]uild/
+[Ll]ibrary/
+[Oo]bj/
+[Tt]emp/
+
+# VS/MD files
+*.booproj
 *.csproj
-*.meta
 *.pidb
 *.sln
 *.suo
+*.tmp
 *.unityproj
+*.user
 *.userprefs
+
+# Unity meta files
+*.meta
+*.pidb.meta
+
+# Unity crash reports file
+sysinfo.txt
+
+# Mac shit
 .DS_Store
-/Library/
-/obj/
-/Temp/

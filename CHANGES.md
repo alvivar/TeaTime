@@ -1,18 +1,30 @@
-- **CHANGE**: ttNew upgraded to tt and now is able to change the current
+- **NEW**: ttRepeat(n), repeats the current queue n times or infinite (n <=
+  -1).
+
+- **CHANGE**: ttWait() renamed to ttLock() (describe better what it does).
+
+- **CHANGE**: ttAdd( & ttLoop(, can't create/change the current queue now, use
+  tt( instead.
+
+- **NEW**: Better examples!
+
+####v0.6
+
+- **CHANGE**: ttNew( upgraded to tt( and now is able to change the current
   queue. It can also reset the content of an existent queue (optional). When
   used without name, the queue will be anonymous (i.e. immune to ttWait).
 
 ####v0.5.9
 
-- **NEW**: ttNew create or change a queue the current queue, using an unique
+- **NEW**: ttNew( create or change a queue the current queue, using an unique
   anonymous identifier.
 
-- **CHANGE**: ttNow does not exists anymore, you can create fast & safe timers
-  using ttNew at the beginning of the queue (for both ttAdd & ttLoop).
+- **CHANGE**: ttNow( does not exists anymore, you can create fast & safe
+  timers using ttNew( at the beginning of the queue (both ttAdd( & ttLoop().
 
 ####v0.5.8.4
 
-- **CHANGE**: ttReset upgraded to TeaTime.Reset(, able to stop and reset
+- **CHANGE**: ttReset( upgraded to TeaTime.Reset(, able to stop and reset
   queues.
 
 - **NEW**: TeaTime.ResetAll( stop and clean all queues in all instances.
@@ -24,24 +36,24 @@
 
 ####v0.5.8
 
-- **NEW**: ttReset stops and resets a queue.
+- **NEW**: ttReset( stops and resets a queue.
 
-- **CHANGE**: ttWaitForCompletion renamed to ttWait.
+- **CHANGE**: ttWaitForCompletion( renamed to ttWait(.
 
 ####v0.5.7
 
-- **CHANGE**: ttHandler.t renamed to ttHandler.deltaTime. Also, his algorithm
-  was greatly improved.
+- **CHANGE**: ttHandler.t renamed to ttHandler.deltaTime (algorithm greatly
+  improved!).
 
 ####v0.5.4
 
-- **CHANGE**: ttAppend renamed to ttAdd.
+- **CHANGE**: ttAppend( renamed to ttAdd(.
 
-- **CHANGE**: ttAppendLoop renamed to ttLoop.
+- **CHANGE**: ttAppendLoop( renamed to ttLoop(.
 
-- **CHANGE**: ttInvoke renamed to ttNow.
+- **CHANGE**: ttInvoke( renamed to ttNow(.
 
-- **CHANGE**: ttLock renamed to ttWaitForCompletion.
+- **CHANGE**: ttLock( renamed to ttWaitForCompletion(.
 
 ####v0.5.2
 
@@ -54,37 +66,37 @@
 
 ####v0.5.1
 
-- **NEW**: ttHandler now supports Append.
+- **NEW**: ttHandler now supports Append(.
 
 - **NEW**: ttHandler 'WaitFor(', waits for a yield or time after the current
   callback execution, just before the next queued callback.
 
 ####v0.5
 
-- **NEW**: AppendLoop, appends a callback that runs frame by frame for his
+- **NEW**: AppendLoop(, appends a callback that runs frame by frame for his
   duration (or infinite) into a queue.
 
 - **NEW**: ttHandler, supports and manage AppendLoop with 't' (completion rate
   from 0 to 1), 'timeSinceStart' and 'Break()'.
 
-- **CHANGE**: ttNow renamed to ttInvoke.
+- **CHANGE**: ttNow( renamed to ttInvoke.
 
 ####v0.4
 
-- **NEW**: ttLock, locks the current queue until all his previous callbacks
+- **NEW**: ttLock(, locks the current queue until all his previous callbacks
   are done (safe to run during arbitrary cycles e.g. Update()).
 
-- **CHANGE**: ttInsert renamed to ttNow.
+- **CHANGE**: ttInsert( renamed to ttNow.
 
 ####v0.3
 
-- **NEW**: ttAppend can name queues (different queues can coexist at the same
+- **NEW**: ttAppend( can name queues (different queues can coexist at the same
   time).
 
 ####v0.2
 
-- **NEW**: ttAppend, appends a timed callback into a queue.
+- **NEW**: ttAppend(, appends a timed callback into a queue.
 
-- **NEW**: ttInsert, executes a timed callback.
+- **NEW**: ttInsert(, executes a timed callback.
 
 ####v0.1
