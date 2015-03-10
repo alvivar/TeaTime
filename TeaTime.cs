@@ -9,7 +9,7 @@
 // Unity games.
 
 // Just put 'TeaTime.cs' somewhere in your project and call it inside any
-// MonoBehaviour using 'this.tt'.
+// MonoBehaviour using 'this.tt' (and trust the autocomplete).
 
 
 //    this.ttAdd("QueueName", 2, () =>
