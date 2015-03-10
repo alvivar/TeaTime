@@ -4,148 +4,74 @@ using UnityEngine;
 
 public class Examples : MonoBehaviour
 {
-    void Update()
+    void Start()
     {
-        Test();
+        // TeaTime is a fast & simple queue for timed callbacks, fashioned as a
+        // MonoBehaviour extension set, focused on solving common coroutines patterns in
+        // Unity games.
+
+        // Just put 'TeaTime.cs' somewhere in your project and call it inside any
+        // MonoBehaviour using 'this.tt' (and trust the autocomplete).
+
+
+        // >> tt(string queueName = null, bool resetQueue = false)
+        // Creates or changes the current queue.
+        // When used without name the queue will be anonymous and untrackable.
+        // If 'resetQueue = true' the queue will be stopped and overwritten.
+
+        // >> ttAdd(float timeDelay, Action callback)
+        // Appends a timed callback into the current queue.
+
+        // == Example: Invoke-like Timer ==
+        // 3 seconds callback timer.
+
+        this.tt().ttAdd(3, delegate()
+        {
+            Debug.Log("3 seconds have passed since the queue started " + Time.time);
+        });
+
+
+
+        // > ttRepeat(n)
+        // Repeats the current queue n times or infinite (n < 0).
+
+        // == InvokeRepeating-like Timer ==
+        // Repeats the callback every 9s, infinitely.
+
+        this.tt().ttAdd(9, delegate()
+        {
+            Debug.Log("9 seconds have passed " + Time.time);
+        })
+        .ttRepeat(-1);
+
+
+
+        // > ttLoop(
+        // Appends into the current queue a callback that runs frame by frame for all his duration.
+
+        // > ttHandler .deltaTime
+        // Special delta customized for the loop duration
+
+        // == Tween-like Color Transition ==
+        // Changes the camera background color to black in 3s, then to white in 4s, and repeat 2 more times.
+
+        this.tt().ttLoop(3, delegate(ttHandler loop)
+        {
+            Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
+        })
+        .ttLoop(4, delegate(ttHandler loop)
+        {
+            Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.white, loop.deltaTime);
+        })
+        .ttRepeat(2).ttAdd(delegate()
+        {
+            Debug.Log("Background transitions just ended " + Time.time);
+        });
     }
 
 
-    void Test()
+    void Update()
     {
-        // 'ttAdd(' appends a timed callback into a queue, execution starts immediately and
-        // all 'ttAdd(' without a name will be appended in the last used queue (or default)
-        // to be executed one after another.
 
-        // In this example, the first callback is called after 1 second, and the second
-        // callback 4 seconds after the first callback is completed (a chain of timed
-        // callbacks).
-        //this.ttAdd("Seconds", 1, () =>
-        //{
-        //    Debug.Log("+1 second " + Time.time);
-        //})
-        //.ttAdd(4, () =>
-        //{
-        //    Debug.Log("+1 +4 seconds " + Time.time);
-        //})
-        //.ttLock();
-        // 'ttWait()' locks the current queue ignoring new appends until all his
-        // current callbacks are completed. That's why they are safe to run during Update
-        // without over-appending, they just keep repeating themselves in order.
-
-
-        // 'ttLoop(' executes his callback frame by frame for all his duration. It
-        // requires 'ttHandler' to work, where you can access special properties, like a
-        // custom delta for interpolations during the loop duration.
-
-        // 'ttAdd(' and 'ttLoop(' can be mixed. In this example, a 3 seconds 'ttLoop(' will
-        // run a Lerp using a special 'deltaTime' from 'ttHandler', customized to
-        // represent the loop duration, then a 'ttAdd(' (0s) marks the loop end.
-        //this.ttLoop("Background change", 3, delegate(ttHandler loop)
-        //{
-        //    Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
-        //})
-        //.ttAdd(() =>
-        //{
-        //    Debug.Log("Black, +3 secs " + Time.time);
-        //})
-        //.ttLoop(3, delegate(ttHandler loop)
-        //{
-        //    Camera.main.backgroundColor = Color.Lerp(Color.black, Color.white, loop.t);
-        //})
-        //.ttAdd(() =>
-        //{
-        //    Debug.Log("White, +3 secs " + Time.time);
-        //})
-        //.ttLock();
-        // In the second 'Lerp' loop, instead of 'loop.deltaTime' we are using 'loop.t',
-        // because 't' contains the completion percentage from 0 to 1 based on duration.
-        // This is the precise value required when using a constant in the 'Lerp' 'from'.
-
-
-        // You can also use 'ttHandler' in a normal 'ttAdd(' for extra features. In this
-        // example we are using 'WaitFor(' to wait for a YieldInstruction (e.g DOTween,
-        // WaitForSeconds) after the callback is done and before the next queued callback.
-        //this.ttAdd("DOTween example", delegate(ttHandler t)
-        //{
-        //    Sequence myTween = DOTween.Sequence();
-        //    myTween.Append(transform.DOMoveX(5, 2.5f));
-        //    myTween.Append(transform.DOMoveX(-5, 2.5f));
-
-        //    t.WaitFor(myTween.WaitForCompletion());
-        //})
-        //.ttAdd(() =>
-        //{
-        //    Debug.Log("myTween end, +5 secs " + Time.time);
-        //})
-        //.ttLock();
-
-
-        // If you call 'ttLoop(' without time (or negative) the loop will be infinite. In
-        // this case you can use 'timeSinceStart' and 'Break(' from ttHandler to control
-        // the loop.
-        //this.ttLoop("Timed by break", delegate(ttHandler t)
-        //{
-        //    if (t.timeSinceStart > 2)
-        //        t.Break();
-        //})
-        //.ttAdd(() =>
-        //{
-        //    Debug.Log("Break Loop, +2 " + Time.time);
-        //})
-        //.ttLock();
-
-
-        // Alternatively to create or change your current queue by using the name
-        // parameter in 'ttAdd(' or 'ttLoop(', there is also 'tt(' that does the same.
-        this.tt("Queue named by tt").ttAdd(3, delegate()
-        {
-            // But, If you use 'tt()' without name, TeaTime will use an unknown and unique
-            // identifier instead. The current queue will be anonymous and untrackable
-            // (immune to 'ttWait'). Pretty useful to create simple timers.
-            this.tt().ttAdd(4, () =>
-            {
-                Debug.Log("Out of sync timer, step 1 +4 " + Time.time);
-            })
-            .ttAdd(1, () =>
-            {
-                Debug.Log("Step 2 +1 " + Time.time);
-            });
-        })
-        .ttLock();
-
-
-        // And finally, 'TeaTime.Reset(' let you stop and clean a running queue or all
-        // queues from an instance, and there is a 'TeaTime.ResetAll()' that cleans
-        // everything.
-        TeaTime.Reset(this, "QueueName");
-
-
-        // **Details to remember**
-        // - Execution starts immediately
-        // - Queues are unique to his MonoBehaviour (this is an extension after all)
-        // - Below the sugar, everything runs on Unity coroutines!
-
-        // **Tips**
-        // - You can create tween-like behaviours with loops and lerp functions
-        // - Always name your queue if you want to use more than one queue with safety 
-        // - You can use a YieldInstruction instead of time (e.g. WaitForEndOfFrame)
-
-        // **About ttHandler**
-        // - ttHandler adds special control features to all your callbacks
-        // - ttHandler.deltaTime contains a customized deltaTime that represents the precise loop duration
-        // - ttHandler.t contains the completion percentage expressed from 0 to 1 based on the loop duration
-        // - ttHandler.waitFor( applies a wait interval once, at the end of the current callback
-
-        // **Moar**
-        // - tt( changes the current queue, reset it or create an anonymous queue
-        // - ttWait() ensures a complete and safe run of the current queue (waits for completion)
-        // - TeaTime.Reset( stops and resets queues and instances, TeaTime.ResetAll( resets everything
-
-        // And that's it!
-
-
-        // By Andrés Villalobos [andresalvivar@gmail.com twitter.com/matnesis]
-        // Special thanks to Antonio Zamora [twitter.com/tzamora] for the loop idea and testing.
-        // Created 2014/12/26 12:21 am
     }
 }
