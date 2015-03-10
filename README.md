@@ -11,9 +11,9 @@ Just put 'TeaTime.cs' somewhere in your project and call it inside any
 MonoBehaviour using 'this.tt' (and trust the autocomplete).
 
 
-	this.tt("QueueName").ttAdd(2, () =>
+	this.tt("QueueExample").ttAdd(2, () =>
 	{
-		Debug.Log("2 seconds since QueueName started " + Time.time);
+		Debug.Log("2 seconds since QueueExample started " + Time.time);
 	})
 	.ttLoop(3, delegate(ttHandler loop)
 	{	
@@ -24,7 +24,7 @@ MonoBehaviour using 'this.tt' (and trust the autocomplete).
 	})
 	.ttAdd(() =>
 	{
-		Debug.Log("5 seconds since QueueName started " + Time.time);
+		Debug.Log("5 seconds since QueueExample started " + Time.time);
 	})
 
 

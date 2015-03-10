@@ -12,9 +12,9 @@
 // MonoBehaviour using 'this.tt' (and trust the autocomplete).
 
 
-//    this.tt("QueueName").ttAdd(2, () =>
+//    this.tt("QueueExample").ttAdd(2, () =>
 //    {
-//        Debug.Log("2 seconds since QueueName started " + Time.time);
+//        Debug.Log("2 seconds since QueueExample started " + Time.time);
 //    })
 //    .ttLoop(3, delegate(ttHandler loop)
 //    {	
@@ -25,7 +25,7 @@
 //    })
 //    .ttAdd(() =>
 //    {
-//        Debug.Log("5 seconds since QueueName started " + Time.time);
+//        Debug.Log("5 seconds since QueueExample started " + Time.time);
 //    })
 
 
