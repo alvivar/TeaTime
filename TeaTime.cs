@@ -19,7 +19,7 @@
 //    .ttLoop(3, delegate(ttHandler loop)
 //    {	
 //        // ttLoop runs frame by frame for all his duration (3s) and his handler have a
-//        // customized delta (loop.deltaTime) that represents the precise loop duration.
+//        // custom delta (loop.deltaTime) that represents the precise loop duration.
 //        Camera.main.backgroundColor 
 //            = Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
 //    })
@@ -873,7 +873,7 @@ public static class TeaTime
             // Completion % from 0 to 1
             loopHandler.t += tRate * delta;
 
-            // Custom delta based on duration
+            // Customized delta that represents the loop duration
             loopHandler.deltaTime = 1 / (duration - loopHandler.timeSinceStart) * delta;
             loopHandler.timeSinceStart += delta;
 

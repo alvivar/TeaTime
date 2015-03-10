@@ -52,7 +52,7 @@ public class Examples : MonoBehaviour
         // Appends into the current queue a callback that runs frame by frame for all his duration.
 
         // > ttHandler loop; loop.deltaTime
-        // Special delta customized to represent the loop duration.
+        // Customized delta that represents the loop duration.
 
         // EXAMPLE
         // Tween-like Color Transition

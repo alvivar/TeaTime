@@ -18,7 +18,7 @@ MonoBehaviour using 'this.tt' (and trust the autocomplete).
 	.ttLoop(3, delegate(ttHandler loop)
 	{	
 		// ttLoop runs frame by frame for all his duration (3s) and his handler have a
-		// customized delta (loop.deltaTime) that represents the precise loop duration.
+		// custom delta (loop.deltaTime) that represents the precise loop duration.
 		Camera.main.backgroundColor 
 			= Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
 	})
