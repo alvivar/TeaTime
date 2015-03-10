@@ -30,7 +30,7 @@ MonoBehaviour using 'this.tt' (and trust the autocomplete).
 
 Check out
 **[Examples.cs](http://github.com/alvivar/TeaTime/blob/master/Examples.cs)**
-to learn. (*More to come!*)
+for practical patterns! (*More to come*)
 
 
 By **[Andrés Villalobos](http://twitter.com/matnesis)**, special thanks to
