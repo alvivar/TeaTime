@@ -81,7 +81,7 @@ public class Examples : MonoBehaviour
         // Executes a callback and waits 2s during continuous calls without over appending callbacks.
         if (Input.anyKey) // On any key hold
         {
-            this.tt("QueueIdentifier").ttAdd(delegate()
+            this.tt("QueueName").ttAdd(delegate()
             {
                 Debug.Log("Wait For Completion Lock: " + Time.time);
             })
@@ -99,7 +99,7 @@ public class Examples : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             // resetQueue set to true
-            this.tt("PositionLerpSelfRestart", true).ttAdd(delegate()
+            this.tt("LerpOverwrite", true).ttAdd(delegate()
             {
                 transform.position = Vector3.zero;
             })
