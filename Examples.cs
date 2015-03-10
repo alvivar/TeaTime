@@ -22,7 +22,8 @@ public class Examples : MonoBehaviour
         // >> ttAdd(float timeDelay, Action callback)
         // Appends a timed callback into the current queue.
 
-        // == Example: Invoke-like Timer ==
+        // EXAMPLE
+        // Invoke-like Timer
         // 3 seconds callback timer.
 
         this.tt().ttAdd(3, delegate()
@@ -32,10 +33,11 @@ public class Examples : MonoBehaviour
 
 
 
-        // > ttRepeat(n)
-        // Repeats the current queue n times or infinite (n < 0).
+        // > ttRepeat(int n = 1)
+        // Repeats the current queue n times or infinite (n <= -1).
 
-        // == InvokeRepeating-like Timer ==
+        // EXAMPLE
+        // InvokeRepeating-like Timer
         // Repeats the callback every 9s, infinitely.
 
         this.tt().ttAdd(9, delegate()
@@ -52,7 +54,8 @@ public class Examples : MonoBehaviour
         // > ttHandler .deltaTime
         // Special delta customized for the loop duration
 
-        // == Tween-like Color Transition ==
+        // EXAMPLE
+        // Tween-like Color Transition
         // Changes the camera background color to black in 3s, then to white in 4s, and repeat 2 more times.
 
         this.tt().ttLoop(3, delegate(ttHandler loop)
