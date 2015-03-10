@@ -19,15 +19,15 @@ public class Examples : MonoBehaviour
         // In this example, the first callback is called after 1 second, and the second
         // callback 4 seconds after the first callback is completed (a chain of timed
         // callbacks).
-        this.ttAdd("Seconds", 1, () =>
-        {
-            Debug.Log("+1 second " + Time.time);
-        })
-        .ttAdd(4, () =>
-        {
-            Debug.Log("+1 +4 seconds " + Time.time);
-        })
-        .ttLock();
+        //this.ttAdd("Seconds", 1, () =>
+        //{
+        //    Debug.Log("+1 second " + Time.time);
+        //})
+        //.ttAdd(4, () =>
+        //{
+        //    Debug.Log("+1 +4 seconds " + Time.time);
+        //})
+        //.ttLock();
         // 'ttWait()' locks the current queue ignoring new appends until all his
         // current callbacks are completed. That's why they are safe to run during Update
         // without over-appending, they just keep repeating themselves in order.
@@ -40,23 +40,23 @@ public class Examples : MonoBehaviour
         // 'ttAdd(' and 'ttLoop(' can be mixed. In this example, a 3 seconds 'ttLoop(' will
         // run a Lerp using a special 'deltaTime' from 'ttHandler', customized to
         // represent the loop duration, then a 'ttAdd(' (0s) marks the loop end.
-        this.ttLoop("Background change", 3, delegate(ttHandler loop)
-        {
-            Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
-        })
-        .ttAdd(() =>
-        {
-            Debug.Log("Black, +3 secs " + Time.time);
-        })
-        .ttLoop(3, delegate(ttHandler loop)
-        {
-            Camera.main.backgroundColor = Color.Lerp(Color.black, Color.white, loop.t);
-        })
-        .ttAdd(() =>
-        {
-            Debug.Log("White, +3 secs " + Time.time);
-        })
-        .ttLock();
+        //this.ttLoop("Background change", 3, delegate(ttHandler loop)
+        //{
+        //    Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
+        //})
+        //.ttAdd(() =>
+        //{
+        //    Debug.Log("Black, +3 secs " + Time.time);
+        //})
+        //.ttLoop(3, delegate(ttHandler loop)
+        //{
+        //    Camera.main.backgroundColor = Color.Lerp(Color.black, Color.white, loop.t);
+        //})
+        //.ttAdd(() =>
+        //{
+        //    Debug.Log("White, +3 secs " + Time.time);
+        //})
+        //.ttLock();
         // In the second 'Lerp' loop, instead of 'loop.deltaTime' we are using 'loop.t',
         // because 't' contains the completion percentage from 0 to 1 based on duration.
         // This is the precise value required when using a constant in the 'Lerp' 'from'.
@@ -65,34 +65,34 @@ public class Examples : MonoBehaviour
         // You can also use 'ttHandler' in a normal 'ttAdd(' for extra features. In this
         // example we are using 'WaitFor(' to wait for a YieldInstruction (e.g DOTween,
         // WaitForSeconds) after the callback is done and before the next queued callback.
-        this.ttAdd("DOTween example", delegate(ttHandler t)
-        {
-            Sequence myTween = DOTween.Sequence();
-            myTween.Append(transform.DOMoveX(5, 2.5f));
-            myTween.Append(transform.DOMoveX(-5, 2.5f));
+        //this.ttAdd("DOTween example", delegate(ttHandler t)
+        //{
+        //    Sequence myTween = DOTween.Sequence();
+        //    myTween.Append(transform.DOMoveX(5, 2.5f));
+        //    myTween.Append(transform.DOMoveX(-5, 2.5f));
 
-            t.WaitFor(myTween.WaitForCompletion());
-        })
-        .ttAdd(() =>
-        {
-            Debug.Log("myTween end, +5 secs " + Time.time);
-        })
-        .ttLock();
+        //    t.WaitFor(myTween.WaitForCompletion());
+        //})
+        //.ttAdd(() =>
+        //{
+        //    Debug.Log("myTween end, +5 secs " + Time.time);
+        //})
+        //.ttLock();
 
 
         // If you call 'ttLoop(' without time (or negative) the loop will be infinite. In
         // this case you can use 'timeSinceStart' and 'Break(' from ttHandler to control
         // the loop.
-        this.ttLoop("Timed by break", delegate(ttHandler t)
-        {
-            if (t.timeSinceStart > 2)
-                t.Break();
-        })
-        .ttAdd(() =>
-        {
-            Debug.Log("Break Loop, +2 " + Time.time);
-        })
-        .ttLock();
+        //this.ttLoop("Timed by break", delegate(ttHandler t)
+        //{
+        //    if (t.timeSinceStart > 2)
+        //        t.Break();
+        //})
+        //.ttAdd(() =>
+        //{
+        //    Debug.Log("Break Loop, +2 " + Time.time);
+        //})
+        //.ttLock();
 
 
         // Alternatively to create or change your current queue by using the name
