@@ -14,12 +14,12 @@ public class Examples : MonoBehaviour
         // MonoBehaviour using 'this.tt' (and trust the autocomplete).
 
 
-        // >> tt(string queueName = null, bool resetQueue = false)
+        // > tt(string queueName = null, bool resetQueue = false)
         // Creates or changes the current queue.
         // When used without name the queue will be anonymous and untrackable.
         // If 'resetQueue = true' the queue will be stopped and overwritten.
 
-        // >> ttAdd(float timeDelay, Action callback)
+        // > ttAdd(float timeDelay, Action callback)
         // Appends a timed callback into the current queue.
 
         // EXAMPLE
@@ -68,7 +68,7 @@ public class Examples : MonoBehaviour
         })
         .ttRepeat(2).ttAdd(delegate()
         {
-            Debug.Log("Background transitions just ended " + Time.time);
+            Debug.Log("Background transitions end " + Time.time);
         });
     }
 
