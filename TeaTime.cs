@@ -556,7 +556,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Repeat the current queue n times or infinite (n <= -1).
+    /// Repeats the current queue n times or infinite (n <= -1).
     /// </summary>
     public static MonoBehaviour ttRepeat(this MonoBehaviour instance, int n = 1)
     {
