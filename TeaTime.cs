@@ -512,9 +512,9 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Locks the current queue ignoring new appends until all his callbacks are completed (i.e. WaitForCompletion).
+    /// Wait for completion. Locks the current queue ignoring new appends until all his callbacks are completed.
     /// </summary>
-    public static MonoBehaviour ttLock(this MonoBehaviour instance)
+    public static MonoBehaviour ttWait(this MonoBehaviour instance)
     {
         PrepareMainQueue(instance);
         PrepareCurrentQueueName(instance);
@@ -553,7 +553,7 @@ public static class TeaTime
         // If infinite
         if (n < 0)
         {
-            instance.tt(currentQueueName[instance]).ttLock();
+            instance.tt(currentQueueName[instance]).ttWait();
 
             PrepareInfiniteQueues(instance);
 
