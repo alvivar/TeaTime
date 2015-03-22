@@ -10,7 +10,6 @@ Unity games.
 Just put 'TeaTime.cs' somewhere in your project and call it inside any
 MonoBehaviour using 'this.tt' (and trust the autocomplete).
 
-
 	this.tt("QueueExample").ttAdd(2, () =>
 	{
 		Debug.Log("2 seconds since QueueExample started " + Time.time);

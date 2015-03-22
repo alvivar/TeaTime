@@ -73,7 +73,7 @@ public class Examples : MonoBehaviour
 
     void Update()
     {
-        // > ttLock()
+        // > ttWait()
         // Locks the current queue ignoring new appends until all his callbacks are completed (i.e. WaitForCompletion).
 
         // EXAMPLE
@@ -86,8 +86,8 @@ public class Examples : MonoBehaviour
                 Debug.Log("Wait For Completion Lock: " + Time.time);
             })
             .ttAdd(2) // 2s wait
-            .ttLock();
-            // ttLock() uses the queue name to set the lock, 
+            .ttWait();
+            // ttWait() uses the queue name to set the lock, 
             // allowing tt("queueName") to wait for completion before appending new callbacks.
         }
 

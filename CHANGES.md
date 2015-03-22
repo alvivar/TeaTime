@@ -1,8 +1,6 @@
 - **NEW**: ttRepeat(n), repeats the current queue n times or infinite (n <=
   -1).
 
-- **CHANGE**: ttWait() renamed to ttLock() (describe better what it does).
-
 - **CHANGE**: ttAdd( & ttLoop(, can't create/change the current queue now, use
   tt( instead.
 
