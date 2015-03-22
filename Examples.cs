@@ -74,7 +74,11 @@ public class Examples : MonoBehaviour
     void Update()
     {
         // > ttWait()
+<<<<<<< HEAD
         // Locks the current queue ignoring new appends until all his callbacks are completed (i.e. WaitForCompletion).
+=======
+        // Wait for completion. Locks the current queue ignoring new appends until all his callbacks are completed.
+>>>>>>> 2749295043a51dde932e8238b69f8b71a55a99dc
 
         // EXAMPLE
         // Wait For Completion Lock
