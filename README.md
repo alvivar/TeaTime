@@ -37,7 +37,3 @@ By **[Andrés Villalobos](http://twitter.com/matnesis)**, special thanks to
 testing.
 
 > 2014/12/26 12:21 am
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/alvivar/teatime/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
