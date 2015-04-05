@@ -4,7 +4,10 @@
 [Oo]bj/
 [Tt]emp/
 
-# VS/MD files
+# Sublime
+*.sublime-workspace
+
+# VS/MD
 *.booproj
 *.csproj
 *.pidb
@@ -15,12 +18,12 @@
 *.user
 *.userprefs
 
-# Unity meta files
-*.meta
+# Unity meta
 *.pidb.meta
+*.meta
 
-# Unity crash reports file
+# Unity crash reports
 sysinfo.txt
 
-# Mac shit
+# Mac junk
 .DS_Store
