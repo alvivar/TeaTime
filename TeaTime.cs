@@ -17,10 +17,10 @@
 //        Debug.Log("2 seconds since QueueExample started " + Time.time);
 //    })
 //    .ttLoop(3, delegate(ttHandler loop)
-//    {	
+//    {
 //        // ttLoop runs frame by frame for all his duration (3s) and his handler have a
 //        // custom delta (loop.deltaTime) that represents the precise loop duration.
-//        Camera.main.backgroundColor 
+//        Camera.main.backgroundColor
 //            = Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
 //    })
 //    .ttAdd(() =>
@@ -130,6 +130,11 @@ public class ttHandler
 /// </summary>
 public static class TeaTime
 {
+    /// <summary>
+    /// Debug mode prints queue interactions on console.
+    /// </summary>
+    public static bool debugMode = false;
+
     /// <summary>
     /// Default queue name.
     /// </summary>
@@ -307,8 +312,8 @@ public static class TeaTime
     /// Appends a callback (timed or looped) into a queue.
     /// </summary>
     private static MonoBehaviour ttAdd(this MonoBehaviour instance, string queueName, float timeDelay, YieldInstruction yieldDelay,
-        Action callback, Action<ttHandler> callbackWithHandler,
-        bool isLoop)
+                                       Action callback, Action<ttHandler> callbackWithHandler,
+                                       bool isLoop)
     {
         // Always remember the name
         PrepareCurrentQueueName(instance);
@@ -520,8 +525,7 @@ public static class TeaTime
         PrepareCurrentQueueName(instance);
 
         // Ignore if the queue if empty
-        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false ||
-            mainQueue[instance][currentQueueName[instance]].Count < 1)
+        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false || mainQueue[instance][currentQueueName[instance]].Count < 1)
             return instance;
 
         // Locks the queue
@@ -539,6 +543,9 @@ public static class TeaTime
     {
         PrepareCurrentQueueName(instance);
 
+        if (debugMode)
+            Debug.Log("TeaTime :: ttRepeat, " + currentQueueName[instance] + ", n = " + n);
+
         // Ignore locked
         if (IsLocked(instance, currentQueueName[instance]))
             return instance;
@@ -546,8 +553,7 @@ public static class TeaTime
         PrepareMainQueue(instance);
 
         // Ignore if the queue if empty
-        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false ||
-            mainQueue[instance][currentQueueName[instance]].Count < 1)
+        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false || mainQueue[instance][currentQueueName[instance]].Count < 1)
             return instance;
 
         // If infinite
@@ -563,12 +569,21 @@ public static class TeaTime
             return instance;
         }
 
-        // Repeat n 
+        // Repeat n
         while (n-- > 0)
         {
             mainQueue[instance][currentQueueName[instance]].AddRange(blueprints[instance][currentQueueName[instance]]);
         }
 
+        return instance;
+    }
+
+
+    /// <summary>
+    /// Repeats the current queue n times or infinite (n <= -1).
+    /// </summary>
+    public static MonoBehaviour ttReset(this MonoBehaviour instance)
+    {
         return instance;
     }
 
@@ -598,6 +613,9 @@ public static class TeaTime
     /// </summary>
     public static void Reset(MonoBehaviour instance, string queueName)
     {
+        if (debugMode)
+            Debug.Log("TeaTime :: Reset, " + queueName + ", from " + instance.name);
+
         // Initialize all
         PrepareMainQueue(instance, queueName);
         PrepareRunningQueues(instance);
@@ -620,7 +638,7 @@ public static class TeaTime
         if (infiniteQueues[instance].Contains(queueName))
             infiniteQueues[instance].Remove(queueName);
 
-        // Stop & clean coroutines 
+        // Stop & clean coroutines
         foreach (IEnumerator coroutine in runningCoroutines[instance][queueName])
         {
             instance.StopCoroutine(coroutine);
@@ -651,7 +669,7 @@ public static class TeaTime
         lockedQueues[instance].Clear();
         infiniteQueues[instance].Clear();
 
-        // Stop & clean coroutines 
+        // Stop & clean coroutines
         foreach (KeyValuePair<string, List<IEnumerator>> coroutineList in runningCoroutines[instance])
         {
             foreach (IEnumerator coroutine in coroutineList.Value)
@@ -782,7 +800,7 @@ public static class TeaTime
             }
             else
             {
-                coroutine = ExecuteOnce(task.time, task.yieldInstruction, task.callback, task.callbackWithHandler);
+                coroutine = ExecuteOnce(instance, task.time, task.yieldInstruction, task.callback, task.callbackWithHandler);
             }
 
             // Register and execute coroutines
@@ -822,10 +840,10 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Executes a timed callback.
+    /// Executes a timed callback, backing up the current queue name (the callback could be a TeaTime queue).
     /// </summary>
-    private static IEnumerator ExecuteOnce(float timeToWait, YieldInstruction yieldToWait,
-        Action callback, Action<ttHandler> callbackWithHandler)
+    private static IEnumerator ExecuteOnce(MonoBehaviour instance, float timeToWait, YieldInstruction yieldToWait,
+                                           Action callback, Action<ttHandler> callbackWithHandler)
     {
         // Wait until
         if (timeToWait > 0)
@@ -833,6 +851,9 @@ public static class TeaTime
 
         if (yieldToWait != null)
             yield return yieldToWait;
+
+        // Queue name backup
+        string queueNameBackup = currentQueueName[instance];
 
         // Executes the normal callback
         if (callback != null)
@@ -847,6 +868,9 @@ public static class TeaTime
             if (t.yieldToWait != null)
                 yield return t.yieldToWait;
         }
+
+        // Recover the queue name
+        currentQueueName[instance] = queueNameBackup;
 
         yield return null;
     }
