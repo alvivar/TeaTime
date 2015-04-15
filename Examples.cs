@@ -99,8 +99,8 @@ public class Examples : MonoBehaviour
         // Moves from Vector3.zero to Vector3(5, 5, 5) in 3 seconds, overwriting itselfs (reset) if recalled.
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            // 'resetQueue' = true
-            this.tt("LerpOverwrite", true).ttAdd(delegate()
+            // The queue is selected, then resetted
+            this.tt("LerpOverwrite").ttReset().ttAdd(delegate()
             {
                 transform.position = Vector3.zero;
             })
