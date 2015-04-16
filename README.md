@@ -1,4 +1,4 @@
-###TeaTime v0.6 alpha 
+###TeaTime v0.6.2 alpha 
 
 _[DOWNLOAD](http://github.com/alvivar/TeaTime/raw/master/TeaTime.zip)_
 
@@ -31,9 +31,8 @@ Check out
 **[Examples.cs](http://github.com/alvivar/TeaTime/blob/master/Examples.cs)**
 to learn with practical patterns! (*More to come*)
 
-
 By **[Andrés Villalobos](http://twitter.com/matnesis)**, special thanks to
-**[Antonio Zamora](http://twitter.com/tzamora)** for the loop idea and
-testing.
+**[Antonio Zamora](http://twitter.com/tzamora)** (loop idea and initial
+testing).
 
 > 2014/12/26 12:21 am

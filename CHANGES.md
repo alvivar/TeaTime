@@ -1,3 +1,19 @@
+- **NEW**: ttReset is back, it stops and resets the current queue.
+
+- **CHANGE**: tt( optional parameter can't reset a queue anymore (use ttReset
+  after tt( instead).
+
+- **BUG FIXED**: Using a TeaTime queue inside a TeaTime queue used to cause a
+  problem with the queue name reference. It's fixed now.
+
+- Minor optimizations.
+
+- Deprecated code cleanup.
+
+- Improved examples.
+
+####v0.6.2
+
 - **NEW**: ttRepeat(n), repeats the current queue n times or infinite (n <=
   -1).
 
