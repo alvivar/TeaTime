@@ -311,26 +311,24 @@ public static class TeaTime
     /// <summary>
     /// Appends a callback (timed or looped) into a queue.
     /// </summary>
-    private static MonoBehaviour ttAdd(this MonoBehaviour instance, string queueName, float timeDelay, YieldInstruction yieldDelay,
+    private static MonoBehaviour ttAdd(this MonoBehaviour instance, float timeDelay, YieldInstruction yieldDelay,
                                        Action callback, Action<ttHandler> callbackWithHandler,
                                        bool isLoop)
     {
-        // Always remember the name
         PrepareCurrentQueueName(instance);
-        currentQueueName[instance] = queueName;
 
         // Ignore locked
-        if (IsLocked(instance, queueName))
+        if (IsLocked(instance, currentQueueName[instance]))
             return instance;
 
-        PrepareMainQueue(instance, queueName);
+        PrepareMainQueue(instance, currentQueueName[instance]);
 
         // Appends a new task (+ Blueprint clone)
-        mainQueue[instance][queueName].Add(new ttTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
-        blueprints[instance][queueName].Add(new ttTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
+        mainQueue[instance][currentQueueName[instance]].Add(new ttTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
+        blueprints[instance][currentQueueName[instance]].Add(new ttTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
 
         // Execute queue
-        instance.StartCoroutine(ExecuteQueue(instance, queueName));
+        instance.StartCoroutine(ExecuteQueue(instance, currentQueueName[instance]));
 
         return instance;
     }
@@ -341,9 +339,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, float timeDelay, Action callback)
     {
-        PrepareCurrentQueueName(instance);
-
-        return instance.ttAdd(currentQueueName[instance], timeDelay, null, callback, null, false);
+        return instance.ttAdd(timeDelay, null, callback, null, false);
     }
 
 
@@ -352,9 +348,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, float timeDelay, Action<ttHandler> callback)
     {
-        PrepareCurrentQueueName(instance);
-
-        return instance.ttAdd(currentQueueName[instance], timeDelay, null, null, callback, false);
+        return instance.ttAdd(timeDelay, null, null, callback, false);
     }
 
 
@@ -363,9 +357,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, YieldInstruction yieldToWait, Action callback)
     {
-        PrepareCurrentQueueName(instance);
-
-        return instance.ttAdd(currentQueueName[instance], 0, yieldToWait, callback, null, false);
+        return instance.ttAdd(0, yieldToWait, callback, null, false);
     }
 
 
@@ -374,9 +366,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, YieldInstruction yieldToWait, Action<ttHandler> callback)
     {
-        PrepareCurrentQueueName(instance);
-
-        return instance.ttAdd(currentQueueName[instance], 0, yieldToWait, null, callback, false);
+        return instance.ttAdd(0, yieldToWait, null, callback, false);
     }
 
 
@@ -385,9 +375,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, float interval)
     {
-        PrepareCurrentQueueName(instance);
-
-        return instance.ttAdd(currentQueueName[instance], interval, null, null, null, false);
+        return instance.ttAdd(interval, null, null, null, false);
     }
 
 
@@ -396,9 +384,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, Action callback)
     {
-        PrepareCurrentQueueName(instance);
-
-        return instance.ttAdd(currentQueueName[instance], 0, null, callback, null, false);
+        return instance.ttAdd(0, null, callback, null, false);
     }
 
 
@@ -407,9 +393,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, Action<ttHandler> callback)
     {
-        PrepareCurrentQueueName(instance);
-
-        return instance.ttAdd(currentQueueName[instance], 0, null, null, callback, false);
+        return instance.ttAdd(0, null, null, callback, false);
     }
 
 
@@ -418,9 +402,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttLoop(this MonoBehaviour instance, float duration, Action<ttHandler> callback)
     {
-        PrepareCurrentQueueName(instance);
-
-        return instance.ttAdd(currentQueueName[instance], duration, null, null, callback, true);
+        return instance.ttAdd(duration, null, null, callback, true);
     }
 
 
@@ -429,9 +411,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttLoop(this MonoBehaviour instance, Action<ttHandler> callback)
     {
-        PrepareCurrentQueueName(instance);
-
-        return instance.ttAdd(currentQueueName[instance], 0, null, null, callback, true);
+        return instance.ttAdd(0, null, null, callback, true);
     }
 
 
