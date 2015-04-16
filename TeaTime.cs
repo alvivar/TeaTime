@@ -1,7 +1,7 @@
-﻿// TeaTime v0.6 alpha
+﻿// TeaTime v0.6.2 alpha
 
 // By Andrés Villalobos [andresalvivar@gmail.com twitter.com/matnesis]
-// Special thanks to Antonio Zamora [twitter.com/tzamora] for the loop idea and testing.
+// Special thanks to Antonio Zamora [twitter.com/tzamora] (loop idea and initial testing).
 // Created 2014/12/26 12:21 am
 
 // TeaTime is a fast & simple queue for timed callbacks, fashioned as a
@@ -459,7 +459,8 @@ public static class TeaTime
         // If infinite
         if (n < 0)
         {
-            instance.tt(currentQueueName[instance]).ttWait();
+            // instance.tt(currentQueueName[instance]).ttWait();
+            instance.ttWait();
 
             PrepareInfiniteQueues(instance);
 
