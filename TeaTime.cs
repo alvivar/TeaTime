@@ -459,7 +459,6 @@ public static class TeaTime
         // If infinite
         if (n < 0)
         {
-            // instance.tt(currentQueueName[instance]).ttWait();
             instance.ttWait();
 
             PrepareInfiniteQueues(instance);
@@ -531,7 +530,7 @@ public static class TeaTime
         if (runningQueues[instance].Contains(queueName))
             runningQueues[instance].Remove(queueName);
 
-        //currentQueue[instance] = queueName;
+        // currentQueue[instance] = queueName;
 
         if (lockedQueues[instance].Contains(queueName))
             lockedQueues[instance].Remove(queueName);
@@ -566,7 +565,7 @@ public static class TeaTime
             taskList.Value.Clear();
 
         runningQueues[instance].Clear();
-        //currentQueue[instance] = DEFAULT_QUEUE_NAME;
+        // currentQueue[instance] = DEFAULT_QUEUE_NAME;
         lockedQueues[instance].Clear();
         infiniteQueues[instance].Clear();
 
