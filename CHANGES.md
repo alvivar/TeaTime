@@ -10,7 +10,7 @@
 
 - Deprecated code cleanup.
 
-- Improved examples.
+- Updated examples.
 
 ####v0.6.2
 
