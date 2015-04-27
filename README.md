@@ -32,7 +32,6 @@ Check out
 to learn with practical patterns! (*More to come*)
 
 By **[Andrés Villalobos](http://twitter.com/matnesis)**, special thanks to
-**[Antonio Zamora](http://twitter.com/tzamora)** (loop idea and initial
-testing).
+**[Antonio Zamora](http://twitter.com/tzamora)** (loop idea and initial push).
 
 > 2014/12/26 12:21 am
