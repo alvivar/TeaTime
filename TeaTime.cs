@@ -469,6 +469,7 @@ public static class TeaTime
 
     /// <summary>
     /// Pauses the current queue.
+    /// (Use .ttPlay() to resume)
     /// </summary>
     public static MonoBehaviour ttPause(this MonoBehaviour instance)
     {
@@ -484,14 +485,15 @@ public static class TeaTime
 
     /// <summary>
     /// Stops and pauses the current queue.
+    /// (Use .ttPlay() to restart)
     /// </summary>
     public static MonoBehaviour ttStop(this MonoBehaviour instance)
     {
         PrepareCurrentQueueName(instance);
         string queueName = currentQueueName[instance];
 
-        // Timed callbacks reset
-        // But leave the current queue config as they are
+        // Current queue reset
+        // (But leaves the config as they are)
         PrepareMainQueue(instance, queueName);
         PrepareRunningQueues(instance);
         PrepareRunningCoroutines(instance, queueName);
@@ -501,14 +503,13 @@ public static class TeaTime
         if (runningQueues[instance].Contains(queueName))
             runningQueues[instance].Remove(queueName);
 
-        // Coroutines cleanup
         foreach (IEnumerator coroutine in runningCoroutines[instance][queueName])
         {
             instance.StopCoroutine(coroutine);
         }
         runningCoroutines[instance][queueName].Clear();
 
-        // Pause, and mainQueue reload from blueprints
+        // Pause and blueprints reload
         instance.ttPause();
         mainQueue[instance][queueName].AddRange(blueprints[instance][queueName]);
 
@@ -517,7 +518,22 @@ public static class TeaTime
 
 
     /// <summary>
+    /// Stops and resets the current queue.
+    /// (Full queue cleanup)
+    /// </summary>
+    public static MonoBehaviour ttReset(this MonoBehaviour instance)
+    {
+        PrepareCurrentQueueName(instance);
+
+        Reset(instance, currentQueueName[instance]);
+
+        return instance;
+    }
+
+
+    /// <summary>
     /// Plays the current queue.
+    /// (Resume paused queues)
     /// </summary>
     public static MonoBehaviour ttPlay(this MonoBehaviour instance)
     {
@@ -570,19 +586,6 @@ public static class TeaTime
         {
             mainQueue[instance][currentQueueName[instance]].AddRange(blueprints[instance][currentQueueName[instance]]);
         }
-
-        return instance;
-    }
-
-
-    /// <summary>
-    /// Stops and resets the current queue.
-    /// </summary>
-    public static MonoBehaviour ttReset(this MonoBehaviour instance)
-    {
-        PrepareCurrentQueueName(instance);
-
-        Reset(instance, currentQueueName[instance]);
 
         return instance;
     }
