@@ -1,4 +1,4 @@
-###TeaTime v0.6.2 alpha 
+###TeaTime v0.6.5 alpha
 
 _[DOWNLOAD](http://github.com/alvivar/TeaTime/raw/master/TeaTime.zip)_
 
@@ -15,10 +15,10 @@ MonoBehaviour using 'this.tt' (and trust the autocomplete).
 		Debug.Log("2 seconds since QueueExample started " + Time.time);
 	})
 	.ttLoop(3, delegate(ttHandler loop)
-	{	
+	{
 		// ttLoop runs frame by frame for all his duration (3s) and his handler have a
 		// custom delta (loop.deltaTime) that represents the precise loop duration.
-		Camera.main.backgroundColor 
+		Camera.main.backgroundColor
 			= Color.Lerp(Camera.main.backgroundColor, Color.black, loop.deltaTime);
 	})
 	.ttAdd(() =>

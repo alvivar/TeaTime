@@ -1,3 +1,10 @@
+- **NEW**: ttPause(, ttStop( and ttPlay( are now implemented and they work
+  exactly as you would think.
+
+- Minor optimizations & code cleanup.
+
+####v0.6.5:
+
 - **NEW**: ttReset is back, it stops and resets the current queue.
 
 - **CHANGE**: tt( optional parameter can't reset a queue anymore (use ttReset
