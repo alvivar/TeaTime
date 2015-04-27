@@ -167,6 +167,11 @@ public static class TeaTime
     private static Dictionary<MonoBehaviour, List<string>> lockedQueues = null;
 
     /// <summary>
+    /// Queues pauses by ttPause().
+    /// </summary>
+    private static Dictionary<MonoBehaviour, List<string>> pausedQueues = null;
+
+    /// <summary>
     /// Infinite queues by ttRepeat(-1).
     /// </summary>
     private static Dictionary<MonoBehaviour, List<string>> infiniteQueues = null;
@@ -249,6 +254,20 @@ public static class TeaTime
 
 
     /// <summary>
+    /// Prepares the dictionary for the queues paused in the instance.
+    /// </summary>
+    private static void PreparePausedQueues(MonoBehaviour instance)
+    {
+        if (pausedQueues == null)
+            pausedQueues = new Dictionary<MonoBehaviour, List<string>>();
+
+        if (pausedQueues.ContainsKey(instance) == false)
+            pausedQueues.Add(instance, new List<string>());
+
+    }
+
+
+    /// <summary>
     /// Prepares the dictionary for the infinite queues in the instance.
     /// </summary>
     private static void PrepareInfiniteQueues(MonoBehaviour instance)
@@ -287,10 +306,18 @@ public static class TeaTime
     {
         PrepareLockedQueues(instance);
 
-        if (lockedQueues[instance].Contains(queueName))
-            return true;
+        return lockedQueues[instance].Contains(queueName);
+    }
 
-        return false;
+
+    /// <summary>
+    /// Returns true if a queue is paused.
+    /// </summary>
+    private static bool IsPaused(MonoBehaviour instance, string queueName)
+    {
+        PreparePausedQueues(instance);
+
+        return pausedQueues[instance].Contains(queueName);
     }
 
 
@@ -301,10 +328,7 @@ public static class TeaTime
     {
         PrepareInfiniteQueues(instance);
 
-        if (infiniteQueues[instance].Contains(queueName))
-            return true;
-
-        return false;
+        return infiniteQueues[instance].Contains(queueName);
     }
 
 
@@ -424,7 +448,7 @@ public static class TeaTime
         PrepareMainQueue(instance);
         PrepareCurrentQueueName(instance);
 
-        // Ignore if the queue if empty
+        // Ignore if the queue is empty
         if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false || mainQueue[instance][currentQueueName[instance]].Count < 1)
             return instance;
 
@@ -436,24 +460,29 @@ public static class TeaTime
     }
 
 
+    public static MonoBehaviour ttPause(this MonoBehaviour instance)
+    {
+
+    }
+
+
     /// <summary>
     /// Repeats the current queue n times or infinite (n <= -1).
     /// </summary>
     public static MonoBehaviour ttRepeat(this MonoBehaviour instance, int n = 1)
     {
+        PrepareMainQueue(instance);
         PrepareCurrentQueueName(instance);
 
         if (debugMode)
             Debug.Log("TeaTime :: ttRepeat, " + currentQueueName[instance] + ", n = " + n);
 
-        // Ignore locked
-        if (IsLocked(instance, currentQueueName[instance]))
+        // Ignore if the queue is empty
+        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false || mainQueue[instance][currentQueueName[instance]].Count < 1)
             return instance;
 
-        PrepareMainQueue(instance);
-
-        // Ignore if the queue if empty
-        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false || mainQueue[instance][currentQueueName[instance]].Count < 1)
+        // Ignore locked
+        if (IsLocked(instance, currentQueueName[instance]))
             return instance;
 
         // If infinite
@@ -660,11 +689,8 @@ public static class TeaTime
     /// </summary>
     private static IEnumerator ExecuteQueue(MonoBehaviour instance, string queueName)
     {
-        // Ignore if empty
-        if (mainQueue.ContainsKey(instance) == false)
-            yield break;
-
-        if (mainQueue[instance].ContainsKey(queueName) == false)
+        // Ignore if the queue is empty
+        if (mainQueue[instance].ContainsKey(queueName) == false || mainQueue[instance][queueName].Count < 1)
             yield break;
 
         PrepareRunningQueues(instance);
@@ -673,7 +699,7 @@ public static class TeaTime
         if (runningQueues.ContainsKey(instance) && runningQueues[instance].Contains(queueName))
             yield break;
 
-        // Locks the queue
+        // Marks the queue as running
         runningQueues[instance].Add(queueName);
 
         // Coroutines registry
