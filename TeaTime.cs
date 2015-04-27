@@ -61,10 +61,12 @@ using UnityEngine;
 
 
 /// <summary>
-/// TeaTime task (callback data).
+/// TeaTime task (queue data).
 /// </summary>
 public class ttTask
 {
+    public MonoBehaviour instance;
+    public string queueName;
     public float time = 0f;
     public YieldInstruction yieldInstruction = null;
     public Action callback = null;
@@ -72,8 +74,10 @@ public class ttTask
     public bool isLoop = false;
 
 
-    public ttTask(float time, YieldInstruction yield, Action callback, Action<ttHandler> callbackWithHandler, bool isLoop)
+    public ttTask(MonoBehaviour instance, string queueName, float time, YieldInstruction yield, Action callback, Action<ttHandler> callbackWithHandler, bool isLoop)
     {
+        this.instance = instance;
+        this.queueName = queueName;
         this.time = time;
         this.yieldInstruction = yield;
         this.callback = callback;
@@ -348,8 +352,9 @@ public static class TeaTime
         PrepareMainQueue(instance, currentQueueName[instance]);
 
         // Appends a new task (+ Blueprint clone)
-        mainQueue[instance][currentQueueName[instance]].Add(new ttTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
-        blueprints[instance][currentQueueName[instance]].Add(new ttTask(timeDelay, yieldDelay, callback, callbackWithHandler, isLoop));
+        ttTask currentTask = new ttTask(instance, currentQueueName[instance], timeDelay, yieldDelay, callback, callbackWithHandler, isLoop);
+        mainQueue[instance][currentQueueName[instance]].Add(currentTask);
+        blueprints[instance][currentQueueName[instance]].Add(currentTask);
 
         // Execute queue
         instance.StartCoroutine(ExecuteQueue(instance, currentQueueName[instance]));
@@ -460,9 +465,21 @@ public static class TeaTime
     }
 
 
+    /// <summary>
+    /// Pauses the current queue.
+    /// </summary>
     public static MonoBehaviour ttPause(this MonoBehaviour instance)
     {
+        PrepareMainQueue(instance);
+        PrepareCurrentQueueName(instance);
 
+        // Ignore if the queue is empty
+        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false || mainQueue[instance][currentQueueName[instance]].Count < 1)
+            return instance;
+
+        // Pauses the queue
+        if (IsPaused(instance, currentQueueName[instance]) == false)
+            pausedQueues[instance].Add(currentQueueName[instance]);
     }
 
 
@@ -771,6 +788,9 @@ public static class TeaTime
     private static IEnumerator ExecuteOnce(float timeToWait, YieldInstruction yieldToWait,
                                            Action callback, Action<ttHandler> callbackWithHandler)
     {
+        // Pause
+        // if (IsPaused(instance, string queueName))
+
         // Wait until
         if (timeToWait > 0)
             yield return new WaitForSeconds(timeToWait);
