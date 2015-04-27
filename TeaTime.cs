@@ -470,16 +470,28 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttPause(this MonoBehaviour instance)
     {
-        PrepareMainQueue(instance);
         PrepareCurrentQueueName(instance);
-
-        // Ignore if the queue is empty
-        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false || mainQueue[instance][currentQueueName[instance]].Count < 1)
-            return instance;
 
         // Pauses the queue
         if (IsPaused(instance, currentQueueName[instance]) == false)
             pausedQueues[instance].Add(currentQueueName[instance]);
+
+        return instance;
+    }
+
+
+    /// <summary>
+    /// Plays the current queue.
+    /// </summary>
+    public static MonoBehaviour ttPlay(this MonoBehaviour instance)
+    {
+        PrepareCurrentQueueName(instance);
+
+        // Unpauses the queue
+        if (IsPaused(instance, currentQueueName[instance]))
+            pausedQueues[instance].Remove(currentQueueName[instance]);
+
+        return instance;
     }
 
 
@@ -734,16 +746,16 @@ public static class TeaTime
             {
                 if (task.time > 0)
                 {
-                    coroutine = ExecuteLoop(task.time, task.callbackWithHandler);
+                    coroutine = ExecuteLoop(task.instance, task.queueName, task.time, task.callbackWithHandler);
                 }
                 else
                 {
-                    coroutine = ExecuteInfiniteLoop(task.callbackWithHandler);
+                    coroutine = ExecuteInfiniteLoop(task.instance, task.queueName, task.callbackWithHandler);
                 }
             }
             else
             {
-                coroutine = ExecuteOnce(task.time, task.yieldInstruction, task.callback, task.callbackWithHandler);
+                coroutine = ExecuteOnce(task.instance, task.queueName, task.time, task.yieldInstruction, task.callback, task.callbackWithHandler);
             }
 
             // Register and execute coroutines
@@ -785,11 +797,12 @@ public static class TeaTime
     /// <summary>
     /// Executes a timed callback, backing up the current queue name (the callback could be a TeaTime queue).
     /// </summary>
-    private static IEnumerator ExecuteOnce(float timeToWait, YieldInstruction yieldToWait,
+    private static IEnumerator ExecuteOnce(MonoBehaviour instance, string queueName, float timeToWait, YieldInstruction yieldToWait,
                                            Action callback, Action<ttHandler> callbackWithHandler)
     {
-        // Pause
-        // if (IsPaused(instance, string queueName))
+        // Pause block
+        while (IsPaused(instance, queueName))
+            yield return null;
 
         // Wait until
         if (timeToWait > 0)
@@ -819,7 +832,7 @@ public static class TeaTime
     /// <summary>
     /// Executes a callback inside a loop for all his duration, or until ttHandler.Break().
     /// </summary>
-    private static IEnumerator ExecuteLoop(float duration, Action<ttHandler> callback)
+    private static IEnumerator ExecuteLoop(MonoBehaviour instance, string queueName, float duration, Action<ttHandler> callback)
     {
         // Only for positive values
         if (duration <= 0)
@@ -832,6 +845,11 @@ public static class TeaTime
         // Run while active until duration
         while (loopHandler.isActive && loopHandler.t < 1)
         {
+            // Pause block
+            while (IsPaused(instance, queueName))
+                yield return null;
+
+            // deltatime
             float unityTimeDelta = Time.deltaTime;
 
             // Completion % from 0 to 1
@@ -860,13 +878,18 @@ public static class TeaTime
     /// <summary>
     /// Executes a callback inside an infinite loop until ttHandler.Break().
     /// </summary>
-    private static IEnumerator ExecuteInfiniteLoop(Action<ttHandler> callback)
+    private static IEnumerator ExecuteInfiniteLoop(MonoBehaviour instance, string queueName, Action<ttHandler> callback)
     {
         ttHandler loopHandler = new ttHandler();
 
         // Run while active
         while (loopHandler.isActive)
         {
+            // Pause block
+            while (IsPaused(instance, queueName))
+                yield return null;
+
+            // deltaTime
             float delta = Time.deltaTime;
             loopHandler.deltaTime = delta;
             loopHandler.timeSinceStart += delta;
