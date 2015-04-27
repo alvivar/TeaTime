@@ -691,16 +691,16 @@ public static class TeaTime
             {
                 if (task.time > 0)
                 {
-                    coroutine = ExecuteLoop(instance, task.time, task.callbackWithHandler);
+                    coroutine = ExecuteLoop(task.time, task.callbackWithHandler);
                 }
                 else
                 {
-                    coroutine = ExecuteInfiniteLoop(instance, task.callbackWithHandler);
+                    coroutine = ExecuteInfiniteLoop(task.callbackWithHandler);
                 }
             }
             else
             {
-                coroutine = ExecuteOnce(instance, task.time, task.yieldInstruction, task.callback, task.callbackWithHandler);
+                coroutine = ExecuteOnce(task.time, task.yieldInstruction, task.callback, task.callbackWithHandler);
             }
 
             // Register and execute coroutines
@@ -742,7 +742,7 @@ public static class TeaTime
     /// <summary>
     /// Executes a timed callback, backing up the current queue name (the callback could be a TeaTime queue).
     /// </summary>
-    private static IEnumerator ExecuteOnce(MonoBehaviour instance, float timeToWait, YieldInstruction yieldToWait,
+    private static IEnumerator ExecuteOnce(float timeToWait, YieldInstruction yieldToWait,
                                            Action callback, Action<ttHandler> callbackWithHandler)
     {
         // Wait until
@@ -751,9 +751,6 @@ public static class TeaTime
 
         if (yieldToWait != null)
             yield return yieldToWait;
-
-        // Queue name backup, to avoid changing the current queue by using TeaTime in the callback
-        string queueNameBackup = currentQueueName[instance];
 
         // Executes the normal callback
         if (callback != null)
@@ -769,9 +766,6 @@ public static class TeaTime
                 yield return t.yieldToWait;
         }
 
-        // Queue name recovery
-        currentQueueName[instance] = queueNameBackup;
-
         yield return null;
     }
 
@@ -779,7 +773,7 @@ public static class TeaTime
     /// <summary>
     /// Executes a callback inside a loop for all his duration, or until ttHandler.Break().
     /// </summary>
-    private static IEnumerator ExecuteLoop(MonoBehaviour instance, float duration, Action<ttHandler> callback)
+    private static IEnumerator ExecuteLoop(float duration, Action<ttHandler> callback)
     {
         // Only for positive values
         if (duration <= 0)
@@ -788,9 +782,6 @@ public static class TeaTime
         // Handler data
         ttHandler loopHandler = new ttHandler();
         float tRate = 1 / duration;
-
-        // Queue name backup, to avoid changing the current queue by using TeaTime in the callback
-        string queueNameBackup = currentQueueName[instance];
 
         // Run while active until duration
         while (loopHandler.isActive && loopHandler.t < 1)
@@ -817,21 +808,15 @@ public static class TeaTime
 
             yield return null;
         }
-
-        // Queue name recovery
-        currentQueueName[instance] = queueNameBackup;
     }
 
 
     /// <summary>
     /// Executes a callback inside an infinite loop until ttHandler.Break().
     /// </summary>
-    private static IEnumerator ExecuteInfiniteLoop(MonoBehaviour instance, Action<ttHandler> callback)
+    private static IEnumerator ExecuteInfiniteLoop(Action<ttHandler> callback)
     {
         ttHandler loopHandler = new ttHandler();
-
-        // Queue name backup, to avoid changing the current queue by using TeaTime in the callback
-        string queueNameBackup = currentQueueName[instance];
 
         // Run while active
         while (loopHandler.isActive)
@@ -853,8 +838,5 @@ public static class TeaTime
 
             yield return null;
         }
-
-        // Queue name recovery
-        currentQueueName[instance] = queueNameBackup;
     }
 }
