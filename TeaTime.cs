@@ -344,20 +344,22 @@ public static class TeaTime
                                        bool isLoop)
     {
         PrepareCurrentQueueName(instance);
+        string queueName = currentQueueName[instance];
 
         // Ignore locked
-        if (IsLocked(instance, currentQueueName[instance]))
+        if (IsLocked(instance, queueName))
             return instance;
 
-        PrepareMainQueue(instance, currentQueueName[instance]);
+        PrepareMainQueue(instance, queueName);
 
-        // Appends a new task (+ Blueprint clone)
-        ttTask currentTask = new ttTask(instance, currentQueueName[instance], timeDelay, yieldDelay, callback, callbackWithHandler, isLoop);
-        mainQueue[instance][currentQueueName[instance]].Add(currentTask);
-        blueprints[instance][currentQueueName[instance]].Add(currentTask);
+        // Appends a new task (+Blueprint clone)
+        ttTask currentTask = new ttTask(instance, queueName, timeDelay, yieldDelay, callback, callbackWithHandler, isLoop);
+        mainQueue[instance][queueName].Add(currentTask);
+        blueprints[instance][queueName].Add(currentTask);
 
         // Execute queue
-        instance.StartCoroutine(ExecuteQueue(instance, currentQueueName[instance]));
+        if (!IsPaused(instance, queueName))
+            instance.StartCoroutine(ExecuteQueue(instance, queueName));
 
         return instance;
     }
@@ -473,8 +475,42 @@ public static class TeaTime
         PrepareCurrentQueueName(instance);
 
         // Pauses the queue
-        if (IsPaused(instance, currentQueueName[instance]) == false)
+        if (!IsPaused(instance, currentQueueName[instance]))
             pausedQueues[instance].Add(currentQueueName[instance]);
+
+        return instance;
+    }
+
+
+    /// <summary>
+    /// Stops and pauses the current queue.
+    /// </summary>
+    public static MonoBehaviour ttStop(this MonoBehaviour instance)
+    {
+        PrepareCurrentQueueName(instance);
+        string queueName = currentQueueName[instance];
+
+        // Timed callbacks reset
+        // But leave the current queue config as they are
+        PrepareMainQueue(instance, queueName);
+        PrepareRunningQueues(instance);
+        PrepareRunningCoroutines(instance, queueName);
+
+        mainQueue[instance][queueName].Clear();
+
+        if (runningQueues[instance].Contains(queueName))
+            runningQueues[instance].Remove(queueName);
+
+        // Coroutines cleanup
+        foreach (IEnumerator coroutine in runningCoroutines[instance][queueName])
+        {
+            instance.StopCoroutine(coroutine);
+        }
+        runningCoroutines[instance][queueName].Clear();
+
+        // Pause, and mainQueue reload from blueprints
+        instance.ttPause();
+        mainQueue[instance][queueName].AddRange(blueprints[instance][queueName]);
 
         return instance;
     }
@@ -487,9 +523,15 @@ public static class TeaTime
     {
         PrepareCurrentQueueName(instance);
 
+        if (debugMode)
+            Debug.Log("TeaTime :: ttPlay, " + currentQueueName[instance]);
+
         // Unpauses the queue
         if (IsPaused(instance, currentQueueName[instance]))
             pausedQueues[instance].Remove(currentQueueName[instance]);
+
+        // Execute queue
+        instance.StartCoroutine(ExecuteQueue(instance, currentQueueName[instance]));
 
         return instance;
     }
@@ -505,10 +547,6 @@ public static class TeaTime
 
         if (debugMode)
             Debug.Log("TeaTime :: ttRepeat, " + currentQueueName[instance] + ", n = " + n);
-
-        // Ignore if the queue is empty
-        if (mainQueue[instance].ContainsKey(currentQueueName[instance]) == false || mainQueue[instance][currentQueueName[instance]].Count < 1)
-            return instance;
 
         // Ignore locked
         if (IsLocked(instance, currentQueueName[instance]))
@@ -579,6 +617,7 @@ public static class TeaTime
         PrepareRunningQueues(instance);
         PrepareCurrentQueueName(instance);
         PrepareLockedQueues(instance);
+        PreparePausedQueues(instance);
         PrepareInfiniteQueues(instance);
         PrepareRunningCoroutines(instance, queueName);
 
@@ -592,6 +631,9 @@ public static class TeaTime
 
         if (lockedQueues[instance].Contains(queueName))
             lockedQueues[instance].Remove(queueName);
+
+        if (pausedQueues[instance].Contains(queueName))
+            pausedQueues[instance].Remove(queueName);
 
         if (infiniteQueues[instance].Contains(queueName))
             infiniteQueues[instance].Remove(queueName);
@@ -625,6 +667,7 @@ public static class TeaTime
         runningQueues[instance].Clear();
         // currentQueue[instance] = DEFAULT_QUEUE_NAME;
         lockedQueues[instance].Clear();
+        pausedQueues[instance].Clear();
         infiniteQueues[instance].Clear();
 
         // Stop & clean coroutines
@@ -682,6 +725,15 @@ public static class TeaTime
             foreach (KeyValuePair<MonoBehaviour, List<string>> lockedList in lockedQueues)
             {
                 lockedList.Value.Clear();
+            }
+        }
+
+        // Paused queues
+        if (pausedQueues != null)
+        {
+            foreach (KeyValuePair<MonoBehaviour, List<string>> pausedList in pausedQueues)
+            {
+                pausedList.Value.Clear();
             }
         }
 
@@ -800,7 +852,7 @@ public static class TeaTime
     private static IEnumerator ExecuteOnce(MonoBehaviour instance, string queueName, float timeToWait, YieldInstruction yieldToWait,
                                            Action callback, Action<ttHandler> callbackWithHandler)
     {
-        // Pause block
+        // Pause
         while (IsPaused(instance, queueName))
             yield return null;
 
@@ -845,7 +897,7 @@ public static class TeaTime
         // Run while active until duration
         while (loopHandler.isActive && loopHandler.t < 1)
         {
-            // Pause block
+            // Pause
             while (IsPaused(instance, queueName))
                 yield return null;
 
@@ -885,7 +937,7 @@ public static class TeaTime
         // Run while active
         while (loopHandler.isActive)
         {
-            // Pause block
+            // Pause
             while (IsPaused(instance, queueName))
                 yield return null;
 
