@@ -1,6 +1,6 @@
 ####v0.6.5:
 
-- **CHANGE*: .ttRepeat default parameter changed to -1 (n = -1) for infinite
+- **CHANGE**: .ttRepeat default parameter changed to -1 (n = -1) for infinite
   repetition (used to be 1).
 
 - **NEW**: ttPause(, ttStop( and ttPlay( are done and they work exactly as you
