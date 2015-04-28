@@ -29,8 +29,9 @@
 //    })
 
 
-// Check out Examples.cs [http://github.com/alvivar/TeaTime/blob/master/Examples.cs]
-// to learn with practical patterns! (*More to come*)
+// Check out the examples!
+// [http://github.com/alvivar/TeaTime/tree/master/Examples] to learn with
+// practical patterns! (*More to come*)
 
 
 // Copyright (c) 2014/12/26 andresalvivar@gmail.com
@@ -352,12 +353,12 @@ public static class TeaTime
 
         PrepareMainQueue(instance, queueName);
 
-        // Appends a new task (+ Blueprint clone)
+        // Adds a new task into the main queue and blueprints
         ttTask currentTask = new ttTask(instance, queueName, timeDelay, yieldDelay, callback, callbackWithHandler, isLoop);
         mainQueue[instance][queueName].Add(currentTask);
         blueprints[instance][queueName].Add(currentTask);
 
-        // Execute queue
+        // Execute the queue unless is paused
         if (!IsPaused(instance, queueName))
             instance.StartCoroutine(ExecuteQueue(instance, queueName));
 
@@ -554,7 +555,7 @@ public static class TeaTime
     /// <summary>
     /// Repeats the current queue n times or infinite (n <= -1).
     /// </summary>
-    public static MonoBehaviour ttRepeat(this MonoBehaviour instance, int n = 1)
+    public static MonoBehaviour ttRepeat(this MonoBehaviour instance, int n = -1)
     {
         PrepareCurrentQueueName(instance);
 
