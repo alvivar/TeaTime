@@ -1,19 +1,16 @@
 ﻿using UnityEngine;
 
 
-public class Examples : MonoBehaviour
+// I'm currently rethinking this examples into something better, in the
+// meantime feel free to tweet or email me be if you have any doubt!
+
+// twitter.com/matnesis | andresalvivar@gmail.com
+
+
+public class BasicStuffExamples : MonoBehaviour
 {
     void Start()
     {
-        // TeaTime is a fast & simple queue for timed callbacks, fashioned as
-        // a MonoBehaviour extension set, focused on solving common coroutines
-        // patterns in Unity games.
-
-        // Just put 'TeaTime.cs' somewhere in your project and call it inside
-        // any MonoBehaviour using 'this.tt' (and trust the autocomplete).
-
-
-
         // EXAMPLE
         // Invoke-like Timer
         // 3 seconds callback timer.
@@ -42,7 +39,7 @@ public class Examples : MonoBehaviour
         })
         .ttRepeat(-1); // Repeat infinitely
 
-        // > ttRepeat(int n = 1) Repeats the current queue n times or infinite
+        // > ttRepeat(int n = -1) Repeats the current queue n times or infinite
         // (n <= -1).
 
 
@@ -79,7 +76,8 @@ public class Examples : MonoBehaviour
     {
         // EXAMPLE
         // Wait For Completion Lock
-        // Executes a callback and waits 2s during continuous calls without over appending callbacks.
+        // Executes a callback and waits 2s during continuous calls without
+        // over appending callbacks.
         if (Input.anyKey) // On any key hold
         {
             this.tt("QueueName").ttAdd(delegate()
@@ -88,8 +86,9 @@ public class Examples : MonoBehaviour
             })
             .ttAdd(2) // 2s wait
             .ttWait();
-            // ttWait() uses the queue name to set the lock,
-            // allowing tt("queueName") to wait for completion before appending new callbacks.
+            // ttWait() uses the queue name to set the lock, allowing
+            // tt("queueName") to wait for completion before appending new
+            // callbacks.
         }
 
         // > ttWait() Locks the current queue ignoring new appends until all
@@ -101,10 +100,11 @@ public class Examples : MonoBehaviour
 
         // EXAMPLE
         // Lerp Overwrite
-        // Moves from Vector3.zero to Vector3(5, 5, 5) in 3 seconds, overwriting itselfs (reset) when recalled.
+        // Moves the position from Vector3.zero to Vector3(5, 5, 5) in 3
+        // seconds, overwriting itselfs if recalled.
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            // The queue is selected, then resetted by using ttReset() after.
+            // The queue is selected, then restarted by ttReset()
             this.tt("LerpOverwrite").ttReset().ttAdd(delegate()
             {
                 transform.position = Vector3.zero;
@@ -121,7 +121,6 @@ public class Examples : MonoBehaviour
 
         // > ttReset() Stops and resets the current queue.
     }
-
 
 
     // TODO

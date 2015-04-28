@@ -3,6 +3,8 @@
 - **NEW**: ttPause(, ttStop( and ttPlay( are done and they work exactly as you
   would think.
 
+- **NEW**: Play, Pause, Stop example.
+
 - Minor optimizations & code cleanup.
 
 ####v0.6.2
