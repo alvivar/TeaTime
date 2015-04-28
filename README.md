@@ -27,9 +27,9 @@ MonoBehaviour using 'this.tt' (and trust the autocomplete).
 	})
 
 
-Check out
-**[Examples.cs](http://github.com/alvivar/TeaTime/blob/master/Examples.cs)**
-to learn with practical patterns! (*More to come*)
+Check out the
+**[examples](http://github.com/alvivar/TeaTime/tree/master/Examples)** to
+learn with practical patterns! (*More to come*)
 
 By **[Andrés Villalobos](http://twitter.com/matnesis)**, special thanks to
 **[Antonio Zamora](http://twitter.com/tzamora)** (loop idea and initial push).
