@@ -1,5 +1,8 @@
 ####v0.6.5:
 
+- **CHANGE*: .ttRepeat default parameter changed to -1 (n = -1) for infinite
+  repetition (used to be 1).
+
 - **NEW**: ttPause(, ttStop( and ttPlay( are done and they work exactly as you
   would think.
 
@@ -25,7 +28,7 @@
 
 ####v0.6
 
-- **NEW**: ttRepeat(n), repeats the current queue n times or infinite (n <=
+- **NEW**: .ttRepeat(n), repeats the current queue n times or infinite (n <=
   -1).
 
 - **CHANGE**: ttAdd( & ttLoop(, can't create/change the current queue now, use
