@@ -849,6 +849,10 @@ public static class TeaTime
     private static IEnumerator ExecuteOnce(MonoBehaviour instance, string queueName, float timeToWait, YieldInstruction yieldToWait,
                                            Action callback, Action<ttHandler> callbackWithHandler)
     {
+        // #fix
+        // Inmediate execution breaks the queue order with nested queues
+        yield return new WaitForEndOfFrame();
+
         // Pause
         while (IsPaused(instance, queueName))
             yield return null;
@@ -886,6 +890,10 @@ public static class TeaTime
         // Only for positive values
         if (duration <= 0)
             yield break;
+
+        // #fix
+        // Inmediate execution breaks the queue order with nested queues
+        yield return new WaitForEndOfFrame();
 
         // Handler data
         ttHandler loopHandler = new ttHandler();
@@ -929,6 +937,10 @@ public static class TeaTime
     /// </summary>
     private static IEnumerator ExecuteInfiniteLoop(MonoBehaviour instance, string queueName, Action<ttHandler> callback)
     {
+        // #fix
+        // Inmediate execution breaks the queue order with nested queues
+        yield return new WaitForEndOfFrame();
+
         ttHandler loopHandler = new ttHandler();
 
         // Run while active
