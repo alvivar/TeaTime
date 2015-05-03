@@ -1,3 +1,8 @@
+####v0.6.5.1:
+
+- **BUG FIXED**: Using a TeaTime queue inside a TeaTime queue used to cause a
+  problem with the queue name reference. It's fixed now.
+
 ####v0.6.5:
 
 - **CHANGE**: .ttRepeat default parameter changed to -1 (n = -1) for infinite
@@ -16,9 +21,6 @@
 
 - **CHANGE**: tt( optional parameter can't reset a queue anymore (use ttReset
   after tt( instead).
-
-- **BUG FIXED**: Using a TeaTime queue inside a TeaTime queue used to cause a
-  problem with the queue name reference. It's fixed now.
 
 - Minor optimizations.
 

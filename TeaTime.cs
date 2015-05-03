@@ -1,4 +1,4 @@
-﻿// TeaTime v0.6.5 alpha
+﻿// TeaTime v0.6.5.1 alpha
 
 // By Andrés Villalobos [andresalvivar@gmail.com twitter.com/matnesis]
 // Special thanks to Antonio Zamora [twitter.com/tzamora] (loop idea and initial push).
