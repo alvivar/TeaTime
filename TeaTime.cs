@@ -351,14 +351,16 @@ public static class TeaTime
 
         PrepareMainQueue(instance, queueName);
 
-        // Adds a new task into the main queue and blueprints
+        // Adds a new task into the main queue
         ttTask currentTask = new ttTask(instance, queueName, timeDelay, yieldDelay, callback, callbackWithHandler, isLoop);
         mainQueue[instance][queueName].Add(currentTask);
-        blueprints[instance][queueName].Add(currentTask);
 
-        // Execute the queue unless is paused
+        // Mirror the queue in blueprints & execute when isn't paused
         if (!IsPaused(instance, queueName))
+        {
+            blueprints[instance][queueName].Add(currentTask);
             instance.StartCoroutine(ExecuteQueue(instance, queueName));
+        }
 
         return instance;
     }
