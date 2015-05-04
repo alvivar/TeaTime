@@ -1,9 +1,9 @@
 ###TODO
 
+- **core** Fuse the main queue & blueprints logic into a 'next level' algorithm (waat)
 - **examples** AHHHH!
 - **feature** Global Stop (Could be Reset with options)
 - **feature** Global Pause
 - **feature** Global Play
-- **bug** Instantly nested queues problem is an antipattern? of bug?
 
-2015/04/28 02:57:35 PM
+2015/05/03 10:53:20 PM
