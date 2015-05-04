@@ -349,15 +349,15 @@ public static class TeaTime
         if (IsLocked(instance, queueName))
             return instance;
 
-        PrepareMainQueue(instance, queueName);
-
         // Adds a new task into the main queue
         ttTask currentTask = new ttTask(instance, queueName, timeDelay, yieldDelay, callback, callbackWithHandler, isLoop);
+        PrepareMainQueue(instance, queueName);
         mainQueue[instance][queueName].Add(currentTask);
 
-        // Mirror the queue in blueprints & execute when isn't paused
+        // Execute when isn't paused
         if (!IsPaused(instance, queueName))
         {
+            // Mirror the main queue into blueprints
             blueprints[instance][queueName].Add(currentTask);
             instance.StartCoroutine(ExecuteQueue(instance, queueName));
         }
@@ -519,6 +519,28 @@ public static class TeaTime
 
 
     /// <summary>
+    /// Resume the current queue.
+    /// </summary>
+    public static MonoBehaviour ttPlay(this MonoBehaviour instance)
+    {
+        PrepareCurrentQueueName(instance);
+        string queueName = currentQueueName[instance];
+
+        if (debugMode)
+            Debug.Log("TeaTime :: ttPlay " + queueName);
+
+        // Unpauses the queue
+        if (IsPaused(instance, queueName))
+            pausedQueues[instance].Remove(queueName);
+
+        // Execute queue
+        instance.StartCoroutine(ExecuteQueue(instance, queueName));
+
+        return instance;
+    }
+
+
+    /// <summary>
     /// Stops and resets the current queue (full queue cleanup).
     /// </summary>
     public static MonoBehaviour ttReset(this MonoBehaviour instance)
@@ -526,27 +548,6 @@ public static class TeaTime
         PrepareCurrentQueueName(instance);
 
         Reset(instance, currentQueueName[instance]);
-
-        return instance;
-    }
-
-
-    /// <summary>
-    /// Resume the current queue.
-    /// </summary>
-    public static MonoBehaviour ttPlay(this MonoBehaviour instance)
-    {
-        PrepareCurrentQueueName(instance);
-
-        if (debugMode)
-            Debug.Log("TeaTime :: ttPlay " + currentQueueName[instance]);
-
-        // Unpauses the queue
-        if (IsPaused(instance, currentQueueName[instance]))
-            pausedQueues[instance].Remove(currentQueueName[instance]);
-
-        // Execute queue
-        instance.StartCoroutine(ExecuteQueue(instance, currentQueueName[instance]));
 
         return instance;
     }
@@ -769,7 +770,13 @@ public static class TeaTime
     {
         // Ignore if the queue is empty
         if (!mainQueue[instance].ContainsKey(queueName) || mainQueue[instance][queueName].Count < 1)
+        {
+            // Queue completed, remove the lock
+            if (IsLocked(instance, queueName))
+                lockedQueues[instance].Remove(queueName);
+
             yield break;
+        }
 
         PrepareRunningQueues(instance);
 
