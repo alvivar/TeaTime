@@ -340,9 +340,7 @@ public static class TeaTime
     /// <summary>
     /// Appends a callback (timed or looped) into a queue.
     /// </summary>
-    private static MonoBehaviour ttAdd(this MonoBehaviour instance, float timeDelay, YieldInstruction yieldDelay,
-                                       Action callback, Action<ttHandler> callbackWithHandler,
-                                       bool isLoop)
+    private static MonoBehaviour ttAdd(this MonoBehaviour instance, float timeDelay, YieldInstruction yieldDelay, Action callback, Action<ttHandler> callbackWithHandler, bool isLoop)
     {
         PrepareCurrentQueueName(instance);
         string queueName = currentQueueName[instance];
@@ -846,12 +844,12 @@ public static class TeaTime
     /// <summary>
     /// Executes a timed callback.
     /// </summary>
-    private static IEnumerator ExecuteOnce(MonoBehaviour instance, string queueName, float timeToWait, YieldInstruction yieldToWait,
-                                           Action callback, Action<ttHandler> callbackWithHandler)
+    private static IEnumerator ExecuteOnce(MonoBehaviour instance, string queueName, float timeToWait, YieldInstruction yieldToWait, Action callback, Action<ttHandler> callbackWithHandler)
     {
         // #fix
         // Inmediate execution breaks the queue order with nested queues
-        yield return new WaitForEndOfFrame();
+        if (timeToWait < Time.deltaTime && yieldToWait == null)
+            yield return new WaitForEndOfFrame();
 
         // Pause
         while (IsPaused(instance, queueName))
@@ -900,7 +898,7 @@ public static class TeaTime
         float tRate = 1 / duration;
 
         // Run while active until duration
-        while (loopHandler.isActive && loopHandler.t < 1)
+        while (loopHandler.isActive && loopHandler.t <= 1)
         {
             // deltatime
             float unityTimeDelta = Time.deltaTime;
