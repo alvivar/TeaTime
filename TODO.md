@@ -1,6 +1,7 @@
 ###TODO
 
-- **core** Fuse the main queue & blueprints logic into a 'next level' algorithm (waat)
+- **core** Fuse the main queue & blueprints logic into a 'next level' algorithm (waat)?
+- **unfinished** Reset must include blueprints
 - **examples** AHHHH!
 - **feature** Global Stop (Could be Reset with options)
 - **feature** Global Pause
