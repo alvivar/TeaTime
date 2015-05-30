@@ -435,6 +435,15 @@ public static class TeaTime
 
 
     /// <summary>
+    /// Appends a YieldInstruction into the current queue.
+    /// </summary>
+    public static MonoBehaviour ttAdd(this MonoBehaviour instance, YieldInstruction yieldToWait)
+    {
+        return instance.ttAdd(0, yieldToWait, null, null, false);
+    }
+
+
+    /// <summary>
     /// Appends a callback into the current queue.
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, Action callback)
