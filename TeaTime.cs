@@ -111,7 +111,7 @@ public class ttHandler
 
 
     /// <summary>
-    /// Time interval to wait after the current callback.
+    /// Appends time intervals to wait once after the current callback.
     /// </summary>
     public void WaitFor(params float[] intervals)
     {
@@ -123,7 +123,7 @@ public class ttHandler
 
 
     /// <summary>
-    /// YieldInstruction to wait after the current callback.
+    /// Appends YieldInstructions to wait once after the current callback.
     /// </summary>
     public void WaitFor(params YieldInstruction[] yieldsToWait)
     {
@@ -135,7 +135,7 @@ public class ttHandler
 
 
     /// <summary>
-    /// IEnumerator to execute and wait after the current callback.
+    /// Appends IEnumerators to execute and wait once after the current callback.
     /// </summary>
     public void WaitFor(params IEnumerator[] ienumsToWait)
     {
@@ -162,7 +162,7 @@ public static class TeaTime
     /// <summary>
     /// Default queue name.
     /// </summary>
-    private const string DEFAULT_QUEUE_NAME = "DEFAULT_QUEUE_NAME";
+    private const string DEFAULT_QUEUE_NAME = "TEATIME_DEFAULT_QUEUE_NAME";
 
     /// <summary>
     /// Main queue for all the timed callbacks.
