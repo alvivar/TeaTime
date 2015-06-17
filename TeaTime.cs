@@ -97,7 +97,8 @@ public class ttHandler
     public float t = 0f;
     public float deltaTime = 0f;
     public float timeSinceStart = 0f;
-    public YieldInstruction yieldToWait = null;
+    public List<YieldInstruction> yieldsToWait;
+    public List<IEnumerator> ienumsToWait;
 
 
     /// <summary>
@@ -110,20 +111,38 @@ public class ttHandler
 
 
     /// <summary>
-    /// Waits for a time interval after the current callback.
+    /// Time interval to wait after the current callback.
     /// </summary>
-    public void WaitFor(float interval)
+    public void WaitFor(params float[] intervals)
     {
-        this.yieldToWait = new WaitForSeconds(interval);
+        foreach (float f in intervals)
+        {
+            this.WaitFor(new WaitForSeconds(f));
+        }
     }
 
 
     /// <summary>
-    /// Waits for a YieldInstruction after the current callback.
+    /// YieldInstruction to wait after the current callback.
     /// </summary>
-    public void WaitFor(YieldInstruction yieldToWait)
+    public void WaitFor(params YieldInstruction[] yieldsToWait)
     {
-        this.yieldToWait = yieldToWait;
+        if (this.yieldsToWait == null)
+            this.yieldsToWait = new List<YieldInstruction>();
+
+        this.yieldsToWait.AddRange(yieldsToWait);
+    }
+
+
+    /// <summary>
+    /// IEnumerator to execute and wait after the current callback.
+    /// </summary>
+    public void WaitFor(params IEnumerator[] ienumsToWait)
+    {
+        if (this.ienumsToWait == null)
+            this.ienumsToWait = new List<IEnumerator>();
+
+        this.ienumsToWait.AddRange(ienumsToWait);
     }
 }
 
@@ -461,6 +480,13 @@ public static class TeaTime
     }
 
 
+    public static MonoBehaviour ttAdd(this MonoBehaviour instance, IEnumerator callback)
+    {
+        // return instance.ttAdd(0, null, null, callback, false);
+        return instance;
+    }
+
+
     /// <summary>
     /// Appends into the current queue a callback that runs frame by frame for all his duration or until ttHandler.Break().
     /// </summary>
@@ -616,6 +642,15 @@ public static class TeaTime
         }
 
         return instance;
+    }
+
+
+    /// <summary>
+    /// Returns the IEnumerator for the current queue.
+    /// </summary>
+    public static IEnumerator ttGet(this MonoBehaviour instance)
+    {
+        return null;
     }
 
 
@@ -881,30 +916,52 @@ public static class TeaTime
         if (timeToWait < Time.deltaTime && yieldToWait == null)
             yield return new WaitForEndOfFrame();
 
+
         // Pause
         while (IsPaused(instance, queueName))
             yield return null;
 
-        // Wait until
+
+        // Wait for
         if (timeToWait > 0)
             yield return new WaitForSeconds(timeToWait);
 
         if (yieldToWait != null)
             yield return yieldToWait;
 
+
         // Executes the normal callback
         if (callback != null)
             callback();
 
-        // Executes the callback with handler (and waits his yield)
+
+        // Executes the callback with handler (and waits his yield / ienumerator)
         if (callbackWithHandler != null)
         {
             ttHandler t = new ttHandler();
             callbackWithHandler(t);
 
-            if (t.yieldToWait != null)
-                yield return t.yieldToWait;
+
+            // Wait for all the yields
+            if (t.yieldsToWait != null)
+            {
+                foreach (YieldInstruction yi in t.yieldsToWait)
+                {
+                    yield return yi;
+                }
+            }
+
+
+            // Wait and execute all the IEnumerators
+            if (t.ienumsToWait != null)
+            {
+                foreach (IEnumerator ien in t.ienumsToWait)
+                {
+                    yield return instance.StartCoroutine(ien);
+                }
+            }
         }
+
 
         yield return null;
     }
@@ -919,13 +976,16 @@ public static class TeaTime
         if (duration <= 0)
             yield break;
 
+
         // #fix
         // Inmediate execution breaks the queue order with nested queues
         yield return new WaitForEndOfFrame();
 
+
         // Handler data
         ttHandler loopHandler = new ttHandler();
         float tRate = 1 / duration;
+
 
         // Run while active until duration
         while (loopHandler.isActive && loopHandler.t <= 1)
@@ -933,27 +993,49 @@ public static class TeaTime
             // deltatime
             float unityTimeDelta = Time.deltaTime;
 
+
             // Completion % from 0 to 1
             loopHandler.t += tRate * unityTimeDelta;
+
 
             // Customized delta that represents the loop duration
             loopHandler.deltaTime = 1 / (duration - loopHandler.timeSinceStart) * unityTimeDelta;
             loopHandler.timeSinceStart += unityTimeDelta;
 
+
             // Pause
             while (IsPaused(instance, queueName))
                 yield return null;
+
 
             // Execute
             if (callback != null)
                 callback(loopHandler);
 
-            // Yields once
-            if (loopHandler.yieldToWait != null)
+
+            // Waits all the yields, once
+            if (loopHandler.yieldsToWait != null)
             {
-                yield return loopHandler.yieldToWait;
-                loopHandler.yieldToWait = null;
+                foreach (YieldInstruction yi in loopHandler.yieldsToWait)
+                {
+                    yield return yi;
+                }
+
+                loopHandler.yieldsToWait = null;
             }
+
+
+            // Waits and execute all IEnumerators, once
+            if (loopHandler.ienumsToWait != null)
+            {
+                foreach (IEnumerator ien in loopHandler.ienumsToWait)
+                {
+                    yield return instance.StartCoroutine(ien);
+                }
+
+                loopHandler.ienumsToWait = null;
+            }
+
 
             yield return null;
         }
@@ -971,6 +1053,7 @@ public static class TeaTime
 
         ttHandler loopHandler = new ttHandler();
 
+
         // Run while active
         while (loopHandler.isActive)
         {
@@ -979,20 +1062,40 @@ public static class TeaTime
             loopHandler.deltaTime = delta;
             loopHandler.timeSinceStart += delta;
 
+
             // Pause
             while (IsPaused(instance, queueName))
                 yield return null;
+
 
             // Execute
             if (callback != null)
                 callback(loopHandler);
 
-            // Yields once
-            if (loopHandler.yieldToWait != null)
+
+            // Waits all the yields, once
+            if (loopHandler.yieldsToWait != null)
             {
-                yield return loopHandler.yieldToWait;
-                loopHandler.yieldToWait = null;
+                foreach (YieldInstruction yi in loopHandler.yieldsToWait)
+                {
+                    yield return yi;
+                }
+
+                loopHandler.yieldsToWait = null;
             }
+
+
+            // Waits and execute all IEnumerators, once
+            if (loopHandler.ienumsToWait != null)
+            {
+                foreach (IEnumerator ien in loopHandler.ienumsToWait)
+                {
+                    yield return instance.StartCoroutine(ien);
+                }
+
+                loopHandler.ienumsToWait = null;
+            }
+
 
             yield return null;
         }
