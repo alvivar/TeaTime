@@ -1,3 +1,12 @@
+####v0.6.5.3
+
+- **UPGRADE** .WaitFor() from ttHandler now queues his arguments every time is
+  called, it also executes and waits IEnumerators.
+
+- **UPGRADE** .ttAdd() now supports single YieldInstructions.
+
+- Minor optimizations.
+
 ####v0.6.5.1:
 
 - **BUG FIXED**: Using a TeaTime queue inside a TeaTime queue used to cause a

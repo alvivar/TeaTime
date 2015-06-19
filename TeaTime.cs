@@ -1,4 +1,4 @@
-﻿// TeaTime v0.6.5.1 alpha
+﻿// TeaTime v0.6.5.3 alpha
 
 // By Andrés Villalobos [andresalvivar@gmail.com twitter.com/matnesis]
 // Special thanks to Antonio Zamora [twitter.com/tzamora] (loop idea and initial push).
@@ -114,38 +114,35 @@ public class ttHandler
 
 
     /// <summary>
-    /// Appends time intervals to wait after the current callback.
+    /// Appends a time interval to wait after the current callback.
     /// </summary>
-    public void WaitFor(params float[] intervals)
+    public void WaitFor(float interval)
     {
-        foreach (float f in intervals)
-        {
-            this.WaitFor(new WaitForSeconds(f));
-        }
+        this.WaitFor(new WaitForSeconds(interval));
     }
 
 
     /// <summary>
-    /// Appends YieldInstructions to wait after the current callback.
+    /// Appends a YieldInstruction to wait after the current callback.
     /// </summary>
-    public void WaitFor(params YieldInstruction[] yieldsToWait)
+    public void WaitFor(YieldInstruction yieldToWait)
     {
         if (this.yieldsToWait == null)
             this.yieldsToWait = new List<YieldInstruction>();
 
-        this.yieldsToWait.AddRange(yieldsToWait);
+        this.yieldsToWait.Add(yieldToWait);
     }
 
 
     /// <summary>
-    /// Appends IEnumerators to execute and wait after the current callback.
+    /// Appends an IEnumerator to execute and wait after the current callback.
     /// </summary>
-    public void WaitFor(params IEnumerator[] ienumsToWait)
+    public void WaitFor(IEnumerator ienumToWait)
     {
         if (this.ienumsToWait == null)
             this.ienumsToWait = new List<IEnumerator>();
 
-        this.ienumsToWait.AddRange(ienumsToWait);
+        this.ienumsToWait.Add(ienumToWait);
     }
 }
 
@@ -169,7 +166,6 @@ public static class TeaTime
 
     /// <summary>
     /// Main queue for all the timed callbacks.
-    /// #todo This can be optimized by using blueprints (below), maybe.
     /// </summary>
     private static Dictionary<MonoBehaviour, Dictionary<string, List<ttTask>>> mainQueue = null;
 
@@ -194,12 +190,12 @@ public static class TeaTime
     private static Dictionary<MonoBehaviour, List<string>> lockedQueues = null;
 
     /// <summary>
-    /// Queues pauses by ttPause().
+    /// Queues paused by ttPause().
     /// </summary>
     private static Dictionary<MonoBehaviour, List<string>> pausedQueues = null;
 
     /// <summary>
-    /// Infinite queues by ttRepeat(-1).
+    /// Infinite queues by ttRepeat(-n).
     /// </summary>
     private static Dictionary<MonoBehaviour, List<string>> infiniteQueues = null;
 
@@ -210,7 +206,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Prepares the main queue for the instance (and the blueprints register).
+    /// Prepares the main queue for the instance (and the blueprints mirror).
     /// </summary>
     private static void PrepareMainQueue(MonoBehaviour instance, string queueName = null)
     {
@@ -221,12 +217,14 @@ public static class TeaTime
         if (!mainQueue.ContainsKey(instance))
             mainQueue.Add(instance, new Dictionary<string, List<ttTask>>());
 
+
         // Blueprints
         if (blueprints == null)
             blueprints = new Dictionary<MonoBehaviour, Dictionary<string, List<ttTask>>>();
 
         if (!blueprints.ContainsKey(instance))
             blueprints.Add(instance, new Dictionary<string, List<ttTask>>());
+
 
         // Task list for both
         if (queueName != null)
@@ -241,14 +239,13 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Prepares the dictionary for the current queue name (last used) in the instance.
+    /// Prepares the dictionary for the current queue name in the instance.
     /// </summary>
     private static void PrepareCurrentQueueName(MonoBehaviour instance)
     {
         if (currentQueueName == null)
             currentQueueName = new Dictionary<MonoBehaviour, string>();
 
-        // Default name
         if (!currentQueueName.ContainsKey(instance))
             currentQueueName[instance] = DEFAULT_QUEUE_NAME;
     }
@@ -519,7 +516,6 @@ public static class TeaTime
     {
         PrepareCurrentQueueName(instance);
 
-        // Locks the queue
         if (!IsLockedOrUnlockEmpty(instance, currentQueueName[instance]))
             lockedQueues[instance].Add(currentQueueName[instance]);
 
@@ -534,7 +530,6 @@ public static class TeaTime
     {
         PrepareCurrentQueueName(instance);
 
-        // Pauses the queue
         if (!IsPaused(instance, currentQueueName[instance]))
             pausedQueues[instance].Add(currentQueueName[instance]);
 
@@ -543,22 +538,29 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Stops and pauses the current queue (use .ttPlay() to restart).
+    /// Stops the current queue (use .ttPlay() to restart).
     /// </summary>
     public static MonoBehaviour ttStop(this MonoBehaviour instance)
     {
         PrepareCurrentQueueName(instance);
         string queueName = currentQueueName[instance];
 
-        // Resetting only the callbacks containers
-        // (Leaving the queue config as they are)
+
+        // If empty, just pause and skip the rest
+        if (IsEmpty(instance, queueName))
+            return instance.ttPause();
+
+
+        // Cleaning only the callbacks and coroutines, leaving the queue
+        // config as they are
         PrepareMainQueue(instance, queueName);
         PrepareRunningQueues(instance);
         PrepareRunningCoroutines(instance, queueName);
 
-        // Clean queue callbacks
+        // Cleaning callbacks
         mainQueue[instance][queueName].Clear();
 
+        // Cleaning running queues
         if (runningQueues[instance].Contains(queueName))
             runningQueues[instance].Remove(queueName);
 
@@ -569,11 +571,13 @@ public static class TeaTime
         }
         runningCoroutines[instance][queueName].Clear();
 
+
         // Pause
         instance.ttPause();
 
         // Restart the main queue using blueprints
         mainQueue[instance][queueName].AddRange(blueprints[instance][queueName]);
+
 
         return instance;
     }
@@ -587,8 +591,10 @@ public static class TeaTime
         PrepareCurrentQueueName(instance);
         string queueName = currentQueueName[instance];
 
+
         if (debugMode)
             Debug.Log("TeaTime :: ttPlay " + queueName);
+
 
         // Unpauses the queue
         if (IsPaused(instance, queueName))
@@ -597,12 +603,13 @@ public static class TeaTime
         // Execute queue
         instance.StartCoroutine(ExecuteQueue(instance, queueName));
 
+
         return instance;
     }
 
 
     /// <summary>
-    /// Stops and resets the current queue (full queue cleanup).
+    /// Stops and resets the current queue (full cleanup).
     /// </summary>
     public static MonoBehaviour ttReset(this MonoBehaviour instance)
     {
@@ -620,13 +627,12 @@ public static class TeaTime
     public static MonoBehaviour ttRepeat(this MonoBehaviour instance, int n = -1)
     {
         PrepareCurrentQueueName(instance);
+        string queueName = currentQueueName[instance];
+
 
         if (debugMode)
-            Debug.Log("TeaTime :: ttRepeat " + currentQueueName[instance] + ", n = " + n);
+            Debug.Log("TeaTime :: ttRepeat " + queueName + ", n = " + n);
 
-        // Ignore locked
-        if (IsLockedOrUnlockEmpty(instance, currentQueueName[instance]))
-            return instance;
 
         // If infinite
         if (n < 0)
@@ -635,17 +641,19 @@ public static class TeaTime
 
             PrepareInfiniteQueues(instance);
 
-            if (!infiniteQueues[instance].Contains(currentQueueName[instance]))
-                infiniteQueues[instance].Add(currentQueueName[instance]);
+            if (!infiniteQueues[instance].Contains(queueName))
+                infiniteQueues[instance].Add(queueName);
 
             return instance;
         }
 
+
         // Repeat n
         while (n-- > 0)
         {
-            mainQueue[instance][currentQueueName[instance]].AddRange(blueprints[instance][currentQueueName[instance]]);
+            mainQueue[instance][queueName].AddRange(blueprints[instance][queueName]);
         }
+
 
         return instance;
     }
@@ -675,6 +683,7 @@ public static class TeaTime
         if (debugMode)
             Debug.Log("TeaTime :: Reset " + queueName + " from " + instance.name);
 
+
         PrepareMainQueue(instance, queueName);
         PrepareRunningQueues(instance);
         PrepareLockedQueues(instance);
@@ -682,8 +691,10 @@ public static class TeaTime
         PrepareInfiniteQueues(instance);
         PrepareRunningCoroutines(instance, queueName);
 
+
         // Clean
         mainQueue[instance][queueName].Clear();
+        blueprints[instance][queueName].Clear();
 
         if (runningQueues[instance].Contains(queueName))
             runningQueues[instance].Remove(queueName);
@@ -696,6 +707,7 @@ public static class TeaTime
 
         if (infiniteQueues[instance].Contains(queueName))
             infiniteQueues[instance].Remove(queueName);
+
 
         // Stop & clean coroutines
         foreach (IEnumerator coroutine in runningCoroutines[instance][queueName])
@@ -718,14 +730,19 @@ public static class TeaTime
         PrepareInfiniteQueues(instance);
         PrepareRunningCoroutines(instance);
 
+
         // Clean all
         foreach (KeyValuePair<string, List<ttTask>> taskList in mainQueue[instance])
+            taskList.Value.Clear();
+
+        foreach (KeyValuePair<string, List<ttTask>> taskList in blueprints[instance])
             taskList.Value.Clear();
 
         runningQueues[instance].Clear();
         lockedQueues[instance].Clear();
         pausedQueues[instance].Clear();
         infiniteQueues[instance].Clear();
+
 
         // Stop & clean coroutines
         foreach (KeyValuePair<string, List<IEnumerator>> coroutineList in runningCoroutines[instance])
@@ -745,10 +762,18 @@ public static class TeaTime
     /// </summary>
     public static void ResetAll()
     {
-        // Main queue clear
+        // Main queue & Blueprints clear
         if (mainQueue != null)
         {
             foreach (KeyValuePair<MonoBehaviour, Dictionary<string, List<ttTask>>> instanceDict in mainQueue)
+            {
+                foreach (KeyValuePair<string, List<ttTask>> taskList in instanceDict.Value)
+                {
+                    taskList.Value.Clear();
+                }
+            }
+
+            foreach (KeyValuePair<MonoBehaviour, Dictionary<string, List<ttTask>>> instanceDict in blueprints)
             {
                 foreach (KeyValuePair<string, List<ttTask>> taskList in instanceDict.Value)
                 {
@@ -831,6 +856,7 @@ public static class TeaTime
         if (IsEmpty(instance, queueName))
             yield break;
 
+
         PrepareRunningQueues(instance);
 
         // Ignore if already running
@@ -840,9 +866,11 @@ public static class TeaTime
         // Marks the queue as running
         runningQueues[instance].Add(queueName);
 
+
         // Coroutines registry
         PrepareRunningCoroutines(instance, queueName);
         IEnumerator coroutine = null;
+
 
         // Run over a clone until depleted
         List<ttTask> batch = new List<ttTask>();
@@ -883,6 +911,7 @@ public static class TeaTime
 
         // The queue has stopped
         runningQueues[instance].Remove(queueName);
+
 
         // Try again is there are new items
         if (mainQueue[instance][queueName].Count > 0)
@@ -939,7 +968,7 @@ public static class TeaTime
             callback();
 
 
-        // Executes the callback with handler (and waits his yield / ienumerator)
+        // Executes the callback with handler (and waits his yields / ienumerators)
         if (callbackWithHandler != null)
         {
             ttHandler t = new ttHandler();
@@ -996,17 +1025,17 @@ public static class TeaTime
         // Run while active until duration
         while (loopHandler.isActive && loopHandler.t <= 1)
         {
-            // deltatime
-            float unityTimeDelta = Time.deltaTime;
+            // deltaTime
+            float unityDeltatime = Time.deltaTime;
 
 
             // Completion % from 0 to 1
-            loopHandler.t += tRate * unityTimeDelta;
+            loopHandler.t += tRate * unityDeltatime;
 
 
             // Customized delta that represents the loop duration
-            loopHandler.deltaTime = 1 / (duration - loopHandler.timeSinceStart) * unityTimeDelta;
-            loopHandler.timeSinceStart += unityTimeDelta;
+            loopHandler.deltaTime = 1 / (duration - loopHandler.timeSinceStart) * unityDeltatime;
+            loopHandler.timeSinceStart += unityDeltatime;
 
 
             // Pause
@@ -1027,11 +1056,11 @@ public static class TeaTime
                     yield return yi;
                 }
 
-                loopHandler.yieldsToWait = null;
+                loopHandler.yieldsToWait.Clear();
             }
 
 
-            // Waits and execute all IEnumerators, once
+            // Executes and waits all IEnumerators, once
             if (loopHandler.ienumsToWait != null)
             {
                 foreach (IEnumerator ien in loopHandler.ienumsToWait)
@@ -1039,7 +1068,7 @@ public static class TeaTime
                     yield return instance.StartCoroutine(ien);
                 }
 
-                loopHandler.ienumsToWait = null;
+                loopHandler.ienumsToWait.Clear();
             }
 
 
@@ -1064,9 +1093,9 @@ public static class TeaTime
         while (loopHandler.isActive)
         {
             // deltaTime
-            float delta = Time.deltaTime;
-            loopHandler.deltaTime = delta;
-            loopHandler.timeSinceStart += delta;
+            float unityDeltaTime = Time.deltaTime;
+            loopHandler.deltaTime = unityDeltaTime;
+            loopHandler.timeSinceStart += unityDeltaTime;
 
 
             // Pause
@@ -1087,11 +1116,11 @@ public static class TeaTime
                     yield return yi;
                 }
 
-                loopHandler.yieldsToWait = null;
+                loopHandler.yieldsToWait.Clear();
             }
 
 
-            // Waits and execute all IEnumerators, once
+            // Executes & waits all IEnumerators, once
             if (loopHandler.ienumsToWait != null)
             {
                 foreach (IEnumerator ien in loopHandler.ienumsToWait)
@@ -1099,7 +1128,7 @@ public static class TeaTime
                     yield return instance.StartCoroutine(ien);
                 }
 
-                loopHandler.ienumsToWait = null;
+                loopHandler.ienumsToWait.Clear();
             }
 
 
