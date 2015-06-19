@@ -72,14 +72,12 @@ public class ttTask
     public YieldInstruction yieldInstruction = null;
     public Action callback = null;
     public Action<ttHandler> callbackWithHandler = null;
-    public IEnumerator coroutine = null;
     public bool isLoop = false;
 
 
     public ttTask(MonoBehaviour instance, string queueName,
                   float time, YieldInstruction yield,
                   Action callback, Action<ttHandler> callbackWithHandler,
-                  IEnumerator coroutine,
                   bool isLoop)
     {
         this.instance = instance;
@@ -88,7 +86,6 @@ public class ttTask
         this.yieldInstruction = yield;
         this.callback = callback;
         this.callbackWithHandler = callbackWithHandler;
-        this.coroutine = coroutine;
         this.isLoop = isLoop;
     }
 }
@@ -391,7 +388,6 @@ public static class TeaTime
     private static MonoBehaviour ttAdd(this MonoBehaviour instance,
                                        float timeDelay, YieldInstruction yieldDelay,
                                        Action callback, Action<ttHandler> callbackWithHandler,
-                                       IEnumerator coroutine,
                                        bool isLoop)
     {
         PrepareCurrentQueueName(instance);
@@ -407,7 +403,6 @@ public static class TeaTime
         ttTask currentTask = new ttTask(instance, queueName,
                                         timeDelay, yieldDelay,
                                         callback, callbackWithHandler,
-                                        coroutine,
                                         isLoop);
 
         mainQueue[instance][queueName].Add(currentTask);
@@ -431,7 +426,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, float timeDelay, Action callback)
     {
-        return instance.ttAdd(timeDelay, null, callback, null, null, false);
+        return instance.ttAdd(timeDelay, null, callback, null, false);
     }
 
 
@@ -440,7 +435,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, float timeDelay, Action<ttHandler> callback)
     {
-        return instance.ttAdd(timeDelay, null, null, callback, null, false);
+        return instance.ttAdd(timeDelay, null, null, callback, false);
     }
 
 
@@ -449,7 +444,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, YieldInstruction yieldToWait, Action callback)
     {
-        return instance.ttAdd(0, yieldToWait, callback, null, null, false);
+        return instance.ttAdd(0, yieldToWait, callback, null, false);
     }
 
 
@@ -458,7 +453,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, YieldInstruction yieldToWait, Action<ttHandler> callback)
     {
-        return instance.ttAdd(0, yieldToWait, null, callback, null, false);
+        return instance.ttAdd(0, yieldToWait, null, callback, false);
     }
 
 
@@ -467,7 +462,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, float interval)
     {
-        return instance.ttAdd(interval, null, null, null, null, false);
+        return instance.ttAdd(interval, null, null, null, false);
     }
 
 
@@ -476,7 +471,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, YieldInstruction yieldToWait)
     {
-        return instance.ttAdd(0, yieldToWait, null, null, null, false);
+        return instance.ttAdd(0, yieldToWait, null, null, false);
     }
 
 
@@ -485,7 +480,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, Action callback)
     {
-        return instance.ttAdd(0, null, callback, null, null, false);
+        return instance.ttAdd(0, null, callback, null, false);
     }
 
 
@@ -494,16 +489,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttAdd(this MonoBehaviour instance, Action<ttHandler> callback)
     {
-        return instance.ttAdd(0, null, null, callback, null, false);
-    }
-
-
-    /// <summary>
-    /// Appends a coroutine into the current queue.
-    /// </summary>
-    public static MonoBehaviour ttAdd(this MonoBehaviour instance, IEnumerator coroutine)
-    {
-        return instance.ttAdd(0, null, null, null, coroutine, false);
+        return instance.ttAdd(0, null, null, callback, false);
     }
 
 
@@ -512,7 +498,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttLoop(this MonoBehaviour instance, float duration, Action<ttHandler> callback)
     {
-        return instance.ttAdd(duration, null, null, callback, null, true);
+        return instance.ttAdd(duration, null, null, callback, true);
     }
 
 
@@ -521,7 +507,7 @@ public static class TeaTime
     /// </summary>
     public static MonoBehaviour ttLoop(this MonoBehaviour instance, Action<ttHandler> callback)
     {
-        return instance.ttAdd(0, null, null, callback, null, true);
+        return instance.ttAdd(0, null, null, callback, true);
     }
 
 
@@ -662,18 +648,6 @@ public static class TeaTime
         }
 
         return instance;
-    }
-
-
-    /// <summary>
-    /// THIS DOES NOT WORK, YET
-    /// Returns the IEnumerator for the current queue.
-    /// </summary>
-    public static IEnumerator ttGet(this MonoBehaviour instance)
-    {
-        PrepareCurrentQueueName(instance);
-
-        return ExecuteQueue(instance, currentQueueName[instance]);
     }
 
 
@@ -883,22 +857,19 @@ public static class TeaTime
                 {
                     coroutine = ExecuteLoop(task.instance, task.queueName,
                                             task.time,
-                                            task.callbackWithHandler,
-                                            task.coroutine);
+                                            task.callbackWithHandler);
                 }
                 else
                 {
                     coroutine = ExecuteInfiniteLoop(task.instance, task.queueName,
-                                                    task.callbackWithHandler,
-                                                    task.coroutine);
+                                                    task.callbackWithHandler);
                 }
             }
             else
             {
                 coroutine = ExecuteOnce(task.instance, task.queueName,
                                         task.time, task.yieldInstruction,
-                                        task.callback, task.callbackWithHandler,
-                                        task.coroutine);
+                                        task.callback, task.callbackWithHandler);
             }
 
             // Register and execute coroutines
@@ -942,8 +913,7 @@ public static class TeaTime
     /// </summary>
     private static IEnumerator ExecuteOnce(MonoBehaviour instance, string queueName,
                                            float timeToWait, YieldInstruction yieldToWait,
-                                           Action callback, Action<ttHandler> callbackWithHandler,
-                                           IEnumerator coroutine)
+                                           Action callback, Action<ttHandler> callbackWithHandler)
     {
         // #fix
         // Inmediate execution breaks the queue order with nested queues
@@ -997,15 +967,6 @@ public static class TeaTime
         }
 
 
-        // Executes and waits the IEnumerator
-        if (coroutine != null)
-        {
-            Debug.Log(currentQueueName[instance]);
-            Debug.Log(coroutine);
-            yield return instance.StartCoroutine(coroutine);
-        }
-
-
         yield return null;
     }
 
@@ -1015,8 +976,7 @@ public static class TeaTime
     /// </summary>
     private static IEnumerator ExecuteLoop(MonoBehaviour instance, string queueName,
                                            float duration,
-                                           Action<ttHandler> callback,
-                                           IEnumerator coroutine)
+                                           Action<ttHandler> callback)
     {
         // Only for positive values
         if (duration <= 0)
@@ -1059,11 +1019,6 @@ public static class TeaTime
                 callback(loopHandler);
 
 
-            // Executes and waits the IEnumerator
-            // if (coroutine != null)
-            //     yield return instance.StartCoroutine(coroutine);
-
-
             // Waits all the yields, once
             if (loopHandler.yieldsToWait != null)
             {
@@ -1096,7 +1051,7 @@ public static class TeaTime
     /// <summary>
     /// Executes a callback inside an infinite loop until ttHandler.Break().
     /// </summary>
-    private static IEnumerator ExecuteInfiniteLoop(MonoBehaviour instance, string queueName, Action<ttHandler> callback, IEnumerator coroutine)
+    private static IEnumerator ExecuteInfiniteLoop(MonoBehaviour instance, string queueName, Action<ttHandler> callback)
     {
         // #fix
         // Inmediate execution breaks the queue order with nested queues
@@ -1122,11 +1077,6 @@ public static class TeaTime
             // Callback execution
             if (callback != null)
                 callback(loopHandler);
-
-
-            // Executes and waits the IEnumerator
-            // if (coroutine != null)
-            //     yield return instance.StartCoroutine(coroutine);
 
 
             // Waits all the yields, once
