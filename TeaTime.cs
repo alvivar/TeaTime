@@ -1,7 +1,7 @@
-﻿// TeaTime v0.6.5.3 alpha
+﻿// TeaTime v0.6.5.4 alpha
 
 // By Andrés Villalobos [andresalvivar@gmail.com twitter.com/matnesis]
-// Special thanks to Antonio Zamora [twitter.com/tzamora] (loop idea and initial push).
+// Special thanks to Antonio Zamora [twitter.com/tzamora] (ttLoop idea and initial push).
 // Created 2014/12/26 12:21 am
 
 // TeaTime is a fast & simple queue for timed callbacks, fashioned as a
@@ -162,7 +162,7 @@ public static class TeaTime
     /// <summary>
     /// Default queue name.
     /// </summary>
-    private const string DEFAULT_QUEUE_NAME = "TEATIME_DEFAULT_QUEUE_NAME";
+    private const string DEFAULT_QUEUE_NAME = "TeaTimeDefaultQueueName";
 
     /// <summary>
     /// Main queue for all the timed callbacks.
@@ -170,7 +170,7 @@ public static class TeaTime
     private static Dictionary<MonoBehaviour, Dictionary<string, List<ttTask>>> mainQueue = null;
 
     /// <summary>
-    /// Contains a complete copy of every queue and their respective callbacks.
+    /// Main queue unaltered backup.
     /// </summary>
     private static Dictionary<MonoBehaviour, Dictionary<string, List<ttTask>>> blueprints = null;
 
@@ -405,7 +405,7 @@ public static class TeaTime
         mainQueue[instance][queueName].Add(currentTask);
 
 
-        // Mirrors the main queue in blueprints
+        // Mirrors the main queue
         blueprints[instance][queueName].Add(currentTask);
 
 
@@ -516,6 +516,10 @@ public static class TeaTime
     {
         PrepareCurrentQueueName(instance);
 
+        // Do nothing
+        if (IsEmpty(instance, currentQueueName[instance]))
+            return instance;
+
         if (!IsLockedOrUnlockEmpty(instance, currentQueueName[instance]))
             lockedQueues[instance].Add(currentQueueName[instance]);
 
@@ -551,16 +555,16 @@ public static class TeaTime
             return instance.ttPause();
 
 
-        // Cleaning only the callbacks and coroutines, leaving the queue
-        // config as they are
+        // Clean only callbacks and coroutines, leaves the queue state
+        // unaltered
         PrepareMainQueue(instance, queueName);
         PrepareRunningQueues(instance);
         PrepareRunningCoroutines(instance, queueName);
 
-        // Cleaning callbacks
+        // Clean the current queue
         mainQueue[instance][queueName].Clear();
 
-        // Cleaning running queues
+        // Clean running queues
         if (runningQueues[instance].Contains(queueName))
             runningQueues[instance].Remove(queueName);
 
@@ -575,7 +579,7 @@ public static class TeaTime
         // Pause
         instance.ttPause();
 
-        // Restart the main queue using blueprints
+        // Reload the main queue with Blueprints data
         mainQueue[instance][queueName].AddRange(blueprints[instance][queueName]);
 
 
@@ -666,7 +670,7 @@ public static class TeaTime
     public static MonoBehaviour tt(this MonoBehaviour instance, string queueName = null)
     {
         if (queueName == null)
-            queueName = DEFAULT_QUEUE_NAME + Time.time + UnityEngine.Random.Range(0, int.MaxValue);
+            queueName = DEFAULT_QUEUE_NAME + UnityEngine.Random.Range(0, int.MaxValue) + Time.time;
 
         PrepareCurrentQueueName(instance);
         currentQueueName[instance] = queueName;
@@ -857,9 +861,8 @@ public static class TeaTime
             yield break;
 
 
-        PrepareRunningQueues(instance);
-
         // Ignore if already running
+        PrepareRunningQueues(instance);
         if (runningQueues.ContainsKey(instance) && runningQueues[instance].Contains(queueName))
             yield break;
 
@@ -905,11 +908,11 @@ public static class TeaTime
             yield return instance.StartCoroutine(coroutine);
             runningCoroutines[instance][queueName].Remove(coroutine);
 
-            // Done!
+            // Task done!
             mainQueue[instance][queueName].Remove(task);
         }
 
-        // The queue has stopped
+        // Queue batch done!
         runningQueues[instance].Remove(queueName);
 
 
@@ -923,13 +926,13 @@ public static class TeaTime
             // Repeat if infinite
             if (IsInfinite(instance, queueName))
             {
-                // Restart the main queue using blueprints
+                // Restart the main queue with Blueprints data
                 mainQueue[instance][queueName].AddRange(blueprints[instance][queueName]);
                 instance.StartCoroutine(ExecuteQueue(instance, queueName));
             }
             else
             {
-                // Queue completed, remove the lock
+                // Queue completed, remove the lock if empty
                 IsLockedOrUnlockEmpty(instance, queueName);
             }
         }
