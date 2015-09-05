@@ -613,6 +613,15 @@ public static class TeaTime
 
 
     /// <summary>
+    /// Restart the current queue.
+    /// </summary>
+    public static MonoBehaviour ttRestart(this MonoBehaviour instance)
+    {
+        return instance.ttStop().ttPlay();
+    }
+
+
+    /// <summary>
     /// Stops and resets the current queue (full cleanup).
     /// </summary>
     public static MonoBehaviour ttReset(this MonoBehaviour instance)
