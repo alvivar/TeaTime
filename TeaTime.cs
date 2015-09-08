@@ -628,6 +628,9 @@ public static class TeaTime
     {
         PrepareCurrentQueueName(instance);
 
+        if (IsEmpty(instance, currentQueueName[instance]))
+            return instance;
+
         Reset(instance, currentQueueName[instance]);
 
         return instance;
