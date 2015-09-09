@@ -579,7 +579,7 @@ public static class TeaTime
         // Pause
         instance.ttPause();
 
-        // Reload the main queue with Blueprints data
+        // Reload the main queue with Blueprints
         mainQueue[instance][queueName].AddRange(blueprints[instance][queueName]);
 
 
@@ -588,7 +588,7 @@ public static class TeaTime
 
 
     /// <summary>
-    /// Resume the current queue.
+    /// Resume the current queue, or restart the queue if it's already finished.
     /// </summary>
     public static MonoBehaviour ttPlay(this MonoBehaviour instance)
     {
@@ -603,6 +603,14 @@ public static class TeaTime
         // Unpauses the queue
         if (IsPaused(instance, queueName))
             pausedQueues[instance].Remove(queueName);
+
+        // If empty, restart using Blueprints
+        if (IsEmpty(instance, queueName))
+        {
+            mainQueue[instance][queueName].Clear();
+            mainQueue[instance][queueName].AddRange(blueprints[instance][queueName]);
+        }
+
 
         // Execute queue
         instance.StartCoroutine(ExecuteQueue(instance, queueName));
@@ -938,7 +946,7 @@ public static class TeaTime
             // Repeat if infinite
             if (IsInfinite(instance, queueName))
             {
-                // Restart the main queue with Blueprints data
+                // Restart the main queue with Blueprints
                 mainQueue[instance][queueName].AddRange(blueprints[instance][queueName]);
                 instance.StartCoroutine(ExecuteQueue(instance, queueName));
             }

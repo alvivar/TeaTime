@@ -1,3 +1,8 @@
+
+####v0.6.5.4?
+
+- .ttPlay is now able to restart a queue if it's already finished.
+
 ####v0.6.5.3
 
 - **UPGRADE** .WaitFor() from ttHandler now queues his arguments every time is
