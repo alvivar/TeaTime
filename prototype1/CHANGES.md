@@ -1,5 +1,11 @@
 
-####v0.6.5.4?
+- **THIS IS THE END** The next version v0.7 is going to be a total code
+  rewrite. Faster, C# compliant, a lot better. This current code is super
+  stable and the best prototype of something in the universe.
+
+- My eternal love to this version <3
+
+####v0.6.5.4
 
 - .ttPlay is now able to restart a queue if it's already finished.
 
