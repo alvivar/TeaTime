@@ -5,7 +5,7 @@
 using UnityEngine;
 
 
-public class Example1 : MonoBehaviour
+public class Test1 : MonoBehaviour
 {
     private TeaTime2 queue;
 
@@ -33,13 +33,24 @@ public class Example1 : MonoBehaviour
         })
         .Loop(1, (TeaHandler2 t) =>
         {
-            transform.position = Vector3.Lerp(transform.position, Random.insideUnitSphere, t.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, new Vector3(10, 10, 10), t.deltaTime);
         })
         .Add(() =>
         {
             Debug.Log("step 5 " + Time.time);
         })
-        .Repeat();
+        .Loop((TeaHandler2 t) =>
+        {
+            transform.position = Vector3.Lerp(transform.position, Vector3.zero, t.deltaTime);
+
+            if (t.timeSinceStart >= 1)
+                t.Break();
+        })
+        .Add(() =>
+        {
+            Debug.Log("step 6 " + Time.time);
+        })
+        .Wait();
     }
 
 

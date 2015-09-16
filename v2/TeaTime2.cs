@@ -23,14 +23,14 @@ public class TeaTask2
 
 public class TeaHandler2
 {
-	public bool isActive = false;
+	public bool isActive = true;
 
 	public float t = 0;
 	public float deltaTime = 0;
 	public float timeSinceStart = 0;
 
-	public List<YieldInstruction> yieldsToWait;
-	public List<IEnumerator> ienumsToWait;
+	public List<YieldInstruction> yieldsToWait = null;
+	public List<IEnumerator> ienumsToWait = null;
 
 
 	public void Break()
@@ -83,6 +83,11 @@ public class TeaTime2
 		get { return _isPlaying; }
 	}
 
+	public bool isFinished
+	{
+		get { return nextTask >= tasks.Count; }
+	}
+
 
 	public TeaTime2(MonoBehaviour instance)
 	{
@@ -102,7 +107,6 @@ public class TeaTime2
 
 
 		TeaTask2 newTask = new TeaTask2();
-		newTask.isLoop = false;
 		newTask.time = timeDelay;
 		newTask.callback = callback;
 		newTask.callbackWithHandler = callbackWithHandler;
@@ -115,27 +119,27 @@ public class TeaTime2
 
 	public TeaTime2 Add(float timeDelay, Action callback)
 	{
-		return this.Add(timeDelay, callback, null);
+		return Add(timeDelay, callback, null);
 	}
 
 	public TeaTime2 Add(float timeDelay, Action<TeaHandler2> callback)
 	{
-		return this.Add(timeDelay, null, callback);
+		return Add(timeDelay, null, callback);
 	}
 
 	public TeaTime2 Add(float timeDelay)
 	{
-		return this.Add(timeDelay, null, null);
+		return Add(timeDelay, null, null);
 	}
 
 	public TeaTime2 Add(Action callback)
 	{
-		return this.Add(0, callback, null);
+		return Add(0, callback, null);
 	}
 
 	public TeaTime2 Add(Action<TeaHandler2> callback)
 	{
-		return this.Add(0, null, callback);
+		return Add(0, null, callback);
 	}
 
 
@@ -143,7 +147,7 @@ public class TeaTime2
 	// LOOP
 
 
-	public TeaTime2 Loop(float duration, Action callback)
+	public TeaTime2 Loop(float duration, Action<TeaHandler2> callback)
 	{
 		// Ignore during Wait or Repeat mode
 		if (_isWaiting || _isRepeating)
@@ -153,11 +157,16 @@ public class TeaTime2
 		TeaTask2 newTask = new TeaTask2();
 		newTask.isLoop = true;
 		newTask.time = duration;
-		newTask.callback = callback;
+		newTask.callbackWithHandler = callback;
 
 		tasks.Add(newTask);
 
 		return this;
+	}
+
+	public TeaTime2 Loop(Action<TeaHandler2> callback)
+	{
+		return Loop(-1, callback);
 	}
 
 
@@ -276,7 +285,6 @@ public class TeaTime2
 
 		while (nextTask < tasks.Count)
 		{
-			// Current
 			TeaTask2 currentTask = tasks[nextTask];
 
 
@@ -285,20 +293,25 @@ public class TeaTime2
 			{
 				// Loops always have a handler
 				TeaHandler2 loopHandler = new TeaHandler2();
-				loopHandler.isActive = true;
 
+				bool isInfinite = currentTask.time < 0;
 
-				// While active and until time
-				float tRate = 1 / currentTask.time;
+				// While active and, until time or infinite
+				float tRate = isInfinite ? 0 : 1 / currentTask.time;
 				while (loopHandler.isActive && loopHandler.t <= 1)
 				{
 					float unityDeltatime = Time.deltaTime;
 
-					// Completion rate from 0 to 1
-					loopHandler.t += tRate * unityDeltatime;
+					// Completion from 0 to 1
+					if (!isInfinite)
+						loopHandler.t += tRate * unityDeltatime;
 
-					// Customized time delta representing the loop duration
-					loopHandler.deltaTime = 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
+					// Customized time delta representing the loop duration on
+					// finite loops
+					loopHandler.deltaTime =
+					    isInfinite
+					    ? unityDeltatime
+					    : 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
 
 					loopHandler.timeSinceStart += unityDeltatime;
 
@@ -329,8 +342,9 @@ public class TeaTime2
 						loopHandler.ienumsToWait.Clear();
 					}
 
-
-					yield return null;
+					// Minimum delay
+					if (loopHandler.yieldsToWait == null && loopHandler.ienumsToWait == null)
+						yield return null;
 				}
 			}
 
@@ -384,7 +398,7 @@ public class TeaTime2
 				}
 
 
-				// Wait frame
+				// Minimum delay
 				if (currentTask.time <= 0)
 					yield return null;
 			}
