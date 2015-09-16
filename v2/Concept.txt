@@ -1,0 +1,55 @@
+
+	TeaTime task = this.tt();
+	TeaTime taskCheck = this.tt();
+
+
+	task.pause().add(0.10f, () =>
+	{
+		if (!something) task.restart();
+	})
+	.add(() =>
+	{
+		// Something now
+	})
+	.loop(1, isActive, (TeaHandler t) =>
+	{
+		// Powerful loop
+
+		if (somethingElse)
+		{
+			// A queue inside a queue
+			if (!taskCheck.isPlaying) taskCheck.add(3, () =>
+			{
+				// Something in 3 seconds while staying in true
+			})
+			.wait();
+		}
+		else
+		{
+			// Reset the above
+			taskCheck.reset();
+		}
+
+	})
+	.wait();
+
+
+	// Queue
+	.add
+	.loop
+
+
+	// Play modes
+	.wait
+	.repeat
+
+
+	// Control
+	.play
+	.pause
+	.stop
+	.restart
+
+
+	// Destructive
+	.reset
