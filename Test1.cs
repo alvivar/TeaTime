@@ -3,7 +3,8 @@
 
 
 using UnityEngine;
-
+using TT2;
+using DG.Tweening;
 
 public class Test1 : MonoBehaviour
 {
@@ -49,6 +50,10 @@ public class Test1 : MonoBehaviour
         .Add(() =>
         {
             Debug.Log("step 6 " + Time.time);
+        })
+        .Add(new WaitForSeconds(1), () =>
+        {
+            Debug.Log("step 7 " + Time.time);
         })
         .Wait();
     }
