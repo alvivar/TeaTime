@@ -13,17 +13,54 @@ using UnityEngine;
 public class TeaTask2
 {
 	public bool isLoop = false;
+
 	public float time = 0;
+	public YieldInstruction yieldInstruction = null;
 	public Action callback = null;
+	public Action<TeaHandler2> callbackWithHandler = null;
 }
 
 
 public class TeaHandler2
 {
-	public bool isActive = true;
+	public bool isActive = false;
+
 	public float t = 0;
 	public float deltaTime = 0;
 	public float timeSinceStart = 0;
+
+	public List<YieldInstruction> yieldsToWait;
+	public List<IEnumerator> ienumsToWait;
+
+
+	public void Break()
+	{
+		isActive = false;
+	}
+
+
+	public void WaitFor(YieldInstruction yi)
+	{
+		if (yieldsToWait == null)
+			yieldsToWait = new List<YieldInstruction>();
+
+		yieldsToWait.Add(yi);
+	}
+
+
+	public void WaitFor(IEnumerator ie)
+	{
+		if (ienumsToWait == null)
+			ienumsToWait = new List<IEnumerator>();
+
+		ienumsToWait.Add(ie);
+	}
+
+
+	public void WaitFor(float time)
+	{
+		WaitFor(new WaitForSeconds(time));
+	}
 }
 
 
@@ -36,9 +73,9 @@ public class TeaTime2
 	private Coroutine currentCoroutine = null;
 
 	private bool _isPlaying;
+	private bool _isPaused;
 	private bool _isWaiting;
 	private bool _isRepeating;
-	private bool _isPaused;
 
 
 	public bool isPlaying
@@ -54,10 +91,10 @@ public class TeaTime2
 
 
 	// >
-	// QUEUE
+	// ADD
 
 
-	public TeaTime2 Add(float timeDelay, Action callback)
+	private TeaTime2 Add(float timeDelay, Action callback, Action<TeaHandler2> callbackWithHandler)
 	{
 		// Ignore during Wait or Repeat mode
 		if (_isWaiting || _isRepeating)
@@ -68,21 +105,42 @@ public class TeaTime2
 		newTask.isLoop = false;
 		newTask.time = timeDelay;
 		newTask.callback = callback;
+		newTask.callbackWithHandler = callbackWithHandler;
 
 		tasks.Add(newTask);
 
 		return this;
 	}
 
+
+	public TeaTime2 Add(float timeDelay, Action callback)
+	{
+		return this.Add(timeDelay, callback, null);
+	}
+
+	public TeaTime2 Add(float timeDelay, Action<TeaHandler2> callback)
+	{
+		return this.Add(timeDelay, null, callback);
+	}
+
 	public TeaTime2 Add(float timeDelay)
 	{
-		return this.Add(timeDelay, null);
+		return this.Add(timeDelay, null, null);
 	}
 
 	public TeaTime2 Add(Action callback)
 	{
-		return this.Add(0, callback);
+		return this.Add(0, callback, null);
 	}
+
+	public TeaTime2 Add(Action<TeaHandler2> callback)
+	{
+		return this.Add(0, null, callback);
+	}
+
+
+	// >
+	// LOOP
 
 
 	public TeaTime2 Loop(float duration, Action callback)
@@ -144,10 +202,7 @@ public class TeaTime2
 	public TeaTime2 Stop()
 	{
 		if (currentCoroutine != null)
-		{
 			instance.StopCoroutine(currentCoroutine);
-			currentCoroutine = null;
-		}
 
 		_isPlaying = false;
 		_isPaused = true;
@@ -174,7 +229,7 @@ public class TeaTime2
 			nextTask = 0;
 
 
-		// Execute
+		// Execute!
 		currentCoroutine = instance.StartCoroutine(ExecuteQueue());
 
 
@@ -184,6 +239,7 @@ public class TeaTime2
 
 	public TeaTime2 Restart()
 	{
+		// Alias
 		return this.Stop().Play();
 	}
 
@@ -201,9 +257,9 @@ public class TeaTime2
 		nextTask = 0;
 
 		_isPlaying = false;
+		_isPaused = false;
 		_isWaiting = false;
 		_isRepeating = false;
-		_isPaused = false;
 
 		return this;
 	}
@@ -227,33 +283,51 @@ public class TeaTime2
 			// LOOP
 			if (currentTask.isLoop)
 			{
+				// Loops always have a handler
 				TeaHandler2 loopHandler = new TeaHandler2();
 				loopHandler.isActive = true;
 
-				// Completion rate [0..1]
+
+				// While active and until time
 				float tRate = 1 / currentTask.time;
-
-
-				while (loopHandler.isActive && tRate <= 1)
+				while (loopHandler.isActive && loopHandler.t <= 1)
 				{
-					// deltaTime
 					float unityDeltatime = Time.deltaTime;
 
-					// Completion % from 0 to 1
+					// Completion rate from 0 to 1
 					loopHandler.t += tRate * unityDeltatime;
 
 					// Customized time delta representing the loop duration
 					loopHandler.deltaTime = 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
+
 					loopHandler.timeSinceStart += unityDeltatime;
-
-
-					// Loops will always have a callback
-					currentTask.callback();
 
 
 					// Pause?
 					while (_isPaused)
 						yield return null;
+
+
+					// Loops always have a callback
+					currentTask.callbackWithHandler(loopHandler);
+
+
+					// Wait for
+					if (loopHandler.yieldsToWait != null)
+					{
+						foreach (YieldInstruction yi in loopHandler.yieldsToWait)
+							yield return yi;
+
+						loopHandler.yieldsToWait.Clear();
+					}
+
+					if (loopHandler.ienumsToWait != null)
+					{
+						foreach (IEnumerator ie in loopHandler.ienumsToWait)
+							yield return instance.StartCoroutine(ie);
+
+						loopHandler.ienumsToWait.Clear();
+					}
 
 
 					yield return null;
@@ -265,9 +339,7 @@ public class TeaTime2
 			{
 				// Time delay
 				if (currentTask.time > 0)
-				{
 					yield return new WaitForSeconds(currentTask.time);
-				}
 
 
 				// Pause?
@@ -278,6 +350,38 @@ public class TeaTime2
 				// Normal callbacks
 				if (currentTask.callback != null)
 					currentTask.callback();
+
+
+				// Callbacks with handlers
+				if (currentTask.callbackWithHandler != null)
+				{
+					TeaHandler2 handler = new TeaHandler2();
+
+					handler.isActive = true;
+					handler.t = 1;
+					handler.timeSinceStart = currentTask.time;
+					handler.deltaTime = Time.deltaTime;
+
+					currentTask.callbackWithHandler(handler);
+
+
+					// Wait for
+					if (handler.yieldsToWait != null)
+					{
+						foreach (YieldInstruction yi in handler.yieldsToWait)
+							yield return yi;
+
+						handler.yieldsToWait.Clear();
+					}
+
+					if (handler.ienumsToWait != null)
+					{
+						foreach (IEnumerator ie in handler.ienumsToWait)
+							yield return instance.StartCoroutine(ie);
+
+						handler.ienumsToWait.Clear();
+					}
+				}
 
 
 				// Wait frame

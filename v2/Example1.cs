@@ -15,21 +15,29 @@ public class Example1 : MonoBehaviour
         queue = this.TeaTime2();
         queue.Add(1, () =>
         {
-            Debug.Log("time " + Time.time);
-            Debug.Log("delta " + Time.deltaTime);
-        })
-        .Add(() =>
-        {
-            Debug.Log("end 1");
+            Debug.Log("step 1 " + Time.time);
         })
         .Add(1, () =>
         {
-            Debug.Log("time " + Time.time);
-            Debug.Log("delta " + Time.deltaTime);
+            Debug.Log("step 2 " + Time.time);
+        })
+        .Add(1, (TeaHandler2 t) =>
+        {
+            Debug.Log("step 3 " + Time.time);
+
+            t.WaitFor(1);
         })
         .Add(() =>
         {
-            Debug.Log("end");
+            Debug.Log("step 4 " + Time.time);
+        })
+        .Loop(1, (TeaHandler2 t) =>
+        {
+            transform.position = Vector3.Lerp(transform.position, Random.insideUnitSphere, t.deltaTime);
+        })
+        .Add(() =>
+        {
+            Debug.Log("step 5 " + Time.time);
         })
         .Repeat();
     }
@@ -37,6 +45,11 @@ public class Example1 : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            queue.Restart();
+        }
+
         if (Input.GetKeyDown(KeyCode.I))
         {
             queue.Play();
