@@ -3,18 +3,18 @@
 
 
 using UnityEngine;
-using TT2;
+using matnesis.TeaTime;
 using DG.Tweening;
 
 
 public class Test1 : MonoBehaviour
 {
-    private TeaTime2 queue;
+    private TeaTime queue;
 
 
     void Start()
     {
-        queue = this.TeaTime2();
+        queue = this.TeaTime();
         queue.Add(1, () =>
         {
             Debug.Log("step 1 " + Time.time);
@@ -23,7 +23,7 @@ public class Test1 : MonoBehaviour
         {
             Debug.Log("step 2 " + Time.time);
         })
-        .Add(1, (TeaHandler2 t) =>
+        .Add(1, (ttHandler t) =>
         {
             Debug.Log("step 3 " + Time.time);
 
@@ -33,7 +33,7 @@ public class Test1 : MonoBehaviour
         {
             Debug.Log("step 4 " + Time.time);
         })
-        .Loop(1, (TeaHandler2 t) =>
+        .Loop(1, (ttHandler t) =>
         {
             transform.position = Vector3.Lerp(transform.position, new Vector3(10, 10, 10), t.deltaTime);
         })
@@ -41,7 +41,7 @@ public class Test1 : MonoBehaviour
         {
             Debug.Log("step 5 " + Time.time);
         })
-        .Loop((TeaHandler2 t) =>
+        .Loop((ttHandler t) =>
         {
             transform.position = Vector3.Lerp(transform.position, Vector3.zero, t.deltaTime);
 
@@ -56,7 +56,7 @@ public class Test1 : MonoBehaviour
         {
             Debug.Log("step 7 " + Time.time);
         })
-        .Loop(0, (TeaHandler2 t) =>
+        .Loop(0, (ttHandler t) =>
         {
             // Ignorable loop
         })

@@ -29,7 +29,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 
-namespace TT2
+namespace matnesis.TeaTime
 {
 	using System;
 	using System.Collections;
@@ -40,21 +40,21 @@ namespace TT2
 	/// <summary>
 	/// Timed task node.
 	/// </summary>
-	public class TeaTask2
+	public class ttTask
 	{
 		public bool isLoop = false;
 
 		public float time = 0;
 		public YieldInstruction yieldInstruction = null;
 		public Action callback = null;
-		public Action<TeaHandler2> callbackWithHandler = null;
+		public Action<ttHandler> callbackWithHandler = null;
 	}
 
 
 	/// <summary>
 	/// Special handler on callbacks.
 	/// </summary>
-	public class TeaHandler2
+	public class ttHandler
 	{
 		public bool isActive = true;
 
@@ -103,11 +103,11 @@ namespace TT2
 	{
 		/// <summary>
 		/// Returns a new TeaTime queue ready to be used. This is basically a
-		/// shorcut to 'new TeaTime2(this);'.
+		/// shorcut to 'new TeaTime(this);'.
 		/// </summary>
-		public static TeaTime2 TeaTime2(this MonoBehaviour instance)
+		public static TeaTime TeaTime(this MonoBehaviour instance)
 		{
-			return new TeaTime2(instance);
+			return new TeaTime(instance);
 		}
 	}
 
@@ -116,11 +116,11 @@ namespace TT2
 	/// TeaTime is a fast & simple queue for timed callbacks, focused on
 	/// solving coroutines patterns in Unity games.
 	/// </summary>
-	public class TeaTime2
+	public class TeaTime
 	{
 		// Queue
-		private List<TeaTask2> tasks = new List<TeaTask2>(); 	// Tasks list used as a queue
-		private int nextTask = 0; 								// Current task marker (to be executed)
+		private List<ttTask> tasks = new List<ttTask>(); 	// Tasks list used as a queue
+		private int nextTask = 0; 							// Current task marker (to be executed)
 
 
 		// Dependencies
@@ -150,27 +150,27 @@ namespace TT2
 		/// <summary>
 		/// A TeaTime queue requires a MonoBehaviour instance to use Coroutines.
 		/// </summary>
-		public TeaTime2(MonoBehaviour instance)
+		public TeaTime(MonoBehaviour instance)
 		{
 			this.instance = instance;
 		}
 
 
 		// >
-		// ADD CALLBACK
+		// ADD
 
 
 		/// <summary>
 		/// Appends a new task.
 		/// </summary>
-		private TeaTime2 Add(float timeDelay, YieldInstruction yi, Action callback, Action<TeaHandler2> callbackWithHandler)
+		private TeaTime Add(float timeDelay, YieldInstruction yi, Action callback, Action<ttHandler> callbackWithHandler)
 		{
 			// Ignore during Wait or Repeat mode
 			if (_isWaiting || _isRepeating)
 				return this;
 
 
-			TeaTask2 newTask = new TeaTask2();
+			ttTask newTask = new ttTask();
 			newTask.time = timeDelay;
 			newTask.yieldInstruction = yi;
 			newTask.callback = callback;
@@ -185,7 +185,7 @@ namespace TT2
 		/// <summary>
 		/// Appends a timed callback.
 		/// </summary>
-		public TeaTime2 Add(float timeDelay, Action callback)
+		public TeaTime Add(float timeDelay, Action callback)
 		{
 			return Add(timeDelay, null, callback, null);
 		}
@@ -194,7 +194,7 @@ namespace TT2
 		/// <summary>
 		/// Appends a timed callback.
 		/// </summary>
-		public TeaTime2 Add(YieldInstruction yi, Action callback)
+		public TeaTime Add(YieldInstruction yi, Action callback)
 		{
 			return Add(0, yi, callback, null);
 		}
@@ -203,7 +203,7 @@ namespace TT2
 		/// <summary>
 		/// Appends a timed callback.
 		/// </summary>
-		public TeaTime2 Add(float timeDelay, Action<TeaHandler2> callback)
+		public TeaTime Add(float timeDelay, Action<ttHandler> callback)
 		{
 			return Add(timeDelay, null, null, callback);
 		}
@@ -212,7 +212,7 @@ namespace TT2
 		/// <summary>
 		/// Appends a timed callback.
 		/// </summary>
-		public TeaTime2 Add(YieldInstruction yi, Action<TeaHandler2> callback)
+		public TeaTime Add(YieldInstruction yi, Action<ttHandler> callback)
 		{
 			return Add(0, yi, null, callback);
 		}
@@ -221,7 +221,7 @@ namespace TT2
 		/// <summary>
 		/// Appends a time delay.
 		/// </summary>
-		public TeaTime2 Add(float timeDelay)
+		public TeaTime Add(float timeDelay)
 		{
 			return Add(timeDelay, null, null, null);
 		}
@@ -230,7 +230,7 @@ namespace TT2
 		/// <summary>
 		/// Appends a time delay.
 		/// </summary>
-		public TeaTime2 Add(YieldInstruction yi)
+		public TeaTime Add(YieldInstruction yi)
 		{
 			return Add(0, yi, null, null);
 		}
@@ -239,7 +239,7 @@ namespace TT2
 		/// <summary>
 		/// Appends a callback.
 		/// </summary>
-		public TeaTime2 Add(Action callback)
+		public TeaTime Add(Action callback)
 		{
 			return Add(0, null, callback, null);
 		}
@@ -248,7 +248,7 @@ namespace TT2
 		/// <summary>
 		/// Appends a callback.
 		/// </summary>
-		public TeaTime2 Add(Action<TeaHandler2> callback)
+		public TeaTime Add(Action<ttHandler> callback)
 		{
 			return Add(0, null, null, callback);
 		}
@@ -262,14 +262,14 @@ namespace TT2
 		/// Appends a callback loop (if duration is less than 0,
 		/// the loop will be infinite).
 		/// </summary>
-		public TeaTime2 Loop(float duration, Action<TeaHandler2> callback)
+		public TeaTime Loop(float duration, Action<ttHandler> callback)
 		{
 			// Ignore during Wait or Repeat mode
 			if (_isWaiting || _isRepeating)
 				return this;
 
 
-			TeaTask2 newTask = new TeaTask2();
+			ttTask newTask = new ttTask();
 			newTask.isLoop = true;
 			newTask.time = duration;
 			newTask.callbackWithHandler = callback;
@@ -283,7 +283,7 @@ namespace TT2
 		/// <summary>
 		/// Appends an infinite callback loop.
 		/// </summary>
-		public TeaTime2 Loop(Action<TeaHandler2> callback)
+		public TeaTime Loop(Action<ttHandler> callback)
 		{
 			return Loop(-1, callback);
 		}
@@ -294,10 +294,9 @@ namespace TT2
 
 
 		/// <summary>
-		/// Enables Wait mode, ignoring new appends (Add, Loop) until
-		/// everything is completed.
+		/// Enables Wait mode, the queue will ignore new appends (Add, Loop).
 		/// </summary>
-		public TeaTime2 Wait()
+		public TeaTime Wait()
 		{
 			_isWaiting = true;
 
@@ -307,9 +306,9 @@ namespace TT2
 
 		/// <summary>
 		/// Enables Repeat mode, the queue will always be restarted on
-		/// completion.
+		/// completion and ignore new appends (Add, Loop).
 		/// </summary>
-		public TeaTime2 Repeat()
+		public TeaTime Repeat()
 		{
 			_isRepeating = true;
 
@@ -320,7 +319,7 @@ namespace TT2
 		/// <summary>
 		/// Disables both Wait and Repeat mode.
 		/// </summary>
-		public TeaTime2 Unlock()
+		public TeaTime Unlock()
 		{
 			_isWaiting = _isRepeating = false;
 
@@ -335,7 +334,7 @@ namespace TT2
 		/// <summary>
 		/// Pauses the queue execution (use Play to resume).
 		/// </summary>
-		public TeaTime2 Pause()
+		public TeaTime Pause()
 		{
 			_isPaused = true;
 
@@ -346,7 +345,7 @@ namespace TT2
 		/// <summary>
 		/// Stops the queue execution (use Play to start over).
 		/// </summary>
-		public TeaTime2 Stop()
+		public TeaTime Stop()
 		{
 			if (currentCoroutine != null)
 				instance.StopCoroutine(currentCoroutine);
@@ -363,7 +362,7 @@ namespace TT2
 		/// <summary>
 		/// Starts / Resumes the queue execution.
 		/// </summary>
-		public TeaTime2 Play()
+		public TeaTime Play()
 		{
 			// Unpause always
 			_isPaused = false;
@@ -390,7 +389,7 @@ namespace TT2
 		/// <summary>
 		/// Restart the queue execution (Stop + Play).
 		/// </summary>
-		public TeaTime2 Restart()
+		public TeaTime Restart()
 		{
 			// Alias
 			return this.Stop().Play();
@@ -404,7 +403,7 @@ namespace TT2
 		/// <summary>
 		/// Stops and cleans the queue.
 		/// </summary>
-		public TeaTime2 Reset()
+		public TeaTime Reset()
 		{
 			if (currentCoroutine != null)
 				instance.StopCoroutine(currentCoroutine);
@@ -436,7 +435,7 @@ namespace TT2
 
 			while (nextTask < tasks.Count)
 			{
-				TeaTask2 currentTask = tasks[nextTask];
+				ttTask currentTask = tasks[nextTask];
 
 
 				if (currentTask.isLoop)
@@ -450,7 +449,7 @@ namespace TT2
 
 
 					// Loops always need a handler
-					TeaHandler2 loopHandler = new TeaHandler2();
+					ttHandler loopHandler = new ttHandler();
 
 					// Negative time means the loop is infinite
 					bool isInfinite = currentTask.time < 0;
@@ -526,7 +525,7 @@ namespace TT2
 					// Callback with handler
 					if (currentTask.callbackWithHandler != null)
 					{
-						TeaHandler2 handler = new TeaHandler2();
+						ttHandler handler = new ttHandler();
 
 						handler.isActive = true;
 						handler.t = 1;
