@@ -103,7 +103,7 @@ namespace matnesis.TeaTime
 	{
 		/// <summary>
 		/// Returns a new TeaTime queue ready to be used. This is basically a
-		/// shorcut to 'new TeaTime(this);'.
+		/// shorcut to 'new TeaTime(this);' in MonoBehaviours.
 		/// </summary>
 		public static TeaTime TeaTime(this MonoBehaviour instance)
 		{
@@ -114,25 +114,25 @@ namespace matnesis.TeaTime
 
 	/// <summary>
 	/// TeaTime is a fast & simple queue for timed callbacks, focused on
-	/// solving coroutines patterns in Unity games.
+	/// solving common coroutines patterns in Unity games.
 	/// </summary>
 	public class TeaTime
 	{
 		// Queue
-		private List<ttTask> tasks = new List<ttTask>(); 	// Tasks list used as a queue
-		private int nextTask = 0; 							// Current task marker (to be executed)
+		private List<ttTask> tasks = new List<ttTask>(); // Tasks list used as a queue
+		private int nextTask = 0; // Current task marker (to be executed)
 
 
 		// Dependencies
-		private MonoBehaviour instance = null; 		// Required to access .StartCoroutine( for the
-		private Coroutine currentCoroutine = null; 	// Coroutine that holds the queue execution
+		private MonoBehaviour instance = null; // Required to access .StartCoroutine( for the
+		private Coroutine currentCoroutine = null; // Coroutine that holds the queue execution
 
 
 		// States
-		private bool _isPlaying; 	// True while executing the queue
-		private bool _isPaused; 	// On Pause()
-		private bool _isWaiting; 	// On Wait()
-		private bool _isRepeating; 	// On Repeat()
+		private bool _isPlaying; // True while executing the queue
+		private bool _isPaused; // On Pause()
+		private bool _isWaiting; // On Wait()
+		private bool _isRepeating; // On Repeat()
 
 
 		// Info
@@ -469,9 +469,9 @@ namespace matnesis.TeaTime
 						// On finite loops this deltaTime represents the exact
 						// loop duration
 						loopHandler.deltaTime =
-						    isInfinite
-						    ? unityDeltatime
-						    : 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
+							isInfinite
+							? unityDeltatime
+							: 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
 
 						loopHandler.timeSinceStart += unityDeltatime;
 
