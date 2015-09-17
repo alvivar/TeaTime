@@ -52,7 +52,7 @@ namespace TT2
 
 
 	/// <summary>
-	/// Special handler during callbacks.
+	/// Special handler on callbacks.
 	/// </summary>
 	public class TeaHandler2
 	{
@@ -119,20 +119,20 @@ namespace TT2
 	public class TeaTime2
 	{
 		// Queue
-		private List<TeaTask2> tasks = new List<TeaTask2>();
-		private int nextTask = 0;
+		private List<TeaTask2> tasks = new List<TeaTask2>(); 	// Tasks list used as a queue
+		private int nextTask = 0; 								// Current task marker (to be executed)
 
 
 		// Dependencies
-		private MonoBehaviour instance = null;
-		private Coroutine currentCoroutine = null;
+		private MonoBehaviour instance = null; 		// Required to access .StartCoroutine( for the
+		private Coroutine currentCoroutine = null; 	// Coroutine that holds the queue execution
 
 
 		// States
-		private bool _isPlaying;
-		private bool _isPaused;
-		private bool _isWaiting;
-		private bool _isRepeating;
+		private bool _isPlaying; 	// True while executing the queue
+		private bool _isPaused; 	// On Pause()
+		private bool _isWaiting; 	// On Wait()
+		private bool _isRepeating; 	// On Repeat()
 
 
 		// Info
@@ -147,13 +147,16 @@ namespace TT2
 		}
 
 
+		/// <summary>
+		/// A TeaTime queue requires a MonoBehaviour instance to use Coroutines.
+		/// </summary>
 		public TeaTime2(MonoBehaviour instance)
 		{
 			this.instance = instance;
 		}
 
 
-		// ADD
+		// ADD CALLBACK
 		// >
 
 
@@ -256,7 +259,8 @@ namespace TT2
 
 
 		/// <summary>
-		/// Appends a callback loop (duration < 0 = infinite).
+		/// Appends a callback loop (if duration is less than 0,
+		/// the loop will be infinite).
 		/// </summary>
 		public TeaTime2 Loop(float duration, Action<TeaHandler2> callback)
 		{
@@ -290,8 +294,8 @@ namespace TT2
 
 
 		/// <summary>
-		/// Enables Wait mode, ignoring new appends until everything is
-		/// completed.
+		/// Enables Wait mode, ignoring new appends (Add, Loop) until
+		/// everything is completed.
 		/// </summary>
 		public TeaTime2 Wait()
 		{
@@ -329,7 +333,7 @@ namespace TT2
 
 
 		/// <summary>
-		/// Pauses the execution (use Play to resume).
+		/// Pauses the queue execution (use Play to resume).
 		/// </summary>
 		public TeaTime2 Pause()
 		{
@@ -340,7 +344,7 @@ namespace TT2
 
 
 		/// <summary>
-		/// Stops the execution (use Play to start over).
+		/// Stops the queue execution (use Play to start over).
 		/// </summary>
 		public TeaTime2 Stop()
 		{
@@ -357,7 +361,7 @@ namespace TT2
 
 
 		/// <summary>
-		/// Starts / Resumes the execution.
+		/// Starts / Resumes the queue execution.
 		/// </summary>
 		public TeaTime2 Play()
 		{
@@ -384,7 +388,7 @@ namespace TT2
 
 
 		/// <summary>
-		/// Restart the execution (Stop + Play).
+		/// Restart the queue execution (Stop + Play).
 		/// </summary>
 		public TeaTime2 Restart()
 		{
@@ -398,7 +402,7 @@ namespace TT2
 
 
 		/// <summary>
-		/// Stops and clean everything.
+		/// Stops and cleans the queue.
 		/// </summary>
 		public TeaTime2 Reset()
 		{
@@ -437,11 +441,7 @@ namespace TT2
 
 				if (currentTask.isLoop)
 				{
-					// >
-					// LOOP PROCESS
-
-
-					// 0 is nothing, skip
+					// Nothing to do, skip
 					if (currentTask.time == 0)
 					{
 						nextTask += 1;
@@ -452,7 +452,7 @@ namespace TT2
 					// Loops always need a handler
 					TeaHandler2 loopHandler = new TeaHandler2();
 
-					// Negative time = Infinite loop
+					// Negative time means the loop is infinite
 					bool isInfinite = currentTask.time < 0;
 
 					// T quotient
@@ -463,7 +463,7 @@ namespace TT2
 					{
 						float unityDeltatime = Time.deltaTime;
 
-						// Completion from 0 to 1
+						// Completion % from 0 to 1
 						if (!isInfinite)
 							loopHandler.t += tRate * unityDeltatime;
 
@@ -486,7 +486,7 @@ namespace TT2
 						currentTask.callbackWithHandler(loopHandler);
 
 
-						// Wait for
+						// Handler WaitFor
 						if (loopHandler.yieldsToWait != null)
 						{
 							foreach (YieldInstruction yi in loopHandler.yieldsToWait)
@@ -496,17 +496,13 @@ namespace TT2
 						}
 
 
-						// Minimum delay
+						// Minimum sane delay
 						if (loopHandler.yieldsToWait == null)
 							yield return null;
 					}
 				}
 				else
 				{
-					// >
-					// ADD PROCESS
-
-
 					// Time delay
 					if (currentTask.time > 0)
 						yield return new WaitForSeconds(currentTask.time);
@@ -522,12 +518,12 @@ namespace TT2
 						yield return null;
 
 
-					// Normal callbacks
+					// Normal callback
 					if (currentTask.callback != null)
 						currentTask.callback();
 
 
-					// Callbacks with handlers
+					// Callback with handler
 					if (currentTask.callbackWithHandler != null)
 					{
 						TeaHandler2 handler = new TeaHandler2();
@@ -540,7 +536,7 @@ namespace TT2
 						currentTask.callbackWithHandler(handler);
 
 
-						// Wait for
+						// Handler WaitFor
 						if (handler.yieldsToWait != null)
 						{
 							foreach (YieldInstruction yi in handler.yieldsToWait)
@@ -551,7 +547,7 @@ namespace TT2
 					}
 
 
-					// Minimum delay
+					// Minimum sane delay
 					if (currentTask.time <= 0)
 						yield return null;
 				}
@@ -562,7 +558,7 @@ namespace TT2
 			}
 
 
-			// Repeat again on Repeat mode
+			// Repeat if Repeat mode
 			if (_isRepeating)
 			{
 				nextTask = 0;

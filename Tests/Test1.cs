@@ -56,7 +56,7 @@ public class Test1 : MonoBehaviour
         {
             Debug.Log("step 7 " + Time.time);
         })
-        .Loop(0, (TeaTask2 t) =>
+        .Loop(0, (TeaHandler2 t) =>
         {
             // Ignorable loop
         })
@@ -64,7 +64,7 @@ public class Test1 : MonoBehaviour
         {
             Debug.Log("step 8 " + Time.time);
         })
-        .Wait();
+        .Wait().Play();
     }
 
 
