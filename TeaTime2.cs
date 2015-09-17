@@ -156,8 +156,8 @@ namespace TT2
 		}
 
 
-		// ADD CALLBACK
 		// >
+		// ADD CALLBACK
 
 
 		/// <summary>
@@ -254,8 +254,8 @@ namespace TT2
 		}
 
 
-		// LOOP
 		// >
+		// LOOP
 
 
 		/// <summary>
@@ -289,8 +289,8 @@ namespace TT2
 		}
 
 
-		// PLAY MODES
 		// >
+		// PLAY MODES
 
 
 		/// <summary>
@@ -328,8 +328,8 @@ namespace TT2
 		}
 
 
-		// CONTROL
 		// >
+		// CONTROL
 
 
 		/// <summary>
