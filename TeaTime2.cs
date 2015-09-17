@@ -5,29 +5,28 @@
 // common coroutines patterns in Unity games.
 
 // By Andrés Villalobos ^ twitter.com/matnesis ^ andresalvivar@gmail.com
-
 // Created 2014/12/26 12:21 AM ^ Rewritten 2015/09/15 12:28 PM
 
 
 // Copyright (c) 2014/12/26 andresalvivar@gmail.com
 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
 
 
 namespace TT2
@@ -53,7 +52,7 @@ namespace TT2
 
 
 	/// <summary>
-	/// Special handler for callbacks.
+	/// Special handler during callbacks.
 	/// </summary>
 	public class TeaHandler2
 	{
@@ -64,7 +63,6 @@ namespace TT2
 		public float timeSinceStart = 0;
 
 		public List<YieldInstruction> yieldsToWait = null;
-		public List<IEnumerator> ienumsToWait = null;
 
 
 		/// <summary>
@@ -85,18 +83,6 @@ namespace TT2
 				yieldsToWait = new List<YieldInstruction>();
 
 			yieldsToWait.Add(yi);
-		}
-
-
-		/// <summary>
-		/// Appends a delay after the current callback execution.
-		/// </summary>
-		public void WaitFor(IEnumerator ie)
-		{
-			if (ienumsToWait == null)
-				ienumsToWait = new List<IEnumerator>();
-
-			ienumsToWait.Add(ie);
 		}
 
 
@@ -136,9 +122,11 @@ namespace TT2
 		private List<TeaTask2> tasks = new List<TeaTask2>();
 		private int nextTask = 0;
 
+
 		// Dependencies
 		private MonoBehaviour instance = null;
 		private Coroutine currentCoroutine = null;
+
 
 		// States
 		private bool _isPlaying;
@@ -147,6 +135,7 @@ namespace TT2
 		private bool _isRepeating;
 
 
+		// Info
 		public bool isPlaying
 		{
 			get { return _isPlaying; }
@@ -166,6 +155,7 @@ namespace TT2
 
 		// ADD
 		// >
+
 
 		/// <summary>
 		/// Appends a new task.
@@ -266,7 +256,7 @@ namespace TT2
 
 
 		/// <summary>
-		/// Appends a loop callback.
+		/// Appends a callback loop (duration < 0 = infinite).
 		/// </summary>
 		public TeaTime2 Loop(float duration, Action<TeaHandler2> callback)
 		{
@@ -287,7 +277,7 @@ namespace TT2
 
 
 		/// <summary>
-		/// Appends an infinite loop callback.
+		/// Appends an infinite callback loop.
 		/// </summary>
 		public TeaTime2 Loop(Action<TeaHandler2> callback)
 		{
@@ -297,6 +287,7 @@ namespace TT2
 
 		// PLAY MODES
 		// >
+
 
 		/// <summary>
 		/// Enables Wait mode, ignoring new appends until everything is
@@ -309,6 +300,7 @@ namespace TT2
 			return this;
 		}
 
+
 		/// <summary>
 		/// Enables Repeat mode, the queue will always be restarted on
 		/// completion.
@@ -320,8 +312,9 @@ namespace TT2
 			return this;
 		}
 
+
 		/// <summary>
-		/// Disable both Wait and Repeat mode.
+		/// Disables both Wait and Repeat mode.
 		/// </summary>
 		public TeaTime2 Unlock()
 		{
@@ -334,8 +327,9 @@ namespace TT2
 		// CONTROL
 		// >
 
+
 		/// <summary>
-		/// Pauses the execution (Use Play to resume).
+		/// Pauses the execution (use Play to resume).
 		/// </summary>
 		public TeaTime2 Pause()
 		{
@@ -346,7 +340,7 @@ namespace TT2
 
 
 		/// <summary>
-		/// Stops the execution (Use Play to start over).
+		/// Stops the execution (use Play to start over).
 		/// </summary>
 		public TeaTime2 Stop()
 		{
@@ -363,7 +357,7 @@ namespace TT2
 
 
 		/// <summary>
-		/// Starts, Resumes execution.
+		/// Starts / Resumes the execution.
 		/// </summary>
 		public TeaTime2 Play()
 		{
@@ -403,6 +397,9 @@ namespace TT2
 		// DESTRUCTION
 
 
+		/// <summary>
+		/// Stops and clean everything.
+		/// </summary>
 		public TeaTime2 Reset()
 		{
 			if (currentCoroutine != null)
@@ -424,6 +421,10 @@ namespace TT2
 		// COROUTINE
 
 
+		/// <summary>
+		/// This is the main algorithm. Executes all tasks, one after the
+		/// other, calling their callbacks according to type, time and config.
+		/// </summary>
 		IEnumerator ExecuteQueue()
 		{
 			_isPlaying = true;
@@ -434,16 +435,30 @@ namespace TT2
 				TeaTask2 currentTask = tasks[nextTask];
 
 
-				// LOOP
 				if (currentTask.isLoop)
 				{
-					// Loops always have a handler
+					// >
+					// LOOP PROCESS
+
+
+					// 0 is nothing, skip
+					if (currentTask.time == 0)
+					{
+						nextTask += 1;
+						continue;
+					}
+
+
+					// Loops always need a handler
 					TeaHandler2 loopHandler = new TeaHandler2();
 
+					// Negative time = Infinite loop
 					bool isInfinite = currentTask.time < 0;
 
-					// While active and, until time or infinite
+					// T quotient
 					float tRate = isInfinite ? 0 : 1 / currentTask.time;
+
+					// While active and, until time or infinite
 					while (loopHandler.isActive && loopHandler.t <= 1)
 					{
 						float unityDeltatime = Time.deltaTime;
@@ -452,8 +467,8 @@ namespace TT2
 						if (!isInfinite)
 							loopHandler.t += tRate * unityDeltatime;
 
-						// Customized time delta representing the loop duration on
-						// finite loops
+						// On finite loops this deltaTime represents the exact
+						// loop duration
 						loopHandler.deltaTime =
 						    isInfinite
 						    ? unityDeltatime
@@ -480,23 +495,18 @@ namespace TT2
 							loopHandler.yieldsToWait.Clear();
 						}
 
-						if (loopHandler.ienumsToWait != null)
-						{
-							foreach (IEnumerator ie in loopHandler.ienumsToWait)
-								yield return instance.StartCoroutine(ie);
-
-							loopHandler.ienumsToWait.Clear();
-						}
 
 						// Minimum delay
-						if (loopHandler.yieldsToWait == null && loopHandler.ienumsToWait == null)
+						if (loopHandler.yieldsToWait == null)
 							yield return null;
 					}
 				}
-
-				// NON LOOP
 				else
 				{
+					// >
+					// ADD PROCESS
+
+
 					// Time delay
 					if (currentTask.time > 0)
 						yield return new WaitForSeconds(currentTask.time);
@@ -538,14 +548,6 @@ namespace TT2
 
 							handler.yieldsToWait.Clear();
 						}
-
-						if (handler.ienumsToWait != null)
-						{
-							foreach (IEnumerator ie in handler.ienumsToWait)
-								yield return instance.StartCoroutine(ie);
-
-							handler.ienumsToWait.Clear();
-						}
 					}
 
 
@@ -555,12 +557,12 @@ namespace TT2
 				}
 
 
-				// Next
+				// Next task
 				nextTask += 1;
 			}
 
 
-			// Repeat if repeat mode
+			// Repeat again on Repeat mode
 			if (_isRepeating)
 			{
 				nextTask = 0;

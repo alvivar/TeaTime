@@ -6,6 +6,7 @@ using UnityEngine;
 using TT2;
 using DG.Tweening;
 
+
 public class Test1 : MonoBehaviour
 {
     private TeaTime2 queue;
@@ -54,6 +55,14 @@ public class Test1 : MonoBehaviour
         .Add(new WaitForSeconds(1), () =>
         {
             Debug.Log("step 7 " + Time.time);
+        })
+        .Loop(0, (TeaTask2 t) =>
+        {
+            // Ignorable loop
+        })
+        .Add(1, () =>
+        {
+            Debug.Log("step 8 " + Time.time);
         })
         .Wait();
     }
