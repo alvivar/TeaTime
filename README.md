@@ -9,4 +9,4 @@ common coroutines patterns in Unity games.
 By **[Andrés Villalobos](http://twitter.com/matnesis)**.
 
 
-> Created 2014/12/26 12:21 am ^ Rewritted 2015/09/17 06:30 pm
+> Created 2014/12/26 12:21 am ^ Rewritten 2015/09/15 12:28 pm
