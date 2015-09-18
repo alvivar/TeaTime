@@ -5,7 +5,7 @@
 // common coroutines patterns in Unity games.
 
 // By Andrés Villalobos ^ twitter.com/matnesis ^ andresalvivar@gmail.com
-// Created 2014/12/26 12:21 AM ^ Rewritten 2015/09/15 12:28 PM
+// Created 2014/12/26 12:21 am ^ Rewritten 2015/09/15 12:28 pm
 
 
 // Copyright (c) 2014/12/26 andresalvivar@gmail.com
@@ -119,20 +119,21 @@ namespace matnesis.TeaTime
 	public class TeaTime
 	{
 		// Queue
-		private List<ttTask> tasks = new List<ttTask>(); // Tasks list used as a queue
-		private int nextTask = 0; // Current task marker (to be executed)
+		private List<ttTask> _tasks = new List<ttTask>(); // Tasks list used as a queue
+		private int _nextTask = 0; // Current task marker (to be executed)
 
 
 		// Dependencies
-		private MonoBehaviour instance = null; // Required to access .StartCoroutine( for the
-		private Coroutine currentCoroutine = null; // Coroutine that holds the queue execution
+		private MonoBehaviour _instance = null; // Required to access .StartCoroutine( for the
+		private Coroutine _currentCoroutine = null; // Coroutine that holds the queue execution
 
 
 		// States
 		private bool _isPlaying; // True while executing the queue
-		private bool _isPaused; // On Pause()
-		private bool _isWaiting; // On Wait()
-		private bool _isRepeating; // On Repeat()
+		private bool _isPaused; // On Pause() state
+		private bool _isWaiting; // On Wait() mode
+		private bool _isRepeating; // On Repeat() mode
+		private bool _isRefreshing; // On Refresh() mode
 
 
 		// Info
@@ -143,7 +144,7 @@ namespace matnesis.TeaTime
 
 		public bool isCompleted
 		{
-			get { return nextTask >= tasks.Count; }
+			get { return _nextTask >= _tasks.Count; }
 		}
 
 
@@ -152,7 +153,7 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public TeaTime(MonoBehaviour instance)
 		{
-			this.instance = instance;
+			_instance = instance;
 		}
 
 
@@ -165,18 +166,17 @@ namespace matnesis.TeaTime
 		/// </summary>
 		private TeaTime Add(float timeDelay, YieldInstruction yi, Action callback, Action<ttHandler> callbackWithHandler)
 		{
-			// Ignore during Wait or Repeat mode
-			if (_isWaiting || _isRepeating)
-				return this;
+			// Ignore on Wait or Repeat mode
+			if (!_isWaiting && !_isRepeating)
+			{
+				ttTask newTask = new ttTask();
+				newTask.time = timeDelay;
+				newTask.yieldInstruction = yi;
+				newTask.callback = callback;
+				newTask.callbackWithHandler = callbackWithHandler;
 
-
-			ttTask newTask = new ttTask();
-			newTask.time = timeDelay;
-			newTask.yieldInstruction = yi;
-			newTask.callback = callback;
-			newTask.callbackWithHandler = callbackWithHandler;
-
-			tasks.Add(newTask);
+				_tasks.Add(newTask);
+			}
 
 
 			// Autoplay if not paused
@@ -266,17 +266,16 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public TeaTime Loop(float duration, Action<ttHandler> callback)
 		{
-			// Ignore during Wait or Repeat mode
-			if (_isWaiting || _isRepeating)
-				return this;
+			// Ignore on Wait or Repeat mode
+			if (!_isWaiting && !_isRepeating)
+			{
+				ttTask newTask = new ttTask();
+				newTask.isLoop = true;
+				newTask.time = duration;
+				newTask.callbackWithHandler = callback;
 
-
-			ttTask newTask = new ttTask();
-			newTask.isLoop = true;
-			newTask.time = duration;
-			newTask.callbackWithHandler = callback;
-
-			tasks.Add(newTask);
+				_tasks.Add(newTask);
+			}
 
 
 			// Autoplay if not paused
@@ -321,6 +320,18 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
+		/// Enables Refresh mode, the queue will always be cleaned on
+		/// completion and ignore new appends (Add, Loop).
+		/// </summary>
+		public TeaTime Refresh()
+		{
+			_isRefreshing = true;
+
+			return this;
+		}
+
+
+		/// <summary>
 		/// Disables both Wait and Repeat mode.
 		/// </summary>
 		public TeaTime Unlock()
@@ -351,13 +362,13 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public TeaTime Stop()
 		{
-			if (currentCoroutine != null)
-				instance.StopCoroutine(currentCoroutine);
+			if (_currentCoroutine != null)
+				_instance.StopCoroutine(_currentCoroutine);
 
 			_isPlaying = false;
-			_isPaused = true;
+			// _isPaused = true;
 
-			nextTask = 0;
+			_nextTask = 0;
 
 			return this;
 		}
@@ -378,12 +389,12 @@ namespace matnesis.TeaTime
 
 
 			// Restart if already finished
-			if (nextTask >= tasks.Count)
-				nextTask = 0;
+			if (_nextTask >= _tasks.Count)
+				_nextTask = 0;
 
 
 			// Execute!
-			currentCoroutine = instance.StartCoroutine(ExecuteQueue());
+			_currentCoroutine = _instance.StartCoroutine(ExecuteQueue());
 
 
 			return this;
@@ -409,11 +420,11 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public TeaTime Reset()
 		{
-			if (currentCoroutine != null)
-				instance.StopCoroutine(currentCoroutine);
+			if (_currentCoroutine != null)
+				_instance.StopCoroutine(_currentCoroutine);
 
-			tasks.Clear();
-			nextTask = 0;
+			_tasks.Clear();
+			_nextTask = 0;
 
 			_isPlaying = false;
 			_isPaused = false;
@@ -437,11 +448,12 @@ namespace matnesis.TeaTime
 			_isPlaying = true;
 
 
+			// Safety delay :)
 			yield return new WaitForEndOfFrame();
 
-			while (nextTask < tasks.Count)
+			while (_nextTask < _tasks.Count)
 			{
-				ttTask currentTask = tasks[nextTask];
+				ttTask currentTask = _tasks[_nextTask];
 
 
 				if (currentTask.isLoop)
@@ -449,7 +461,7 @@ namespace matnesis.TeaTime
 					// Nothing to do, skip
 					if (currentTask.time == 0)
 					{
-						nextTask += 1;
+						_nextTask += 1;
 						continue;
 					}
 
@@ -559,15 +571,15 @@ namespace matnesis.TeaTime
 
 
 				// Next task
-				nextTask += 1;
+				_nextTask += 1;
 			}
 
 
 			// Repeat if Repeat mode
 			if (_isRepeating)
 			{
-				nextTask = 0;
-				currentCoroutine = instance.StartCoroutine(ExecuteQueue());
+				_nextTask = 0;
+				_currentCoroutine = _instance.StartCoroutine(ExecuteQueue());
 			}
 			else
 			{
