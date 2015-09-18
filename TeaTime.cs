@@ -178,7 +178,9 @@ namespace matnesis.TeaTime
 
 			tasks.Add(newTask);
 
-			return this;
+
+			// Autoplay if not paused
+			return _isPaused || _isPlaying ? this : this.Play();
 		}
 
 
@@ -276,7 +278,9 @@ namespace matnesis.TeaTime
 
 			tasks.Add(newTask);
 
-			return this;
+
+			// Autoplay if not paused
+			return _isPaused || _isPlaying ? this : this.Play();
 		}
 
 
@@ -433,6 +437,8 @@ namespace matnesis.TeaTime
 			_isPlaying = true;
 
 
+			yield return new WaitForEndOfFrame();
+
 			while (nextTask < tasks.Count)
 			{
 				ttTask currentTask = tasks[nextTask];
@@ -469,9 +475,9 @@ namespace matnesis.TeaTime
 						// On finite loops this deltaTime represents the exact
 						// loop duration
 						loopHandler.deltaTime =
-							isInfinite
-							? unityDeltatime
-							: 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
+						    isInfinite
+						    ? unityDeltatime
+						    : 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
 
 						loopHandler.timeSinceStart += unityDeltatime;
 
