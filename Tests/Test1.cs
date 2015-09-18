@@ -15,7 +15,7 @@ public class Test1 : MonoBehaviour
     void Start()
     {
         queue = this.TeaTime();
-        queue.Add(1, () =>
+        queue.Pause().Add(1, () =>
         {
             Debug.Log("step 1 " + Time.time);
         })
@@ -64,7 +64,7 @@ public class Test1 : MonoBehaviour
         {
             Debug.Log("step 8 " + Time.time);
         })
-        .Wait().Play();
+        .Repeat();
     }
 
 
