@@ -129,11 +129,10 @@ namespace matnesis.TeaTime
 
 
 		// States
-		private bool _isPlaying; // True while executing the queue
-		private bool _isPaused; // On Pause() state
-		private bool _isWaiting; // On Wait() mode
-		private bool _isRepeating; // On Repeat() mode
-		private bool _isRefreshing; // On Refresh() mode
+		private bool _isPlaying = false; // True while executing the queue
+		private bool _isPaused = false; // On Pause() state
+		private bool _isWaiting = false; // On Wait() mode
+		private bool _isRepeating = false; // On Repeat() mode
 
 
 		// Info
@@ -314,18 +313,6 @@ namespace matnesis.TeaTime
 		public TeaTime Repeat()
 		{
 			_isRepeating = true;
-
-			return this;
-		}
-
-
-		/// <summary>
-		/// Enables Refresh mode, the queue will always be cleaned on
-		/// completion and ignore new appends (Add, Loop).
-		/// </summary>
-		public TeaTime Refresh()
-		{
-			_isRefreshing = true;
 
 			return this;
 		}
@@ -575,7 +562,7 @@ namespace matnesis.TeaTime
 			}
 
 
-			// Repeat if Repeat mode
+			// Repeat on Repeat mode
 			if (_isRepeating)
 			{
 				_nextTask = 0;
