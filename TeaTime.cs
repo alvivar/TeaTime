@@ -435,22 +435,26 @@ namespace matnesis.TeaTime
 			_isPlaying = true;
 
 
-			// Safety delay :)
-			yield return new WaitForEndOfFrame();
-
 			while (_nextTask < _tasks.Count)
 			{
+				// Current
 				ttTask currentTask = _tasks[_nextTask];
+
+				// Next
+				_nextTask += 1;
+
+
+				// Let's wait
+				// 1 For secuencial Adds or Loops before their first execution
+				// 2 Maybe a callback is trying to modify his own queue
+				yield return new WaitForEndOfFrame();
 
 
 				if (currentTask.isLoop)
 				{
 					// Nothing to do, skip
 					if (currentTask.time == 0)
-					{
-						_nextTask += 1;
 						continue;
-					}
 
 
 					// Loops always need a handler
@@ -528,9 +532,9 @@ namespace matnesis.TeaTime
 
 
 					// Callback with handler
+					ttHandler handler = new ttHandler();
 					if (currentTask.callbackWithHandler != null)
 					{
-						ttHandler handler = new ttHandler();
 
 						handler.isActive = true;
 						handler.t = 1;
@@ -552,13 +556,9 @@ namespace matnesis.TeaTime
 
 
 					// Minimum sane delay
-					if (currentTask.time <= 0)
+					if (currentTask.time <= 0 && handler.yieldsToWait == null)
 						yield return null;
 				}
-
-
-				// Next task
-				_nextTask += 1;
 			}
 
 

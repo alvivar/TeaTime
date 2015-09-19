@@ -26,7 +26,6 @@ public class Test1 : MonoBehaviour
         .Add(1, (ttHandler t) =>
         {
             Debug.Log("step 3 " + Time.time);
-
             t.WaitFor(1);
         })
         .Add(() =>
@@ -64,7 +63,7 @@ public class Test1 : MonoBehaviour
         {
             Debug.Log("step 8 " + Time.time);
         })
-        .Repeat();
+        .Wait();
     }
 
 
