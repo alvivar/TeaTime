@@ -115,14 +115,14 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Returns a TeaTime queue bounded to his name, unique per instance.
-		/// This allows you to access queues without a formal definition. Dark
-		/// magic stuff.
+		/// Returns a TeaTime queue bounded to his name, unique per instance,
+		/// new on the first call. This allows you to access queues without a
+		/// formal definition. Dark magic stuff.
 		/// </summary>
 		public static TeaTime tt(this MonoBehaviour instance, string queueName)
 		{
-			// #todo ttRegister will need a clean up from time to time if this
-			// technique is used in volatile GameObjects.
+			// #todo ttRegister will (probably) need an auto clean up from
+			// time to time if this technique is used in volatile GameObjects.
 
 			// First time
 			if (ttRegister == null)
