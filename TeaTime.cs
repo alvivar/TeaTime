@@ -121,6 +121,9 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public static TeaTime tt(this MonoBehaviour instance, string queueName)
 		{
+			// #todo ttRegister will need a clean up from time to time if this
+			// technique is used in volatile GameObjects.
+
 			// First time
 			if (ttRegister == null)
 				ttRegister = new Dictionary<MonoBehaviour, Dictionary<string, TeaTime>>();
