@@ -14,7 +14,7 @@ public class Test1 : MonoBehaviour
 
     void Start()
     {
-        queue = this.TeaTime();
+        queue = this.tt();
         queue.Pause().Add(1, () =>
         {
             Debug.Log("step 1 " + Time.time);

@@ -97,17 +97,42 @@ namespace matnesis.TeaTime
 
 
 	/// <summary>
-	/// Special TeaTime related extensions.
+	/// Special TeaTime extensions.
 	/// </summary>
 	public static class TeaTimeExtensions
 	{
+		private static Dictionary<MonoBehaviour, Dictionary<string, TeaTime>> ttRegister; // Queues bounded by 'tt(string)'
+
+
 		/// <summary>
 		/// Returns a new TeaTime queue ready to be used. This is basically a
 		/// shorcut to 'new TeaTime(this);' in MonoBehaviours.
 		/// </summary>
-		public static TeaTime TeaTime(this MonoBehaviour instance)
+		public static TeaTime tt(this MonoBehaviour instance)
 		{
 			return new TeaTime(instance);
+		}
+
+
+		/// <summary>
+		/// Returns a TeaTime queue bounded to his name, unique per instance.
+		/// This allows you to access queues without a formal definition. Dark
+		/// magic stuff.
+		/// </summary>
+		public static TeaTime tt(this MonoBehaviour instance, string queueName)
+		{
+			// First time
+			if (ttRegister == null)
+				ttRegister = new Dictionary<MonoBehaviour, Dictionary<string, TeaTime>>();
+
+			if (!ttRegister.ContainsKey(instance))
+				ttRegister[instance] = new Dictionary<string, TeaTime>();
+
+			if (!ttRegister[instance].ContainsKey(queueName))
+				ttRegister[instance][queueName] = new TeaTime(instance);
+
+
+			return ttRegister[instance][queueName];
 		}
 	}
 
