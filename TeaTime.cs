@@ -117,7 +117,7 @@ namespace matnesis.TeaTime
 		/// <summary>
 		/// Returns a TeaTime queue bounded to his name, unique per instance,
 		/// new on the first call. This allows you to access queues without a
-		/// formal definition. Dark magic stuff.
+		/// formal definition. Dark magic.
 		/// </summary>
 		public static TeaTime tt(this MonoBehaviour instance, string queueName)
 		{
