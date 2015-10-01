@@ -506,9 +506,9 @@ namespace matnesis.TeaTime
 						// On finite loops this deltaTime represents the exact
 						// loop duration
 						loopHandler.deltaTime =
-						    isInfinite
-						    ? unityDeltatime
-						    : 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
+							isInfinite
+							? unityDeltatime
+							: 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
 
 						loopHandler.timeSinceStart += unityDeltatime;
 
