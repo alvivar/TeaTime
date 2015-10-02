@@ -161,6 +161,8 @@ namespace matnesis.TeaTime
 		private bool _isPaused = false; // On Pause() state
 		private bool _isWaiting = false; // On Wait() mode
 		private bool _isRepeating = false; // On Repeat() mode
+		private bool _isConsuming = false; // On Consume() mode
+
 
 
 		// Info
@@ -347,11 +349,23 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Disables both Wait and Repeat mode.
+		/// Enables Consume mode, the queue will remove each callback from
+		/// memory after execution.
+		/// </summary>
+		public TeaTime Consume()
+		{
+			_isConsuming = true;
+
+			return this;
+		}
+
+
+		/// <summary>
+		/// Disables all modes (Wait, Repeat, Consume).
 		/// </summary>
 		public TeaTime Unlock()
 		{
-			_isWaiting = _isRepeating = false;
+			_isWaiting = _isRepeating = _isConsuming = false;
 
 			return this;
 		}
@@ -506,9 +520,9 @@ namespace matnesis.TeaTime
 						// On finite loops this deltaTime represents the exact
 						// loop duration
 						loopHandler.deltaTime =
-							isInfinite
-							? unityDeltatime
-							: 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
+						    isInfinite
+						    ? unityDeltatime
+						    : 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
 
 						loopHandler.timeSinceStart += unityDeltatime;
 
@@ -586,6 +600,14 @@ namespace matnesis.TeaTime
 					// Minimum sane delay
 					if (currentTask.time <= 0 && handler.yieldsToWait == null)
 						yield return null;
+				}
+
+
+				// Remove the current task on Consume mode
+				if (_isConsuming)
+				{
+					_nextTask -= 1;
+					_tasks.Remove(currentTask);
 				}
 			}
 
