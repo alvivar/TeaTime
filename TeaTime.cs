@@ -164,7 +164,6 @@ namespace matnesis.TeaTime
 		private bool _isConsuming = false; // On Consume() mode
 
 
-
 		// Info
 		public bool isPlaying
 		{
