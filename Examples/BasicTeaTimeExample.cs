@@ -39,8 +39,27 @@ public class BasicTeaTimeExample : MonoBehaviour
 		// that lerps to a random color.
 		queue.Loop(1f, (ttHandler t) =>
 		{
-			cubeRen.material.color = Color.Lerp(cubeRen.material.color, randomColor, t.deltaTime);
-			// t.deltaTime is a custom delta that represents the loop duration
+			cubeRen.material.color = Color.Lerp(
+			                             cubeRen.material.color,
+			                             randomColor,
+			                             t.deltaTime); // t.deltaTime is a custom delta that represents the loop duration
+		});
+	}
+
+
+	public void RandomScale()
+	{
+		Vector3 randomScale = new Vector3(Random.Range(0.5f, 2), Random.Range(0.5f, 2), Random.Range(0.5f, 2));
+
+
+		// Adds a one second callback loop
+		// that lerps to a random scale.
+		queue.Loop(1f, (ttHandler t) =>
+		{
+			cubeRen.transform.localScale = Vector3.Lerp(
+			                                   cube.localScale,
+			                                   randomScale,
+			                                   t.deltaTime); // t.deltaTime is a custom delta that represents the loop duration
 		});
 	}
 }
