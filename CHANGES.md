@@ -1,13 +1,30 @@
 
 ####v0.7
 
-- Total code rewrite. Faster, C# compliant, cleaner, better.
+- Total code rewrite. The same pattern but faster, C# compliant, cleaner,
+  better.
 
-- TeaTime is a normal Object i.e TeaTime queue = new TeaTime(MonoBehaviour);
+- **Change**: TeaTime is a normal instantiable Object now i.e: **TeaTime queue
+  = new TeaTime(MonoBehaviour);**
 
-- *New* Consume mode, each callback is removed after execution from the queue.
+- **Change**: Each TeaTime queue handles itself (one coroutine per queue).
+  There is no global controls (yet).
 
-- *Optimization* Each callback is saved permanently,
+- **Optimization**: Callbacks are saved permanently by default.
+
+- **New rule**: Calling .Add( or .Loop( activates stopped queues even during
+  Wait() or Repeat() modes unless they are .Pause().
+
+- **New**: Consume mode, each callback is removed from the queue after
+  execution (non accumulative).
+
+- **New**: IsPlaying property, true during execution.
+
+- **New**: IsCompleted property, true if the queue execution is done.
+
+- **New**: Count property.
+
+- **New**: Current property, current queue position to be executed.
 
 ####v0.6.5.4
 
