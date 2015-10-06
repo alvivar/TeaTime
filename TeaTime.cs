@@ -46,6 +46,7 @@ namespace matnesis.TeaTime
 
 		public float time = 0;
 		public YieldInstruction yieldInstruction = null;
+
 		public Action callback = null;
 		public Action<ttHandler> callbackWithHandler = null;
 	}
@@ -148,7 +149,7 @@ namespace matnesis.TeaTime
 	{
 		// Queue
 		private List<ttTask> _tasks = new List<ttTask>(); // Tasks list used as a queue
-		private int _nextTask = 0; // Current task marker (to be executed)
+		private int _nextTask = 0; // Current task mark (to be executed)
 
 
 		// Dependencies
@@ -157,7 +158,7 @@ namespace matnesis.TeaTime
 
 
 		// States
-		private bool _isPlaying = false; // True while executing the queue
+		private bool _isPlaying = false; // True while execution
 		private bool _isPaused = false; // On Pause() state
 		private bool _isWaiting = false; // On Wait() mode
 		private bool _isRepeating = false; // On Repeat() mode
@@ -175,6 +176,11 @@ namespace matnesis.TeaTime
 			get { return _nextTask >= _tasks.Count; }
 		}
 
+		public int Count
+		{
+			get { return _tasks.Count; }
+		}
+
 
 		/// <summary>
 		/// A TeaTime queue requires a MonoBehaviour instance to use Coroutines.
@@ -185,7 +191,7 @@ namespace matnesis.TeaTime
 		}
 
 
-		// >
+		// ^
 		// ADD
 
 
@@ -284,7 +290,7 @@ namespace matnesis.TeaTime
 		}
 
 
-		// >
+		// ^
 		// LOOP
 
 
@@ -320,8 +326,8 @@ namespace matnesis.TeaTime
 		}
 
 
-		// >
-		// PLAY MODES
+		// ^
+		// MODES
 
 
 		/// <summary>
@@ -348,8 +354,8 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Enables Consume mode, the queue will remove each callback from
-		/// memory after execution.
+		/// Enables Consume mode, the queue will remove each callback after
+		/// execution.
 		/// </summary>
 		public TeaTime Consume()
 		{
@@ -370,12 +376,12 @@ namespace matnesis.TeaTime
 		}
 
 
-		// >
+		// ^
 		// CONTROL
 
 
 		/// <summary>
-		/// Pauses the queue execution (use Play to resume).
+		/// Pauses the queue execution (use .Play() to resume).
 		/// </summary>
 		public TeaTime Pause()
 		{
@@ -386,7 +392,7 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Stops the queue execution (use Play to start over).
+		/// Stops the queue execution (use .Play() to start over).
 		/// </summary>
 		public TeaTime Stop()
 		{
@@ -439,7 +445,7 @@ namespace matnesis.TeaTime
 		}
 
 
-		// >
+		// ^
 		// DESTRUCTION
 
 
@@ -463,7 +469,7 @@ namespace matnesis.TeaTime
 		}
 
 
-		// >
+		// ^
 		// COROUTINE
 
 
