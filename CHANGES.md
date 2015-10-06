@@ -1,7 +1,13 @@
 
 ####v0.7
 
-- v0.7 is a total code rewrite. Faster, C# compliant, a lot better :D
+- Total code rewrite. Faster, C# compliant, cleaner, better.
+
+- TeaTime is a normal Object i.e TeaTime queue = new TeaTime(MonoBehaviour);
+
+- *New* Consume mode, each callback is removed after execution from the queue.
+
+- *Optimization* Each callback is saved permanently,
 
 ####v0.6.5.4
 
