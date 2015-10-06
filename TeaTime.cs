@@ -158,32 +158,49 @@ namespace matnesis.TeaTime
 
 
 		// States
-		private bool _isPlaying = false; // True while execution
+		private bool _isPlaying = false; // True while queue execution
 		private bool _isPaused = false; // On Pause() state
 		private bool _isWaiting = false; // On Wait() mode
 		private bool _isRepeating = false; // On Repeat() mode
 		private bool _isConsuming = false; // On Consume() mode
 
 
-		// Info
-		public bool isPlaying
+		/// <summary>
+		/// True while the queue is being executed.
+		/// </summary>
+		public bool IsPlaying
 		{
 			get { return _isPlaying; }
 		}
 
-		public bool isCompleted
+		/// <summary>
+		/// True if the queue execution is done.
+		/// </summary>
+		public bool IsCompleted
 		{
-			get { return _nextTask >= _tasks.Count; }
+			get { return _nextTask >= _tasks.Count && !_isPlaying; }
 		}
 
+		/// <summary>
+		/// Queue count.
+		/// </summary>
 		public int Count
 		{
 			get { return _tasks.Count; }
 		}
 
+		/// <summary>
+		/// Current queue position to be executed.
+		/// </summary>
+		public int Current
+		{
+			get { return _nextTask; }
+		}
+
 
 		/// <summary>
-		/// A TeaTime queue requires a MonoBehaviour instance to use Coroutines.
+		/// A TeaTime queue requires a MonoBehaviour instance to access his
+		/// coroutine fuctions.
 		/// </summary>
 		public TeaTime(MonoBehaviour instance)
 		{
@@ -196,7 +213,7 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Appends a new task.
+		/// Appends a new ttTask.
 		/// </summary>
 		private TeaTime Add(float timeDelay, YieldInstruction yi, Action callback, Action<ttHandler> callbackWithHandler)
 		{
