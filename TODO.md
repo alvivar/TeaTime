@@ -1,3 +1,3 @@
 ###TO DO
 
-- **More and better examples!**
+- More and better examples!
