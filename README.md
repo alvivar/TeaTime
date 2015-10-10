@@ -26,13 +26,14 @@ common coroutines patterns in Unity games.
 	{
 		Debug.Log("The loop is done! " + Time.time);
 	})
-	.Repeat(); // Repeat forever!
+	.Repeat(); // Repeats forever!
 
-	// And
+	// With the usual controls
 	queue.Pause();
 	queue.Play();
 	queue.Stop();
-	queue.Reset();
+
+	// and some more!
 
 
 By **[Andrés Villalobos](http://twitter.com/matnesis)**.
