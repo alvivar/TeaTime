@@ -4,18 +4,16 @@
 
 using UnityEngine;
 using matnesis.TeaTime;
-using DG.Tweening;
 
 
-public class Test1 : MonoBehaviour
+public class TeaTimeTest1 : MonoBehaviour
 {
-    private TeaTime queue;
+    TeaTime queue;
 
 
     void Start()
     {
-        queue = this.tt();
-        queue.Pause().Add(1, () =>
+        queue = this.tt().Pause().Add(1, () =>
         {
             Debug.Log("step 1 " + Time.time);
         })
@@ -69,6 +67,11 @@ public class Test1 : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            queue.Reset();
+        }
+
         if (Input.GetKeyDown(KeyCode.U))
         {
             queue.Restart();
@@ -87,11 +90,6 @@ public class Test1 : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
         {
             queue.Stop();
-        }
-
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            queue.Reset();
         }
     }
 }
