@@ -1,5 +1,6 @@
 
-####v0.7 2015/10/10
+####v0.7
+#####2015/10/10
 
 - Total code rewrite. The same pattern but faster, **C#** compliant, cleaner,
   better!

@@ -1,6 +1,6 @@
 ###TeaTime v0.7 alpha
 
-_[DOWNLOAD](http://github.com/alvivar/TeaTime/raw/master/TeaTime.zip)_
+_[DOWNLOAD](http://github.com/alvivar/TeaTime/raw/master/TeaTime.zip)_ /
 _[Examples](http://github.com/alvivar/TeaTime/tree/master/Examples)_
 
 
@@ -38,9 +38,10 @@ common coroutines patterns in Unity games.
 
 Check out the
 _[examples](http://github.com/alvivar/TeaTime/tree/master/Examples)_! (Work in
-progress).
+progress)
 
 Feel free to ask me about it!
+
 By **[Andrés Villalobos](http://twitter.com/matnesis)**.
 
 
