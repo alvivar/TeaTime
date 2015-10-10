@@ -1,30 +1,38 @@
 
 ####v0.7
 
-- Total code rewrite. The same pattern but faster, C# compliant, cleaner,
-  better.
+- Total code rewrite. The same pattern but faster, **C#** compliant, cleaner,
+  better!
 
-- **Change**: TeaTime is a normal instantiable Object now i.e: **TeaTime queue
+- **CHANGE**: TeaTime is a normal instantiable Object now i.e: **TeaTime queue
   = new TeaTime(MonoBehaviour);**
 
-- **Change**: Each TeaTime queue handles itself (one coroutine per queue).
-  There is no global controls (yet).
+- **CHANGE**: **this.tt()** (MonoBehaviour extension) returns a new TeaTime
+  queue ready to be used.
 
-- **Optimization**: Callbacks are saved permanently by default.
+- **CHANGE**: **this.tt("queueName")** returns a TeaTime queue bounded to his
+  name, unique per instance, new on the first call. This allows you to access
+  queues without a formal definition (same as the first prototype). Dark
+  magic.
 
-- **New rule**: Calling .Add( or .Loop( activates stopped queues even during
-  Wait() or Repeat() modes unless they are .Pause().
+- **CHANGE**: Each TeaTime queue handles itself (one coroutine per queue).
+  There is no global controls yet, only per queue.
 
-- **New**: Consume mode, each callback is removed from the queue after
+- **OPTIMIZATION**: Callbacks are saved permanently by default.
+
+- **NEW RULE**: Calling **.Add(** or **.Loop(** activates stopped queues even during
+  **.Wait()** or **.Repeat()** modes unless they are **.Pause()**.
+
+- **NEW**: **Consume mode**, each callback is removed from the queue after
   execution (non accumulative).
 
-- **New**: IsPlaying property, true during execution.
+- **NEW**: **.IsPlaying** property, true during execution.
 
-- **New**: IsCompleted property, true if the queue execution is done.
+- **NEW**: **.IsCompleted** property, true if the queue execution is done.
 
-- **New**: Count property.
+- **NEW**: Queue **.Count** property.
 
-- **New**: Current property, current queue position to be executed.
+- **NEW**: **.Current** property, current queue position to be executed.
 
 ####v0.6.5.4
 
