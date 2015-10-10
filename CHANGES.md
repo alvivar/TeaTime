@@ -20,8 +20,8 @@
 
 - **OPTIMIZATION**: Callbacks are saved permanently by default.
 
-- **NEW RULE**: Calling **.Add(** or **.Loop(** activates stopped queues even during
-  **.Wait()** or **.Repeat()** modes unless they are **.Pause()**.
+- **NEW RULE**: Calling **.Add(** or **.Loop(** activates stopped queues even
+  during **.Wait()** or **.Repeat()** modes unless they are **.Pause()**.
 
 - **NEW**: **Consume mode**, each callback is removed from the queue after
   execution (non accumulative).
