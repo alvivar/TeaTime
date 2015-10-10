@@ -116,9 +116,9 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Returns a TeaTime queue bounded to his name, unique per instance,
-		/// new on the first call. This allows you to access queues without a
-		/// formal definition. Dark magic.
+		/// Returns a TeaTime queue bounded to his name, unique per
+		/// MonoBehaviour instance, new on the first call. This allows you to
+		/// access queues without a formal definition. Dark magic.
 		/// </summary>
 		public static TeaTime tt(this MonoBehaviour instance, string queueName)
 		{
@@ -344,7 +344,7 @@ namespace matnesis.TeaTime
 
 
 		// ^
-		// MODES
+		// QUEUE MODES
 
 
 		/// <summary>
@@ -487,7 +487,7 @@ namespace matnesis.TeaTime
 
 
 		// ^
-		// COROUTINE
+		// THE COROUTINE
 
 
 		/// <summary>
@@ -514,6 +514,7 @@ namespace matnesis.TeaTime
 				yield return new WaitForEndOfFrame();
 
 
+				// It's a loop
 				if (currentTask.isLoop)
 				{
 					// Nothing to do, skip
@@ -533,20 +534,20 @@ namespace matnesis.TeaTime
 					// While active and, until time or infinite
 					while (loopHandler.isActive && loopHandler.t <= 1)
 					{
-						float unityDeltatime = Time.deltaTime;
+						float unityDeltaTime = Time.deltaTime;
 
 						// Completion % from 0 to 1
 						if (!isInfinite)
-							loopHandler.t += tRate * unityDeltatime;
+							loopHandler.t += tRate * unityDeltaTime;
 
-						// On finite loops this deltaTime represents the exact
-						// loop duration
+						// On finite loops this .deltaTime is sincronized with
+						// the exact loop duration
 						loopHandler.deltaTime =
 						    isInfinite
-						    ? unityDeltatime
-						    : 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltatime;
+						    ? unityDeltaTime
+						    : 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltaTime;
 
-						loopHandler.timeSinceStart += unityDeltatime;
+						loopHandler.timeSinceStart += unityDeltaTime;
 
 
 						// Pause?
@@ -554,11 +555,11 @@ namespace matnesis.TeaTime
 							yield return null;
 
 
-						// Loops always have a callback
+						// Loops always have a callback with a handler
 						currentTask.callbackWithHandler(loopHandler);
 
 
-						// Handler WaitFor
+						// Handler .WaitFor(
 						if (loopHandler.yieldsToWait != null)
 						{
 							foreach (YieldInstruction yi in loopHandler.yieldsToWait)
@@ -573,6 +574,7 @@ namespace matnesis.TeaTime
 							yield return null;
 					}
 				}
+				// It's a timed callback
 				else
 				{
 					// Time delay
@@ -625,7 +627,7 @@ namespace matnesis.TeaTime
 				}
 
 
-				// Remove the current task on Consume mode
+				// Consume mode removes the task after execution
 				if (_isConsuming)
 				{
 					_nextTask -= 1;
@@ -640,6 +642,7 @@ namespace matnesis.TeaTime
 				_nextTask = 0;
 				_currentCoroutine = _instance.StartCoroutine(ExecuteQueue());
 			}
+			// Done!
 			else
 			{
 				_isPlaying = false;
