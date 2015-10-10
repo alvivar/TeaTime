@@ -1,5 +1,5 @@
 
-####v0.7
+####v0.7 beta
 #####2015/10/10
 
 - Total code rewrite. The same pattern but faster, **C#** compliant, cleaner,

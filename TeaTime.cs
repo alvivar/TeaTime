@@ -1,5 +1,5 @@
 
-// TeaTime v0.7 alpha
+// TeaTime v0.7 beta
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
