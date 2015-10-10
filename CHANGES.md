@@ -1,5 +1,5 @@
 
-####v0.7
+####v0.7 2015/10/10
 
 - Total code rewrite. The same pattern but faster, **C#** compliant, cleaner,
   better!
@@ -12,8 +12,7 @@
 
 - **CHANGE**: **this.tt("queueName")** returns a TeaTime queue bounded to his
   name, unique per instance, new on the first call. This allows you to access
-  queues without a formal definition (same as the first prototype). Dark
-  magic.
+  queues without a formal definition (as usual). Dark magic.
 
 - **CHANGE**: Each TeaTime queue handles itself (one coroutine per queue).
   There is no global controls yet, only per queue.
