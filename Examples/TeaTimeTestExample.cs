@@ -1,4 +1,6 @@
 
+// I use this script to test random things.
+
 // 2015/09/15 12:47:29 PM
 
 
@@ -6,7 +8,7 @@ using UnityEngine;
 using matnesis.TeaTime;
 
 
-public class TeaTimeTest1 : MonoBehaviour
+public class TeaTimeTestExample : MonoBehaviour
 {
 	TeaTime queue;
 

@@ -1,4 +1,6 @@
 ﻿
+// Examples (work in progress).
+
 // 2015/10/05 05:54:55 PM
 
 
@@ -12,6 +14,7 @@ public class BasicTeaTimeExample : MonoBehaviour
 	public Transform cube;
 	public Renderer cubeRen;
 
+
 	// Declare your queue
 	TeaTime queue;
 
@@ -20,7 +23,7 @@ public class BasicTeaTimeExample : MonoBehaviour
 	{
 		// Instantiate
 		queue = new TeaTime(this);
-		// or you can use this shortcut: 'queue = this.tt();' (a special MonoBehaviour extension)
+		// or you can use this shortcut: 'queue = this.tt();' (special MonoBehaviour extension)
 	}
 
 
@@ -35,8 +38,7 @@ public class BasicTeaTimeExample : MonoBehaviour
 		Color randomColor = new Color(Random.value, Random.value, Random.value, Random.value);
 
 
-		// Adds a one second callback loop
-		// that lerps to a random color.
+		// Adds a one second callback loop that lerps to a random color.
 		queue.Loop(1f, (ttHandler t) =>
 		{
 			cubeRen.material.color = Color.Lerp(
@@ -52,8 +54,7 @@ public class BasicTeaTimeExample : MonoBehaviour
 		Vector3 randomScale = new Vector3(Random.Range(0.5f, 2), Random.Range(0.5f, 2), Random.Range(0.5f, 2));
 
 
-		// Adds a one second callback loop
-		// that lerps to a random scale.
+		// Adds a one second callback loop that lerps to a random scale.
 		queue.Loop(1f, (ttHandler t) =>
 		{
 			cubeRen.transform.localScale = Vector3.Lerp(

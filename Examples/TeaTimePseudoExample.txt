@@ -1,0 +1,33 @@
+
+	TeaTime queue = this.tt();
+	TeaTime queueCheck = this.tt();
+
+
+	queue.Pause().Add(0.10f, () =>
+	{
+		if (!something) queue.Restart();
+	})
+	.Add(() =>
+	{
+		// Something happen
+	})
+	.loop(1, (ttHandler t) =>
+	{
+		// Powerful loop
+
+		if (somethingElse)
+		{
+			// A queue inside a queue
+			if (!queueCheck.IsPlaying) queueCheck.Add(3, () =>
+			{
+				// Something in 3 seconds while staying in true
+			})
+			.Wait();
+		}
+		else
+		{
+			// Reset the above
+			queueCheck.Reset();
+		}
+	})
+	.Wait();
