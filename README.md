@@ -11,12 +11,12 @@ common coroutines patterns in Unity games.
 	// In MonoBehaviours
 	TeaTime queue = this.tt().Add(1, () =>
 	{
-		// Autoplays by default
+		// The queue autoplays by default
 		Debug.Log("Once second later! " + Time.time);
 	})
 	.Loop(3, (ttHandler loop) =>
 	{
-		// This callback repeats itself per frame during duration
+		// This callback is repeated per frame during the loop duration
 		transform.position =
 			Vector3.Lerp(
 				transform.position,
