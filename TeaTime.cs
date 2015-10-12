@@ -417,8 +417,6 @@ namespace matnesis.TeaTime
 				_instance.StopCoroutine(_currentCoroutine);
 
 			_isPlaying = false;
-			// _isPaused = true;
-
 			_nextTask = 0;
 
 			return this;
@@ -492,7 +490,8 @@ namespace matnesis.TeaTime
 
 		/// <summary>
 		/// This is the main algorithm. Executes all tasks, one after the
-		/// other, calling their callbacks according to type, time and config.
+		/// other, calling their callbacks according to type, time and queue
+		/// config.
 		/// </summary>
 		IEnumerator ExecuteQueue()
 		{
