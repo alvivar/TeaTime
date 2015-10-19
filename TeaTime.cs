@@ -159,10 +159,10 @@ namespace matnesis.TeaTime
 
 		// States
 		private bool _isPlaying = false; // True while queue execution
-		private bool _isPaused = false; // On Pause() state
-		private bool _isWaiting = false; // On Wait() mode
-		private bool _isRepeating = false; // On Repeat() mode
-		private bool _isConsuming = false; // On Consume() mode
+		private bool _isPaused = false; // On .Pause()
+		private bool _isWaiting = false; // On .Wait() mode
+		private bool _isRepeating = false; // On .Repeat() mode
+		private bool _isConsuming = false; // On .Consume() mode
 
 
 		/// <summary>
@@ -217,7 +217,7 @@ namespace matnesis.TeaTime
 		/// </summary>
 		private TeaTime Add(float timeDelay, YieldInstruction yi, Action callback, Action<ttHandler> callbackWithHandler)
 		{
-			// Ignore on Wait mode
+			// Ignores appends on Wait mode
 			if (!_isWaiting)
 			{
 				ttTask newTask = new ttTask();
@@ -230,7 +230,7 @@ namespace matnesis.TeaTime
 			}
 
 
-			// Autoplay if not paused or currently playing
+			// Autoplay if not paused or playing
 			return _isPaused || _isPlaying ? this : this.Play();
 		}
 
@@ -313,11 +313,11 @@ namespace matnesis.TeaTime
 
 		/// <summary>
 		/// Appends a callback loop (if duration is less than 0,
-		/// the loop will be infinite).
+		/// the loop runs infinitely).
 		/// </summary>
 		public TeaTime Loop(float duration, Action<ttHandler> callback)
 		{
-			// Ignore on Wait mode
+			// Ignores appends on Wait mode
 			if (!_isWaiting)
 			{
 				ttTask newTask = new ttTask();
@@ -329,7 +329,7 @@ namespace matnesis.TeaTime
 			}
 
 
-			// Autoplay if not paused or currently playing
+			// Autoplay if not paused or playing
 			return _isPaused || _isPlaying ? this : this.Play();
 		}
 
@@ -663,7 +663,7 @@ namespace matnesis.TeaTime
 			}
 
 
-			// Repeats on Repeat mode
+			// Repeats on Repeat mode (if needed)
 			if (_isRepeating && _tasks.Count > 0)
 			{
 				_nextTask = 0;
