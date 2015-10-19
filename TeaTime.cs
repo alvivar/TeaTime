@@ -230,7 +230,7 @@ namespace matnesis.TeaTime
 			}
 
 
-			// Autoplay if not paused
+			// Autoplay if not paused or currently playing
 			return _isPaused || _isPlaying ? this : this.Play();
 		}
 
@@ -329,7 +329,7 @@ namespace matnesis.TeaTime
 			}
 
 
-			// Autoplay if not paused
+			// Autoplay if not paused or currently playing
 			return _isPaused || _isPlaying ? this : this.Play();
 		}
 
@@ -348,7 +348,7 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Enables Wait mode, the queue will ignore new appends (Add, Loop).
+		/// Enables Wait mode, the queue will ignore new appends (Add, Loop, If).
 		/// </summary>
 		public TeaTime Wait()
 		{
@@ -360,7 +360,7 @@ namespace matnesis.TeaTime
 
 		/// <summary>
 		/// Enables Repeat mode, the queue will always be restarted on
-		/// completion and ignore new appends (Add, Loop).
+		/// completion and ignore new appends (Add, Loop, If).
 		/// </summary>
 		public TeaTime Repeat()
 		{
@@ -451,12 +451,40 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Restart the queue execution (Stop + Play).
+		/// Restarts the queue execution (Stop + Play).
 		/// </summary>
 		public TeaTime Restart()
 		{
 			// Alias
 			return this.Stop().Play();
+		}
+
+
+		// ^
+		// SPECIAL
+
+
+		/// <summary>
+		/// Appends a boolean condition that stops the queue when isn't
+		/// fullfiled. On Repeat mode the queue is restarted. On Consume mode
+		/// the cycle is also interrupted during negative evaluations.
+		/// </summary>
+		public TeaTime If(Func<bool> condition)
+		{
+			return this.Add(() =>
+			{
+				if (!condition())
+				{
+					if (_isRepeating)
+					{
+						this.Restart();
+					}
+					else
+					{
+						this.Stop();
+					}
+				}
+			});
 		}
 
 
@@ -636,7 +664,7 @@ namespace matnesis.TeaTime
 
 
 			// Repeat on Repeat mode
-			if (_isRepeating)
+			if (_isRepeating && _tasks.Count > 0)
 			{
 				_nextTask = 0;
 				_currentCoroutine = _instance.StartCoroutine(ExecuteQueue());
