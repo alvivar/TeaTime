@@ -1,3 +1,12 @@
+####v0.7.2 beta
+#####2015/10/19
+
+- **NEW**: .If(Func<bool>) Appends a boolean condition that stops the queue
+  when isn't fullfiled. On Repeat mode the queue is restarted. The
+  interruption also affects Consume mode (no execution, no removal).
+
+- **CHANGE**: .Repeat() mode no longer ignores new appends. That's exclusive
+  to .Wait().
 
 ####v0.7 beta
 #####2015/10/10
