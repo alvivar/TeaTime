@@ -466,8 +466,8 @@ namespace matnesis.TeaTime
 
 		/// <summary>
 		/// Appends a boolean condition that stops the queue when isn't
-		/// fullfiled. On Repeat mode the queue is restarted. On Consume mode
-		/// the cycle is also interrupted during negative evaluations.
+		/// fullfiled. On Repeat mode the queue is restarted. The interruption
+		/// also affects Consume mode (no execution, no removal).
 		/// </summary>
 		public TeaTime If(Func<bool> condition)
 		{
@@ -663,7 +663,7 @@ namespace matnesis.TeaTime
 			}
 
 
-			// Repeat on Repeat mode
+			// Repeats on Repeat mode
 			if (_isRepeating && _tasks.Count > 0)
 			{
 				_nextTask = 0;
