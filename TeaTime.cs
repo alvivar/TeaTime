@@ -217,8 +217,8 @@ namespace matnesis.TeaTime
 		/// </summary>
 		private TeaTime Add(float timeDelay, YieldInstruction yi, Action callback, Action<ttHandler> callbackWithHandler)
 		{
-			// Ignore on Wait or Repeat mode
-			if (!_isWaiting && !_isRepeating)
+			// Ignore on Wait mode
+			if (!_isWaiting)
 			{
 				ttTask newTask = new ttTask();
 				newTask.time = timeDelay;
@@ -317,8 +317,8 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public TeaTime Loop(float duration, Action<ttHandler> callback)
 		{
-			// Ignore on Wait or Repeat mode
-			if (!_isWaiting && !_isRepeating)
+			// Ignore on Wait mode
+			if (!_isWaiting)
 			{
 				ttTask newTask = new ttTask();
 				newTask.isLoop = true;
@@ -360,7 +360,7 @@ namespace matnesis.TeaTime
 
 		/// <summary>
 		/// Enables Repeat mode, the queue will always be restarted on
-		/// completion and ignore new appends (Add, Loop, If).
+		/// completion.
 		/// </summary>
 		public TeaTime Repeat()
 		{
