@@ -149,7 +149,7 @@ namespace matnesis.TeaTime
 	{
 		// Queue
 		private List<ttTask> _tasks = new List<ttTask>(); // Tasks list used as a queue
-		private int _nextTask = 0; // Current task mark (to be executed)
+		private int _currentTask = 0; // Current task mark (to be executed)
 
 
 		// Dependencies
@@ -178,7 +178,7 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public bool IsCompleted
 		{
-			get { return _nextTask >= _tasks.Count && !_isPlaying; }
+			get { return _currentTask >= _tasks.Count && !_isPlaying; }
 		}
 
 		/// <summary>
@@ -194,7 +194,7 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public int Current
 		{
-			get { return _nextTask; }
+			get { return _currentTask; }
 		}
 
 
@@ -417,7 +417,7 @@ namespace matnesis.TeaTime
 				_instance.StopCoroutine(_currentCoroutine);
 
 			_isPlaying = false;
-			_nextTask = 0;
+			_currentTask = 0;
 
 			return this;
 		}
@@ -438,8 +438,8 @@ namespace matnesis.TeaTime
 
 
 			// Restart if already finished
-			if (_nextTask >= _tasks.Count)
-				_nextTask = 0;
+			if (_currentTask >= _tasks.Count)
+				_currentTask = 0;
 
 
 			// Execute!
@@ -501,7 +501,7 @@ namespace matnesis.TeaTime
 				_instance.StopCoroutine(_currentCoroutine);
 
 			_tasks.Clear();
-			_nextTask = 0;
+			_currentTask = 0;
 
 			_isPlaying = false;
 			_isPaused = false;
@@ -526,13 +526,13 @@ namespace matnesis.TeaTime
 			_isPlaying = true;
 
 
-			while (_nextTask < _tasks.Count)
+			while (_currentTask < _tasks.Count)
 			{
 				// Current
-				ttTask currentTask = _tasks[_nextTask];
+				ttTask currentTask = _tasks[_currentTask];
 
 				// Next
-				_nextTask += 1;
+				_currentTask += 1;
 
 
 				// Let's wait
@@ -657,7 +657,7 @@ namespace matnesis.TeaTime
 				// Consume mode removes the task after execution
 				if (_isConsuming)
 				{
-					_nextTask -= 1;
+					_currentTask -= 1;
 					_tasks.Remove(currentTask);
 				}
 			}
@@ -666,7 +666,7 @@ namespace matnesis.TeaTime
 			// Repeats on Repeat mode (if needed)
 			if (_isRepeating && _tasks.Count > 0)
 			{
-				_nextTask = 0;
+				_currentTask = 0;
 				_currentCoroutine = _instance.StartCoroutine(ExecuteQueue());
 			}
 			// Done!
