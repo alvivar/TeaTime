@@ -633,7 +633,6 @@ namespace matnesis.TeaTime
 
 					if (currentTask.callbackWithHandler != null)
 					{
-
 						handler.isActive = true;
 						handler.t = 1;
 						handler.timeSinceStart = currentTask.time;
