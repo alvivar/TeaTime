@@ -1,5 +1,5 @@
 
-// TeaTime v0.7.2 beta
+// TeaTime v0.7.3 beta
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
@@ -57,6 +57,8 @@ namespace matnesis.TeaTime
 	/// </summary>
 	public class ttHandler
 	{
+		public TeaTime self;
+
 		public bool isActive = true;
 
 		public float t = 0;
@@ -551,6 +553,7 @@ namespace matnesis.TeaTime
 
 					// Loops always need a handler
 					ttHandler loopHandler = new ttHandler();
+					loopHandler.self = this;
 
 					// Negative time means the loop is infinite
 					bool isInfinite = currentTask.time < 0;
@@ -626,6 +629,8 @@ namespace matnesis.TeaTime
 
 					// Callback with handler
 					ttHandler handler = new ttHandler();
+					handler.self = this;
+
 					if (currentTask.callbackWithHandler != null)
 					{
 
