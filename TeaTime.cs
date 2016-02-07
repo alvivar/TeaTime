@@ -411,7 +411,7 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Stops the queue execution (use .Play() to start over).
+		/// Stops and pauses the queue execution (use .Play() to start over).
 		/// </summary>
 		public TeaTime Stop()
 		{
@@ -421,12 +421,15 @@ namespace matnesis.TeaTime
 			_isPlaying = false;
 			_currentTask = 0;
 
+			_isPaused = true;
+
+
 			return this;
 		}
 
 
 		/// <summary>
-		/// Starts / Resumes the queue execution.
+		/// Starts and resumes the queue execution.
 		/// </summary>
 		public TeaTime Play()
 		{
@@ -457,7 +460,6 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public TeaTime Restart()
 		{
-			// Alias
 			return this.Stop().Play();
 		}
 
