@@ -1,7 +1,12 @@
+####v0.7.3.1 beta
+#####2016/02/08
+
+- **CHANGE**: **.Stop()** also pauses the queue.
+
 ####v0.7.3 beta
 #####2015/12/14
 
-- **NEW**: **ttHandler** now holds a reference to itselfs (**.self**);
+- **NEW**: **ttHandler** now holds a reference to itselfs (**.self**).
 
 ####v0.7.2 beta
 #####2015/10/19
