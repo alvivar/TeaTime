@@ -51,10 +51,6 @@ public class TeaTimeTestExample : MonoBehaviour
 		{
 			Debug.Log("step 6 " + Time.time);
 		})
-		.Add(new WaitForSeconds(1), () =>
-		{
-			Debug.Log("step 7 " + Time.time);
-		})
 		.Loop(0, (ttHandler t) =>
 		{
 			// Ignorable loop
@@ -63,7 +59,7 @@ public class TeaTimeTestExample : MonoBehaviour
 		{
 			Debug.Log("step 8 " + Time.time);
 		})
-		.Wait();
+		.Immutable();
 	}
 
 
