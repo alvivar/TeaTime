@@ -1,21 +1,21 @@
 
-// TeaTime v0.7.3.1 beta
+// TeaTime v0.7.4 beta
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
 
-// By Andrés Villalobos ^ twitter.com/matnesis ^ andresalvivar@gmail.com
-// Created 2014/12/26 12:21 am ^ Rewritten 2015/09/15 12:28 pm
+// By Andrés Villalobos ~ twitter.com/matnesis ~ andresalvivar@gmail.com
+// Created 2014/12/26 12:21 am ~ Rewritten 2015/09/15 12:28 pm
 
 
 // Copyright (c) 2014/12/26 andresalvivar@gmail.com
 
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
@@ -24,9 +24,9 @@
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
 
 namespace matnesis.TeaTime
@@ -45,7 +45,7 @@ namespace matnesis.TeaTime
         public bool isLoop = false;
 
         public float time = 0;
-        public Func<float> timeFunc = null;
+        public Func<float> timeByFunc = null;
 
         public Action callback = null;
         public Action<ttHandler> callbackWithHandler = null;
@@ -69,7 +69,7 @@ namespace matnesis.TeaTime
 
 
         /// <summary>
-        /// Breaks the current loop (isActive = false).
+        /// Breaks the current loop (.isActive = false).
         /// </summary>
         public void Break()
         {
@@ -144,8 +144,8 @@ namespace matnesis.TeaTime
 
 
     /// <summary>
-    /// TeaTime is a fast & simple queue for timed callbacks, focused on
-    /// solving common coroutines patterns in Unity games.
+    /// TeaTime is a fast & simple queue for timed callbacks, focused on solving
+    /// common coroutines patterns in Unity games.
     /// </summary>
     public class TeaTime
     {
@@ -162,7 +162,7 @@ namespace matnesis.TeaTime
         // States
         private bool _isPlaying = false; // True while queue execution
         private bool _isPaused = false; // On .Pause()
-        private bool _isImmutable = false; // On .Wait() mode
+        private bool _isImmutable = false; // On .Immutable() mode
         private bool _isRepeating = false; // On .Repeat() mode
         private bool _isConsuming = false; // On .Consume() mode
 
@@ -210,21 +210,21 @@ namespace matnesis.TeaTime
         }
 
 
-        // ^
+        // @
         // ADD
 
 
         /// <summary>
         /// Appends a new ttTask.
         /// </summary>
-        private TeaTime Add(float timeDelay, Func<float> timeByFunc, Action callback, Action<ttHandler> callbackWithHandler)
+        private TeaTime Add(float timeDelay, Func<float> timeDelayByFunc, Action callback, Action<ttHandler> callbackWithHandler)
         {
             // Ignores appends on Immutable mode
             if (!_isImmutable)
             {
                 ttTask newTask = new ttTask();
                 newTask.time = timeDelay;
-                newTask.timeFunc = timeByFunc;
+                newTask.timeByFunc = timeDelayByFunc;
                 newTask.callback = callback;
                 newTask.callbackWithHandler = callbackWithHandler;
 
@@ -309,13 +309,13 @@ namespace matnesis.TeaTime
         }
 
 
-        // ^
+        // @
         // LOOP
 
 
         /// <summary>
-        /// Appends a callback loop (if duration is less than 0,
-        /// the loop runs infinitely).
+        /// Appends a callback loop (if duration is less than 0, the loop runs
+        /// infinitely).
         /// </summary>
         private TeaTime Loop(float duration, Func<float> durationByFunc, Action<ttHandler> callback)
         {
@@ -325,7 +325,7 @@ namespace matnesis.TeaTime
                 ttTask newTask = new ttTask();
                 newTask.isLoop = true;
                 newTask.time = duration;
-                newTask.timeFunc = durationByFunc;
+                newTask.timeByFunc = durationByFunc;
                 newTask.callbackWithHandler = callback;
 
                 _tasks.Add(newTask);
@@ -366,7 +366,7 @@ namespace matnesis.TeaTime
         }
 
 
-        // ^
+        // @
         // QUEUE MODES
 
 
@@ -417,7 +417,7 @@ namespace matnesis.TeaTime
         }
 
 
-        // ^
+        // @
         // CONTROL
 
 
@@ -485,7 +485,7 @@ namespace matnesis.TeaTime
         }
 
 
-        // ^
+        // @
         // SPECIAL
 
 
@@ -513,12 +513,13 @@ namespace matnesis.TeaTime
         }
 
 
-        // ^
+        // @
         // DESTRUCTION
 
 
         /// <summary>
-        /// Stops and cleans the queue.
+        /// Stops and cleans the queue, turning off all modes (Immutable,
+        /// Repeat, Consume). Just like new.
         /// </summary>
         public TeaTime Reset()
         {
@@ -530,14 +531,17 @@ namespace matnesis.TeaTime
 
             _isPlaying = false;
             _isPaused = false;
+
+            // Modes off
             _isImmutable = false;
             _isRepeating = false;
+            _isConsuming = false;
 
             return this;
         }
 
 
-        // ^
+        // @
         // THE COROUTINE
 
 
@@ -574,9 +578,9 @@ namespace matnesis.TeaTime
                     loopHandler.self = this;
 
 
-                    // The duration by Func<float> is added to duration
-                    if (currentTask.timeFunc != null)
-                        currentTask.time += currentTask.timeFunc();
+                    // Func<float> is added to duration
+                    if (currentTask.timeByFunc != null)
+                        currentTask.time += currentTask.timeByFunc();
 
                     // Negative time means the loop is infinite
                     bool isInfinite = currentTask.time < 0;
@@ -631,9 +635,9 @@ namespace matnesis.TeaTime
                 // It's a timed callback
                 else
                 {
-                    // The time delay by Func<float> is added to the time delay
-                    if (currentTask.timeFunc != null)
-                        currentTask.time += currentTask.timeFunc();
+                    // Func<float> is added to the time delay
+                    if (currentTask.timeByFunc != null)
+                        currentTask.time += currentTask.timeByFunc();
 
                     // Time delay
                     if (currentTask.time > 0)

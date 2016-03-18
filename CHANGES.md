@@ -1,3 +1,16 @@
+####v0.7.4 beta
+#####2016/03/17
+
+- **CHANGE**: **.Wait()** renamed to **.Immutable()**.
+
+- **CHANGE**: **.Add(** and **.Loop(** can use a Func<float> as time!
+
+- **CHANGE**: **.Reset()** also turn off all queue modes.
+
+- **CHANGE**: **.Add(** no longer uses YieldInstruction as time.
+
+- **CHANGE**: **.Stop()** no longer pauses the queue. Purity +1
+
 ####v0.7.3.1 beta
 #####2016/02/08
 
