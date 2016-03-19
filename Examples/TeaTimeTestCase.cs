@@ -1,5 +1,5 @@
 
-// I use this script to test random things.
+// I use this script to test that everything works!
 
 // 2015/09/15 12:47:29 PM
 
@@ -7,8 +7,7 @@
 using UnityEngine;
 using matnesis.TeaTime;
 
-
-public class TeaTimeTestExample : MonoBehaviour
+public class TeaTimeTestCase : MonoBehaviour
 {
 	TeaTime queue;
 
@@ -60,6 +59,9 @@ public class TeaTimeTestExample : MonoBehaviour
 			Debug.Log("step 8 " + Time.time);
 		})
 		.Immutable();
+
+
+        // #todo Create tests for Func<float> time for Add & Loop
 	}
 
 

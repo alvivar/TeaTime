@@ -1,4 +1,4 @@
-﻿
+
 // Examples (work in progress).
 
 // 2015/10/05 05:54:55 PM
@@ -24,12 +24,6 @@ public class BasicTeaTimeExample : MonoBehaviour
 		// Instantiate
 		queue = new TeaTime(this);
 		// or you can use this shortcut: 'queue = this.tt();' (special MonoBehaviour extension)
-	}
-
-
-	void Update()
-	{
-
 	}
 
 
@@ -60,7 +54,7 @@ public class BasicTeaTimeExample : MonoBehaviour
 			cubeRen.transform.localScale = Vector3.Lerp(
 			                                   cube.localScale,
 			                                   randomScale,
-			                                   t.deltaTime); // t.deltaTime is a custom delta that represents the loop duration
+			                                   t.deltaTime);
 		});
 	}
 }
