@@ -1,10 +1,11 @@
 
+// @
 // TeaTime v0.7.4 beta
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
 
-// By Andrés Villalobos ~ twitter.com/matnesis ~ andresalvivar@gmail.com
+// Andrés Villalobos ~ twitter.com/matnesis ~ andresalvivar@gmail.com
 // Created 2014/12/26 12:21 am ~ Rewritten 2015/09/15 12:28 pm
 
 
@@ -17,8 +18,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -155,7 +156,7 @@ namespace matnesis.TeaTime
 
 
         // Dependencies
-        private MonoBehaviour _instance = null; // Required to access .StartCoroutine( for the
+        private MonoBehaviour _instance = null; // Required to access Unity coroutine fuctions
         private Coroutine _currentCoroutine = null; // Coroutine that holds the queue execution
 
 
@@ -343,7 +344,7 @@ namespace matnesis.TeaTime
         /// </summary>
         public TeaTime Loop(float duration, Action<ttHandler> callback)
         {
-            return Loop(duration, callback);
+            return Loop(duration, null, callback);
         }
 
 
@@ -362,7 +363,7 @@ namespace matnesis.TeaTime
         /// </summary>
         public TeaTime Loop(Action<ttHandler> callback)
         {
-            return Loop(-1, callback);
+            return Loop(-1, null, callback);
         }
 
 
@@ -440,8 +441,8 @@ namespace matnesis.TeaTime
             if (_currentCoroutine != null)
                 _instance.StopCoroutine(_currentCoroutine);
 
-            _isPlaying = false;
             _currentTask = 0;
+            _isPlaying = false;
 
 
             return this;
@@ -573,18 +574,22 @@ namespace matnesis.TeaTime
                 // It's a loop
                 if (currentTask.isLoop)
                 {
+                    // Func<float> is added to duration if exists
+                    if (currentTask.timeByFunc != null)
+                        currentTask.time += currentTask.timeByFunc();
+
+                    // Nothing to do, skip
+                    if (currentTask.time == 0)
+                        continue;
+
+
                     // Loops always need a handler
                     ttHandler loopHandler = new ttHandler();
                     loopHandler.self = this;
 
 
-                    // Func<float> is added to duration
-                    if (currentTask.timeByFunc != null)
-                        currentTask.time += currentTask.timeByFunc();
-
                     // Negative time means the loop is infinite
                     bool isInfinite = currentTask.time < 0;
-
 
                     // T quotient
                     float tRate = isInfinite ? 0 : 1 / currentTask.time;
