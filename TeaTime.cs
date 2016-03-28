@@ -408,9 +408,9 @@ namespace matnesis.TeaTime
 
 
         /// <summary>
-        /// Disables all modes (Wait, Repeat, Consume).
+        /// Disables all modes (Immutable, Repeat, Consume).
         /// </summary>
-        public TeaTime Unlock()
+        public TeaTime Release()
         {
             _isImmutable = _isRepeating = _isConsuming = false;
 

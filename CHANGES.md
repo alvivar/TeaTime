@@ -7,6 +7,8 @@
 
 - **CHANGE**: **.Reset()** also turn off all queue modes.
 
+- **CHANGE**: **.Unlock()** (that turns off all queue modes) renamed to **Release()**.
+
 - **CHANGE**: **.Add(** no longer uses YieldInstruction as time.
 
 - **CHANGE**: **.Stop()** no longer pauses the queue. Purity +1
