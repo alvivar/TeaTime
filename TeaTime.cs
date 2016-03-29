@@ -58,7 +58,7 @@ namespace matnesis.TeaTime
     /// </summary>
     public class ttHandler
     {
-        public TeaTime self;
+        public TeaTime self; // Current TeaTime instance
 
         public bool isActive = true;
 
