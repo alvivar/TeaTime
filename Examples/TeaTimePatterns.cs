@@ -5,7 +5,7 @@
 
 
 using UnityEngine;
-using matnesis.TeaTime;
+using matnesis.TeaTime; // Add the namespace!
 
 public class TeaTimePatterns : MonoBehaviour
 {
@@ -70,7 +70,7 @@ public class TeaTimePatterns : MonoBehaviour
 
 
         //
-        // More examples to come! Soon!
+        // More to come! Soon!
         //
     }
 }

@@ -1,5 +1,5 @@
 ﻿
-// Example of a queue of tweens!
+// Queue of tweens example 2
 
 // 2015/10/05 05:54:55 PM
 
@@ -8,7 +8,7 @@ using UnityEngine;
 using matnesis.TeaTime; // Add the namespace!
 
 
-public class TeaTimeTweenQueue : MonoBehaviour
+public class TeaTimeTweenQueue2 : MonoBehaviour
 {
     public Transform cube;
     public Renderer cubeRen;
