@@ -1,5 +1,5 @@
 
-###TeaTime API v0.7.4b
+###TeaTime API v0.7.7 beta
 
 **Timed Callbacks**
 - **.Add(**
@@ -9,16 +9,19 @@
 - **.Immutable()**
 - **.Repeat()**
 - **.Consume()**
+- **.Release()**
 
 **Control**
-- **.Play()**
 - **.Pause()**
 - **.Stop()**
+- **.Play()**
 - **.Restart()**
-- **.Unlock()**
+
+**Destruction**
+- **.Reset()**
 
 **Special**
 - **.If(Func<bool>)**
 
-**Destructive**
-- **.Reset()**
+**Custom Yields**
+- **.WaitForCompletion()**

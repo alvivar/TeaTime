@@ -1,3 +1,14 @@
+####v0.7.7 beta
+#####2016/04/24
+
+- **NEW**: **.WaitForCompletion** returns a YieldInstruction, this way TeaTime
+  can **ttHandler.WaitFor** another TeaTimes. :D
+
+- **CHANGE**: **ttHandler.Break()** renamed to .EndLoop, clarity +1
+
+- **BUG FIX**: Using a Func<float> as time wasn't working as expected, it's
+  awesome now.
+
 ####v0.7.4 beta
 #####2016/03/17
 
