@@ -1,6 +1,6 @@
 
 // @
-// TeaTime v0.7.4 beta
+// TeaTime v0.7.7 beta
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
@@ -18,8 +18,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -39,7 +39,7 @@ namespace matnesis.TeaTime
 
 
     /// <summary>
-    /// Timed task node.
+    /// Timed Task node.
     /// </summary>
     internal class ttTask
     {
@@ -54,13 +54,13 @@ namespace matnesis.TeaTime
 
 
     /// <summary>
-    /// Special handler on callbacks.
+    /// TeaTime handler for callbacks.
     /// </summary>
     public class ttHandler
     {
         public TeaTime self; // Current TeaTime instance
 
-        public bool isActive = true;
+        public bool isLooping = false;
 
         public float t = 0;
         public float deltaTime = 0;
@@ -70,11 +70,11 @@ namespace matnesis.TeaTime
 
 
         /// <summary>
-        /// Breaks the current loop (.isActive = false).
+        /// Ends the current loop (.isLooping = false).
         /// </summary>
-        public void Break()
+        public void EndLoop()
         {
-            isActive = false;
+            isLooping = false;
         }
 
 
@@ -101,7 +101,7 @@ namespace matnesis.TeaTime
 
 
     /// <summary>
-    /// Special TeaTime extensions.
+    /// TeaTime extensions. Dark Magic mostly.
     /// </summary>
     public static class TeaTimeExtensions
     {
@@ -121,7 +121,7 @@ namespace matnesis.TeaTime
         /// <summary>
         /// Returns a TeaTime queue bounded to his name, unique per
         /// MonoBehaviour instance, new on the first call. This allows you to
-        /// access queues without a formal definition. Dark magic.
+        /// access queues without a formal definition. Dark magic, be careful.
         /// </summary>
         public static TeaTime tt(this MonoBehaviour instance, string queueName)
         {
@@ -145,6 +145,19 @@ namespace matnesis.TeaTime
 
 
     /// <summary>
+    /// TeaTime custom yield that waits for completion (currently unused).
+    /// </summary>
+    internal class ttYield : CustomYieldInstruction
+    {
+        private TeaTime tt;
+
+        public override bool keepWaiting { get { return tt.IsCompleted; } }
+
+        public ttYield(TeaTime tt) { this.tt = tt; }
+    }
+
+
+    /// <summary>
     /// TeaTime is a fast & simple queue for timed callbacks, focused on solving
     /// common coroutines patterns in Unity games.
     /// </summary>
@@ -153,6 +166,7 @@ namespace matnesis.TeaTime
         // Queue
         private List<ttTask> _tasks = new List<ttTask>(); // Tasks list used as a queue
         private int _currentTask = 0; // Current task mark (to be executed)
+        private int _executedCount = 0; // Executed task count
 
 
         // Dependencies
@@ -181,7 +195,7 @@ namespace matnesis.TeaTime
         /// </summary>
         public bool IsCompleted
         {
-            get { return _currentTask >= _tasks.Count && !_isPlaying; }
+            get { return _currentTask > _tasks.Count && !_isPlaying; }
         }
 
         /// <summary>
@@ -198,6 +212,15 @@ namespace matnesis.TeaTime
         public int Current
         {
             get { return _currentTask; }
+        }
+
+
+        /// <summary>
+        /// Executed callback count.
+        /// </summary>
+        public int ExecutedCount
+        {
+            get { return _executedCount; }
         }
 
 
@@ -487,6 +510,35 @@ namespace matnesis.TeaTime
 
 
         // @
+        // DESTRUCTION
+
+
+        /// <summary>
+        /// Stops and cleans the queue, turning off all modes (Immutable,
+        /// Repeat, Consume). Just like new.
+        /// </summary>
+        public TeaTime Reset()
+        {
+            if (_currentCoroutine != null)
+                _instance.StopCoroutine(_currentCoroutine);
+
+            _tasks.Clear();
+            _currentTask = 0;
+            _executedCount = 0;
+
+            _isPlaying = false;
+            _isPaused = false;
+
+            // Modes off
+            _isImmutable = false;
+            _isRepeating = false;
+            _isConsuming = false;
+
+            return this;
+        }
+
+
+        // @
         // SPECIAL
 
 
@@ -515,30 +567,24 @@ namespace matnesis.TeaTime
 
 
         // @
-        // DESTRUCTION
+        // CUSTOM YIELDS
 
 
         /// <summary>
-        /// Stops and cleans the queue, turning off all modes (Immutable,
-        /// Repeat, Consume). Just like new.
+        /// IEnumerator that waits for completion.
         /// </summary>
-        public TeaTime Reset()
+        private IEnumerator WaitForCompletion(TeaTime tt)
         {
-            if (_currentCoroutine != null)
-                _instance.StopCoroutine(_currentCoroutine);
+            while (!tt.IsCompleted) yield return null;
+        }
 
-            _tasks.Clear();
-            _currentTask = 0;
-
-            _isPlaying = false;
-            _isPaused = false;
-
-            // Modes off
-            _isImmutable = false;
-            _isRepeating = false;
-            _isConsuming = false;
-
-            return this;
+        /// <summary>
+        /// Creates a YieldInstruction that waits for completion.
+        /// </summary>
+        public YieldInstruction WaitForCompletion()
+        {
+            // Basically .IsCompleted
+            return _instance.StartCoroutine(WaitForCompletion(this));
         }
 
 
@@ -574,28 +620,32 @@ namespace matnesis.TeaTime
                 // It's a loop
                 if (currentTask.isLoop)
                 {
-                    // Func<float> is added to duration if exists
+                    // Holds the duration
+                    float loopDuration = currentTask.time;
+
+                    // Func<float> is added
                     if (currentTask.timeByFunc != null)
-                        currentTask.time += currentTask.timeByFunc();
+                        loopDuration += currentTask.timeByFunc();
 
                     // Nothing to do, skip
-                    if (currentTask.time == 0)
+                    if (loopDuration == 0)
                         continue;
 
 
-                    // Loops always need a handler
+                    // Loops will always need a handler
                     ttHandler loopHandler = new ttHandler();
                     loopHandler.self = this;
+                    loopHandler.isLooping = true;
 
 
                     // Negative time means the loop is infinite
-                    bool isInfinite = currentTask.time < 0;
+                    bool isInfinite = loopDuration < 0;
 
                     // T quotient
-                    float tRate = isInfinite ? 0 : 1 / currentTask.time;
+                    float tRate = isInfinite ? 0 : 1 / loopDuration;
 
-                    // While active and, until time or infinite
-                    while (loopHandler.isActive && loopHandler.t <= 1)
+                    // While looping and, until time or infinite
+                    while (loopHandler.isLooping && loopHandler.t <= 1)
                     {
                         float unityDeltaTime = Time.deltaTime;
 
@@ -608,8 +658,9 @@ namespace matnesis.TeaTime
                         loopHandler.deltaTime =
                             isInfinite
                             ? unityDeltaTime
-                            : 1 / (currentTask.time - loopHandler.timeSinceStart) * unityDeltaTime;
+                            : 1 / (loopDuration - loopHandler.timeSinceStart) * unityDeltaTime;
 
+                        // A classic
                         loopHandler.timeSinceStart += unityDeltaTime;
 
 
@@ -618,7 +669,7 @@ namespace matnesis.TeaTime
                             yield return null;
 
 
-                        // Loops always have a callback with a handler
+                        // Loops will always have a callback with a handler
                         currentTask.callbackWithHandler(loopHandler);
 
 
@@ -636,17 +687,24 @@ namespace matnesis.TeaTime
                         if (loopHandler.yieldsToWait == null)
                             yield return null;
                     }
+
+
+                    // Executed +1
+                    _executedCount += 1;
                 }
                 // It's a timed callback
                 else
                 {
-                    // Func<float> is added to the time delay
+                    // Holds the delay
+                    float delayDuration = currentTask.time;
+
+                    // Func<float> is added
                     if (currentTask.timeByFunc != null)
-                        currentTask.time += currentTask.timeByFunc();
+                        delayDuration += currentTask.timeByFunc();
 
                     // Time delay
-                    if (currentTask.time > 0)
-                        yield return new WaitForSeconds(currentTask.time);
+                    if (delayDuration > 0)
+                        yield return new WaitForSeconds(delayDuration);
 
 
                     // Pause?
@@ -660,14 +718,13 @@ namespace matnesis.TeaTime
 
 
                     // Callback with handler
-                    ttHandler handler = new ttHandler();
-                    handler.self = this;
-
                     if (currentTask.callbackWithHandler != null)
                     {
-                        handler.isActive = true;
+                        ttHandler handler = new ttHandler();
+                        handler.self = this;
+
                         handler.t = 1;
-                        handler.timeSinceStart = currentTask.time;
+                        handler.timeSinceStart = delayDuration;
                         handler.deltaTime = Time.deltaTime;
 
                         currentTask.callbackWithHandler(handler);
@@ -681,12 +738,18 @@ namespace matnesis.TeaTime
 
                             handler.yieldsToWait.Clear();
                         }
+
+
+                        // Minimum sane delay
+                        if (delayDuration <= 0 && handler.yieldsToWait == null)
+                            yield return null;
                     }
-
-
-                    // Minimum sane delay
-                    if (currentTask.time <= 0 && handler.yieldsToWait == null)
+                    else if (delayDuration <= 0)
                         yield return null;
+
+
+                    // Executed +1
+                    _executedCount += 1;
                 }
 
 
