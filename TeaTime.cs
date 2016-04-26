@@ -79,7 +79,7 @@ namespace matnesis.TeaTime
 
 
         /// <summary>
-        /// Appends a delay after the current callback execution.
+        /// Appends a delay to wait after the current callback execution.
         /// </summary>
         public void WaitFor(YieldInstruction yi)
         {
@@ -91,17 +91,26 @@ namespace matnesis.TeaTime
 
 
         /// <summary>
-        /// Appends a delay after the current callback execution.
+        /// Appends a delay to wait after the current callback execution.
         /// </summary>
         public void WaitFor(float time)
         {
             WaitFor(new WaitForSeconds(time));
         }
+
+
+        /// <summary>
+        /// Appends a delay to wait after the current callback execution.
+        /// </summary>
+        public void WaitFor(TeaTime tt)
+        {
+            WaitFor(tt.WaitForCompletion());
+        }
     }
 
 
     /// <summary>
-    /// TeaTime extensions. Dark Magic mostly.
+    /// TeaTime extensions (Dark magic).
     /// </summary>
     public static class TeaTimeExtensions
     {
@@ -571,7 +580,7 @@ namespace matnesis.TeaTime
 
 
         /// <summary>
-        /// IEnumerator that waits for completion.
+        /// IEnumerator that waits the completion of a TeaTime.
         /// </summary>
         private IEnumerator WaitForCompletion(TeaTime tt)
         {
@@ -579,11 +588,10 @@ namespace matnesis.TeaTime
         }
 
         /// <summary>
-        /// Creates a YieldInstruction that waits for completion.
+        /// Returns a YieldInstruction that waits until the queue is completed.
         /// </summary>
         public YieldInstruction WaitForCompletion()
         {
-            // Basically .IsCompleted
             return _instance.StartCoroutine(WaitForCompletion(this));
         }
 
@@ -597,7 +605,7 @@ namespace matnesis.TeaTime
         /// other, calling their callbacks according to type, time and queue
         /// config.
         /// </summary>
-        IEnumerator ExecuteQueue()
+        private IEnumerator ExecuteQueue()
         {
             _isPlaying = true;
 
