@@ -1,6 +1,6 @@
 
 // @
-// TeaTime v0.7.7 beta
+// TeaTime v0.7.8 beta
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
@@ -156,13 +156,62 @@ namespace matnesis.TeaTime
     /// <summary>
     /// TeaTime custom yield that waits for completion (currently unused).
     /// </summary>
-    internal class ttYield : CustomYieldInstruction
+    internal class ttWaitForCompletion : CustomYieldInstruction
     {
         private TeaTime tt;
 
         public override bool keepWaiting { get { return tt.IsCompleted; } }
 
-        public ttYield(TeaTime tt) { this.tt = tt; }
+        public ttWaitForCompletion(TeaTime tt) { this.tt = tt; }
+    }
+
+
+    /// <summary>
+    /// YieldInstruction static cache!
+    /// Found here http://forum.unity3d.com/threads/c-coroutine-waitforseconds-garbage-collection-tip.224878/
+    /// </summary>
+    public static class ttYield
+    {
+        class FloatComparer : IEqualityComparer<float>
+        {
+            bool IEqualityComparer<float>.Equals(float x, float y)
+            {
+                return x == y;
+            }
+
+            int IEqualityComparer<float>.GetHashCode(float obj)
+            {
+                return obj.GetHashCode();
+            }
+        }
+
+
+        static Dictionary<float, WaitForSeconds> _secondsCache = new Dictionary<float, WaitForSeconds>(100, new FloatComparer());
+
+
+        static WaitForEndOfFrame _endOfFrame = new WaitForEndOfFrame();
+        public static WaitForEndOfFrame EndOfFrame
+        {
+            get { return _endOfFrame; }
+        }
+
+
+        static WaitForFixedUpdate _fixedUpdate = new WaitForFixedUpdate();
+        public static WaitForFixedUpdate FixedUpdate
+        {
+            get { return _fixedUpdate; }
+        }
+
+
+        public static WaitForSeconds Seconds(float seconds)
+        {
+            WaitForSeconds wfs = null;
+
+            if (!_secondsCache.TryGetValue(seconds, out wfs))
+                _secondsCache.Add(seconds, wfs = new WaitForSeconds(seconds));
+
+            return wfs;
+        }
     }
 
 
@@ -622,7 +671,7 @@ namespace matnesis.TeaTime
                 // Let's wait
                 // 1 For secuencial Adds or Loops before their first execution
                 // 2 Maybe a callback is trying to modify his own queue
-                yield return new WaitForEndOfFrame();
+                yield return ttYield.EndOfFrame;
 
 
                 // It's a loop
@@ -684,8 +733,8 @@ namespace matnesis.TeaTime
                         // Handler .WaitFor(
                         if (loopHandler.yieldsToWait != null)
                         {
-                            foreach (YieldInstruction yi in loopHandler.yieldsToWait)
-                                yield return yi;
+                            for (int i = 0, len = loopHandler.yieldsToWait.Count; i < len; i++)
+                                yield return loopHandler.yieldsToWait[i];
 
                             loopHandler.yieldsToWait.Clear();
                         }
@@ -712,7 +761,7 @@ namespace matnesis.TeaTime
 
                     // Time delay
                     if (delayDuration > 0)
-                        yield return new WaitForSeconds(delayDuration);
+                        yield return ttYield.Seconds(delayDuration);
 
 
                     // Pause?
@@ -741,8 +790,8 @@ namespace matnesis.TeaTime
                         // Handler WaitFor
                         if (handler.yieldsToWait != null)
                         {
-                            foreach (YieldInstruction yi in handler.yieldsToWait)
-                                yield return yi;
+                            for (int i = 0, len = handler.yieldsToWait.Count; i < len; i++)
+                                yield return handler.yieldsToWait[i];
 
                             handler.yieldsToWait.Clear();
                         }
