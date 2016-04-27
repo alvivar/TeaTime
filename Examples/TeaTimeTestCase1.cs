@@ -7,7 +7,7 @@
 using UnityEngine;
 using matnesis.TeaTime;
 
-public class TeaTimeTestCase : MonoBehaviour
+public class TeaTimeTestCase1 : MonoBehaviour
 {
     TeaTime queue;
 
@@ -70,7 +70,9 @@ public class TeaTimeTestCase : MonoBehaviour
         .Immutable();
 
 
-        // #todo Create tests for Func<float> as time
+        // #todo
+        // Create tests for Func<float> as time
+        // Create a tests for Consume() mode
     }
 
 
