@@ -1,3 +1,9 @@
+####v0.7.8 beta
+#####2016/04/26
+
+- **OPTIMIZATION**: Common **YieldInstruction**s (WaitForEndOfFrame()
+  WaitForSeconds(s)) are cached now.
+
 ####v0.7.7 beta
 #####2016/04/24
 
