@@ -479,10 +479,10 @@ namespace matnesis.TeaTime
 
 
         /// <summary>
-        /// Reverses current queue and playback mode
+        /// Reverses playback mode
         /// completion.
         /// </summary>
-        public TeaTime ReversePlayMode() 
+        public TeaTime ReversePlayback() 
         {
             _isReversed = !_isReversed;
             if (IsPlaying) _currentTask = _tasks.Count - _currentTask;
@@ -491,22 +491,22 @@ namespace matnesis.TeaTime
         }
 
         /// <summary>
-        /// Return reversed queue 
+        /// Sets backward playback mode
         /// completion.
         /// </summary>
-        public TeaTime BackwardsPlayMode() 
+        public TeaTime BackwardPlayback() 
         {
-            if (!_isReversed) return this.ReversePlayMode();
+            if (!_isReversed) return this.ReversePlayback();
             return this;
         }
 
         /// <summary>
-        /// Return forward playback
+        /// Sets forward playback mode
         /// completion.
         /// </summary>
-        public TeaTime ForwardPlayMode() 
+        public TeaTime ForwardPlayback() 
         {
-            if (_isReversed) return this.ReversePlayMode();
+            if (_isReversed) return this.ReversePlayback();
             return this;
         }
 

@@ -36,10 +36,10 @@ public class TeaTimeReverse : MonoBehaviour {
 
     void OnMouseEnter() {
         Debug.Log("ENTER");
-        queue.ForwardPlayMode().Play();
+        queue.ForwardPlayback().Play();
     }
     void OnMouseExit() {
         Debug.Log("EXIT");
-        queue.BackwardsPlayMode().Play();
+        queue.BackwardPlayback().Play();
     }
 }
