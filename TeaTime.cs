@@ -61,6 +61,7 @@ namespace matnesis.TeaTime
         public TeaTime self; // Current TeaTime instance
 
         public bool isLooping = false;
+        public bool isReversed = false;
 
         public float t = 0;
         public float deltaTime = 0;
@@ -238,6 +239,7 @@ namespace matnesis.TeaTime
         private bool _isImmutable = false; // On .Immutable() mode
         private bool _isRepeating = false; // On .Repeat() mode
         private bool _isConsuming = false; // On .Consume() mode
+        private bool _isReversed = false; // On .Reverse() mode
 
 
         /// <summary>
@@ -477,6 +479,38 @@ namespace matnesis.TeaTime
 
 
         /// <summary>
+        /// Reverses playback mode
+        /// completion.
+        /// </summary>
+        public TeaTime ReversePlayback() 
+        {
+            _isReversed = !_isReversed;
+            if (IsPlaying) _currentTask = _tasks.Count - _currentTask;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Sets backward playback mode
+        /// completion.
+        /// </summary>
+        public TeaTime BackwardPlayback() 
+        {
+            if (!_isReversed) return this.ReversePlayback();
+            return this;
+        }
+
+        /// <summary>
+        /// Sets forward playback mode
+        /// completion.
+        /// </summary>
+        public TeaTime ForwardPlayback() 
+        {
+            if (_isReversed) return this.ReversePlayback();
+            return this;
+        }
+
+        /// <summary>
         /// Enables Consume mode, the queue will remove each callback after
         /// execution.
         /// </summary>
@@ -657,16 +691,26 @@ namespace matnesis.TeaTime
         private IEnumerator ExecuteQueue()
         {
             _isPlaying = true;
-
+            int lastTaskId = -1;
 
             while (_currentTask < _tasks.Count)
             {
                 // Current
-                ttTask currentTask = _tasks[_currentTask];
+                int taskId = _currentTask;
 
-                // Next
-                _currentTask += 1;
+                if (_isReversed) taskId = _tasks.Count - 1 - _currentTask;
 
+                if (taskId < 0) break;
+
+
+                ttTask currentTask = _tasks[taskId];
+
+                // Next task ( or previous depending if it's reversed )
+                _currentTask++;
+
+                // Ignore if the task ID is the same ( prevents already playing queue to execute twice on reverse )
+                if (taskId == lastTaskId) continue;
+                lastTaskId = taskId;
 
                 // Let's wait
                 // 1 For secuencial Adds or Loops before their first execution
@@ -693,7 +737,7 @@ namespace matnesis.TeaTime
                     ttHandler loopHandler = new ttHandler();
                     loopHandler.self = this;
                     loopHandler.isLooping = true;
-
+                    loopHandler.isReversed = _isReversed;
 
                     // Negative time means the loop is infinite
                     bool isInfinite = loopDuration < 0;
@@ -701,10 +745,21 @@ namespace matnesis.TeaTime
                     // T quotient
                     float tRate = isInfinite ? 0 : 1 / loopDuration;
 
+                    if (loopHandler.isReversed) {
+                        loopHandler.t = 1f;
+                        tRate = -tRate;
+                    }
+
                     // While looping and, until time or infinite
-                    while (loopHandler.isLooping && loopHandler.t <= 1)
+                    while (loopHandler.isLooping && (loopHandler.isReversed ? loopHandler.t >= 0 : loopHandler.t <= 1))
                     {
                         float unityDeltaTime = Time.deltaTime;
+
+                        // Check for queue reversal
+                        if (_isReversed && _isReversed != loopHandler.isReversed) {
+                            tRate = -tRate;
+                            loopHandler.isReversed = _isReversed;
+                        }
 
                         // Completion % from 0 to 1
                         if (!isInfinite)
@@ -716,6 +771,8 @@ namespace matnesis.TeaTime
                             isInfinite
                             ? unityDeltaTime
                             : 1 / (loopDuration - loopHandler.timeSinceStart) * unityDeltaTime;
+
+                        if (loopHandler.isReversed) loopHandler.deltaTime = -loopHandler.deltaTime;
 
                         // A classic
                         loopHandler.timeSinceStart += unityDeltaTime;
@@ -816,16 +873,20 @@ namespace matnesis.TeaTime
                     _currentTask -= 1;
                     _tasks.Remove(currentTask);
                 }
-
-
-                // Repeats on Repeat mode (if needed)
-                if (_isRepeating && _tasks.Count > 0 && _currentTask >= _tasks.Count)
-                    _currentTask = 0;
             }
 
 
+            // Repeats on Repeat mode (if needed)
+            if (_isRepeating && _tasks.Count > 0)
+            {
+                _currentTask = 0;
+                _currentCoroutine = _instance.StartCoroutine(ExecuteQueue());
+            }
             // Done!
-            _isPlaying = false;
+            else
+            {
+                _isPlaying = false;
+            }
 
 
             yield return null;
