@@ -1,5 +1,6 @@
 
-// I use this script to test that everything works!
+// If every Debug.Log follows in order one after the other, with 1 second
+// between them, then everything is fine!
 
 // 2015/09/15 12:47:29 PM
 
