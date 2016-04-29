@@ -1,4 +1,12 @@
-####v0.7.8 beta
+####v0.8 beta
+#####2016/04/26
+
+- **NEW FEATURES**: **.Backward()** **.Forward()** and **.Reverse()** allows you
+  give a direction to the queue execution!**
+
+**_[Thank you Xerios!](http://github.com/alvivar/TeaTime/pull/8)_**
+
+####v0.7.9 beta
 #####2016/04/26
 
 - **Optimizations +1**: **YieldInstruction**s like WaitForEndOfFrame,
@@ -211,6 +219,8 @@
   from 0 to 1), 'timeSinceStart' and 'Break()'.
 
 - **CHANGE**: ttNow( renamed to ttInvoke.
+
+**_[Thanks you @tzamora!](http://github.com/tzamora)_** (Loop code)
 
 ####v0.3
 
