@@ -1,8 +1,9 @@
 ####v0.7.8 beta
 #####2016/04/26
 
-- **OPTIMIZATION**: Common **YieldInstruction**s (WaitForEndOfFrame()
-  WaitForSeconds(s)) are cached now.
+- **Optimizations +1**: **YieldInstruction**s like WaitForEndOfFrame,
+  WaitForSeconds are cached now, calls to StarCoroutine were decreased a lot, no
+  more foreachs, other minor optimizations.
 
 ####v0.7.7 beta
 #####2016/04/24

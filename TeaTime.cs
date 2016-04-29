@@ -816,20 +816,16 @@ namespace matnesis.TeaTime
                     _currentTask -= 1;
                     _tasks.Remove(currentTask);
                 }
+
+
+                // Repeats on Repeat mode (if needed)
+                if (_isRepeating && _tasks.Count > 0 && _currentTask >= _tasks.Count)
+                    _currentTask = 0;
             }
 
 
-            // Repeats on Repeat mode (if needed)
-            if (_isRepeating && _tasks.Count > 0)
-            {
-                _currentTask = 0;
-                _currentCoroutine = _instance.StartCoroutine(ExecuteQueue());
-            }
             // Done!
-            else
-            {
-                _isPlaying = false;
-            }
+            _isPlaying = false;
 
 
             yield return null;
