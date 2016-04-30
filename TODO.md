@@ -1,9 +1,10 @@
 ###TO DO!
 
-- A super test to Backward + Forward + Reverse mode
 - More and better examples
-- A good strees test
-- Maybe a TeaTime manager will help with precison and optimization
+- A good testing to Reverse/Backward/Forward mode
+- Yoyo mode (Forward, Backward cycle)
+- A good stress test
+- Maybe a TeaTime manager will help with precision and optimization
 - Improve time precision ^
 - Use arrays instead of generic lists ^
 
