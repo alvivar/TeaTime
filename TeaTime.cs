@@ -448,8 +448,8 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Enables Immutable mode, the queue will ignore new appends (Add,
-		/// Loop, If).
+		/// Enables Immutable mode, the queue will ignore new appends (.Add
+		/// .Loop .If)
 		/// </summary>
 		public TeaTime Immutable()
 		{
@@ -506,7 +506,7 @@ namespace matnesis.TeaTime
 		}
 
 		/// <summary>
-		/// Enables Forward mode (default), executing callbacks one after the
+		/// Enables Forward mode (the default), executing callbacks one after the
 		/// other.
 		/// </summary>
 		public TeaTime Forward()
@@ -586,7 +586,7 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Restarts the queue execution (Stop + Play).
+		/// Restarts the queue execution (.Stop().Play()).
 		/// </summary>
 		public TeaTime Restart()
 		{
@@ -632,6 +632,7 @@ namespace matnesis.TeaTime
 		/// Appends a boolean condition that stops the queue when isn't
 		/// fullfiled. On Repeat mode the queue is restarted. The interruption
 		/// also affects Consume mode (no execution, no removal).
+		/// #todo Test with .Reverse() stuff
 		/// </summary>
 		public TeaTime If(Func<bool> condition)
 		{
@@ -694,16 +695,20 @@ namespace matnesis.TeaTime
 				// Current task to be executed
 				int taskId = _currentTask;
 				if (_isReversed) taskId = _tasks.Count - 1 - _currentTask;
-				if (taskId < 0) break;
+
+				// Stop when reach the end by going backwards
+				// #todo Needs to be compatible with .Repeat()
+				if (taskId < 0)
+					break;
 
 				ttTask currentTask = _tasks[taskId];
 
-				// Next task next (or previous if the queue is reversed)
+				// Next task (or previous if the queue is backward)
 				_currentTask++;
 
-
-				// Ignore already executed tasks (when reversed)
-				if (taskId == lastTaskId) continue;
+				// Avoid executing a task twice when reversed
+				if (taskId == lastTaskId)
+					continue;
 				lastTaskId = taskId;
 
 
@@ -878,8 +883,12 @@ namespace matnesis.TeaTime
 
 
 				// Repeats on Repeat mode (if needed)
+				// #todo Needs to be compatible with .Reverse() stuff
 				if (_isRepeating && _tasks.Count > 0 && _currentTask >= _tasks.Count)
+				{
 					_currentTask = 0;
+					lastTaskId = -1;
+				}
 			}
 
 
