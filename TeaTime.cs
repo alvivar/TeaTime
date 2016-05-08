@@ -1,6 +1,6 @@
 
 // @
-// TeaTime v0.8 beta
+// TeaTime v0.8.1 beta
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
@@ -155,7 +155,7 @@ namespace matnesis.TeaTime
 
 
 	/// <summary>
-	/// TeaTime custom yield that waits for completion (currently unused).
+	/// (Currently unused) TeaTime custom yield that waits for completion.
 	/// </summary>
 	internal class ttWaitForCompletion : CustomYieldInstruction
 	{
@@ -219,6 +219,7 @@ namespace matnesis.TeaTime
 		private List<ttTask> _tasks = new List<ttTask>(); // Tasks list used as a queue
 		private int _currentTask = 0; // Current task mark (to be executed)
 		private int _executedCount = 0; // Executed task count
+		private int _lastPlayExecutedCount = 0; // Executed task count during the last play
 
 
 		// Dependencies
@@ -233,6 +234,7 @@ namespace matnesis.TeaTime
 		private bool _isRepeating = false; // On .Repeat() mode
 		private bool _isConsuming = false; // On .Consume() mode
 		private bool _isReversed = false; // On .Reverse() Backward() Forward() mode
+		private bool _isYoyo = false; // On .Yoyo() mode
 
 
 		/// <summary>
@@ -248,7 +250,7 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public bool IsCompleted
 		{
-			get { return _currentTask > _tasks.Count && !_isPlaying; }
+			get { return _currentTask >= _tasks.Count && !_isPlaying; }
 		}
 
 		/// <summary>
@@ -517,6 +519,18 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
+		/// Enables Yoyo mode, that will .Reverse() the callback execution order
+		/// when the queue is completed. Only once per play without Repeat mode.
+		/// </summary>
+		public TeaTime Yoyo()
+		{
+			_isYoyo = true;
+
+			return this;
+		}
+
+
+		/// <summary>
 		/// Disables all modes (Immutable, Repeat, Consume, Backward).
 		/// </summary>
 		public TeaTime Release()
@@ -619,7 +633,7 @@ namespace matnesis.TeaTime
 			_isImmutable = false;
 			_isRepeating = false;
 			_isConsuming = false;
-
+			_isYoyo = false;
 			return this.Forward();
 		}
 
@@ -630,9 +644,7 @@ namespace matnesis.TeaTime
 
 		/// <summary>
 		/// Appends a boolean condition that stops the queue when isn't
-		/// fullfiled. On Repeat mode the queue is restarted. The interruption
-		/// also affects Consume mode (no execution, no removal).
-		/// #todo Test with .Reverse() stuff
+		/// fullfiled. On Repeat mode the queue is restarted.
 		/// </summary>
 		public TeaTime If(Func<bool> condition)
 		{
@@ -688,6 +700,7 @@ namespace matnesis.TeaTime
 			_isPlaying = true;
 
 
+			_lastPlayExecutedCount = 0;
 			int lastTaskId = -1;
 
 			while (_currentTask < _tasks.Count)
@@ -695,13 +708,8 @@ namespace matnesis.TeaTime
 				// Current task to be executed
 				int taskId = _currentTask;
 				if (_isReversed) taskId = _tasks.Count - 1 - _currentTask;
-
-				// Stop when reach the end by going backwards
-				// #todo Needs to be compatible with .Repeat()
-				if (taskId < 0)
-					break;
-
 				ttTask currentTask = _tasks[taskId];
+
 
 				// Next task (or previous if the queue is backward)
 				_currentTask++;
@@ -757,7 +765,7 @@ namespace matnesis.TeaTime
 					while (loopHandler.isLooping && (loopHandler.isReversed ? loopHandler.t >= 0 : loopHandler.t <= 1))
 					{
 						// Check for queue reversal
-						if (_isReversed && _isReversed != loopHandler.isReversed)
+						if (_isReversed != loopHandler.isReversed)
 						{
 							tRate = -tRate;
 							loopHandler.isReversed = _isReversed;
@@ -777,7 +785,7 @@ namespace matnesis.TeaTime
 							? unityDeltaTime
 							: 1 / (loopDuration - loopHandler.timeSinceStart) * unityDeltaTime;
 
-						// .deltaTime depends on direction
+						// .deltaTime is also reversed
 						if (loopHandler.isReversed)
 							loopHandler.deltaTime = -loopHandler.deltaTime;
 
@@ -812,6 +820,7 @@ namespace matnesis.TeaTime
 
 					// Executed +1
 					_executedCount += 1;
+					_lastPlayExecutedCount += 1;
 				}
 				// It's a timed callback
 				else
@@ -871,6 +880,7 @@ namespace matnesis.TeaTime
 
 					// Executed +1
 					_executedCount += 1;
+					_lastPlayExecutedCount += 1;
 				}
 
 
@@ -882,8 +892,13 @@ namespace matnesis.TeaTime
 				}
 
 
-				// Repeats on Repeat mode (if needed)
-				// #todo Needs to be compatible with .Reverse() stuff
+				// On Yoyo mode the queue is reversed at the end, only once per
+				// play without Repeat mode
+				if (_isYoyo && _currentTask >= _tasks.Count && (_lastPlayExecutedCount <= _tasks.Count || _isRepeating))
+					this.Reverse();
+
+
+				// Repeats on Repeat mode
 				if (_isRepeating && _tasks.Count > 0 && _currentTask >= _tasks.Count)
 				{
 					_currentTask = 0;
