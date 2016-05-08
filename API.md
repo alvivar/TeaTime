@@ -1,5 +1,5 @@
 
-###TeaTime API v0.8 beta
+###TeaTime API
 
 **Timed Callbacks**
 - **.Add(**
@@ -12,13 +12,14 @@
 - **.Reverse()**
 - **.Backward()**
 - **.Forward()**
-- **.Release()**
+- **.Yoyo()**
 
 **Control**
 - **.Pause()**
 - **.Stop()**
 - **.Play()**
 - **.Restart()**
+- **.Release()**
 
 **Destruction**
 - **.Reset()**

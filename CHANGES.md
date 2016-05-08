@@ -1,3 +1,9 @@
+####v0.8.1 beta
+#####2016/04/26
+
+- **NEW FEATURE**: **.Yoyo()** mode will **.Reverse()** the execution order when
+  the queue is completed. Only once per play without **Repeat** mode.
+
 ####v0.8 beta
 #####2016/04/26
 
