@@ -531,12 +531,12 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Disables all modes (Immutable, Repeat, Consume, Backward).
+		/// Disables all modes (Immutable, Repeat, Consume, Backward, Yoyo).
+		/// Just like new.
 		/// </summary>
 		public TeaTime Release()
 		{
-			_isImmutable = _isRepeating = _isConsuming = false;
-
+			_isImmutable = _isRepeating = _isConsuming = _isYoyo = false;
 			return this.Forward();
 		}
 
@@ -573,7 +573,7 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Starts and resumes the queue execution.
+		/// Starts or resumes the queue execution.
 		/// </summary>
 		public TeaTime Play()
 		{
@@ -615,7 +615,7 @@ namespace matnesis.TeaTime
 
 		/// <summary>
 		/// Stops and cleans the queue, turning off all modes (Immutable,
-		/// Repeat, Consume, Backward). Just like new.
+		/// Repeat, Consume, Backward, Yoyo). Just like new.
 		/// </summary>
 		public TeaTime Reset()
 		{
