@@ -1,5 +1,5 @@
 ﻿
-// TeaTime Reverse() Backward() Forward() mode example.
+// TeaTime Reverse() Backward() Forward() & Yoyo() mode example! <3
 
 // Thank you Xerios! http://github.com/alvivar/TeaTime/pull/8
 
@@ -7,12 +7,13 @@
 
 
 using UnityEngine;
-using matnesis.TeaTime; // Add the namespace!
+using matnesis.TeaTime; // The namespace!
 
 public class TeaTimeReverse1 : MonoBehaviour
 {
-    public Transform cube;
     public Renderer cubeRen;
+
+    private bool lastCompletion = false;
 
 
     // Declare your queue
@@ -23,34 +24,50 @@ public class TeaTimeReverse1 : MonoBehaviour
     {
         // Instantiate
         queue = new TeaTime(this);
-        // or you can use this shortcut: 'queue = this.tt();' (special MonoBehaviour extension)
+        // or you can use this shortcut: 'queue = this.tt();' (special
+        // MonoBehaviour extension)
 
 
         // Adds a one second callback loop that lerps to a random color.
-        queue.Loop(0.25f, (ttHandler t) =>
+        queue
+        .Add(() => Debug.Log("Queue Beginning " + Time.time))
+        .Loop(1, (ttHandler t) =>
         {
-            cubeRen.material.color = Color.Lerp(new Color(1, 1, 1, 1), new Color(1, 0, 0, 1), t.t);
-            // Debug.Log("TEST 1");
+            // From white to black, using .t (completion float from 0.0 to 1.0)
+            cubeRen.material.color = Color.Lerp(
+                Color.white,
+                Color.black,
+                t.t);
         })
-        .Loop(0.5f, (ttHandler t) =>
+        .Loop(1, (ttHandler t) =>
         {
-            cubeRen.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(3, 3, 3), t.t);
-            // Debug.Log("TEST 4");
-        }).Pause();
-
+            cubeRen.transform.localScale = Vector3.Lerp(
+                new Vector3(1, 1, 1),
+                new Vector3(3, 3, 3),
+                t.t);
+        })
+        .Add(() => Debug.Log("Queue End " + Time.time))
+        .Yoyo();
+        // Yoyo mode will .Reverse() the queue execution order at the end
     }
 
 
-    void OnMouseEnter()
+    void Update()
     {
-        Debug.Log("OnMouseEnter " + Time.time);
-        queue.Forward().Play();
-    }
+        // Go Forward
+        if (Input.GetKeyDown(KeyCode.K))
+            queue.Forward().Play();
+
+        // Go Backward
+        if (Input.GetKeyDown(KeyCode.J))
+            queue.Backward().Play();
 
 
-    void OnMouseExit()
-    {
-        Debug.Log("OnMouseExit " + Time.time);
-        queue.Backward().Play();
+        // .IsCompleted log
+        if (lastCompletion != queue.IsCompleted)
+        {
+            Debug.Log("Is completed? " + (queue.IsCompleted ? "YES" : "NO"));
+            lastCompletion = queue.IsCompleted;
+        }
     }
 }
