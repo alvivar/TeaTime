@@ -682,6 +682,7 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public YieldInstruction WaitForCompletion()
 		{
+			// #todo Could this be cached somehow?
 			return _instance.StartCoroutine(WaitForCompletion(this));
 		}
 
@@ -714,7 +715,8 @@ namespace matnesis.TeaTime
 				// Next task (or previous if the queue is backward)
 				_currentTask++;
 
-				// Avoid executing a task twice when reversed
+				// Avoid executing a task twice when reversed and the queue
+				// hasn't reached the end
 				if (taskId == lastTaskId)
 					continue;
 				lastTaskId = taskId;
@@ -885,6 +887,7 @@ namespace matnesis.TeaTime
 
 
 				// Consume mode removes the task after execution
+				// #todo Need to be tested with .Reverse() stuff
 				if (_isConsuming)
 				{
 					_currentTask -= 1;
@@ -895,14 +898,17 @@ namespace matnesis.TeaTime
 				// On Yoyo mode the queue is reversed at the end, only once per
 				// play without Repeat mode
 				if (_isYoyo && _currentTask >= _tasks.Count && (_lastPlayExecutedCount <= _tasks.Count || _isRepeating))
+				{
 					this.Reverse();
+					lastTaskId = -1; // To default
+				}
 
 
 				// Repeats on Repeat mode
 				if (_isRepeating && _tasks.Count > 0 && _currentTask >= _tasks.Count)
 				{
 					_currentTask = 0;
-					lastTaskId = -1;
+					lastTaskId = -1; // To default
 				}
 			}
 
