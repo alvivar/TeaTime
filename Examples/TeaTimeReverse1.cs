@@ -48,7 +48,8 @@ public class TeaTimeReverse1 : MonoBehaviour
         })
         .Add(() => Debug.Log("Queue End " + Time.time))
         .Yoyo();
-        // Yoyo mode will .Reverse() the queue execution order at the end
+        // Yoyo mode will .Reverse() the queue execution order when the queue is
+        // completed
     }
 
 
