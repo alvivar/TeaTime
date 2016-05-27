@@ -26,7 +26,7 @@ public class TeaTimeTestCase1 : MonoBehaviour
         .Add(1, (ttHandler t) =>
         {
             Debug.Log("step 3 " + Time.time);
-            t.WaitFor(1);
+            t.Wait(1);
         })
         .Add(() =>
         {
@@ -62,7 +62,7 @@ public class TeaTimeTestCase1 : MonoBehaviour
         .Add((ttHandler t) =>
         {
             // WaitFor a Loop and an Add
-            t.WaitFor(this.tt().Loop(0.5f, (ttHandler) => { }).Add(0.5f, () =>
+            t.Wait(this.tt().Loop(0.5f, (ttHandler) => { }).Add(0.5f, () =>
             {
                 Debug.Log("step 9 " + Time.time);
             })

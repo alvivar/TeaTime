@@ -1,3 +1,9 @@
+####v0.8.2 beta
+#####2016/05/27
+
+- **CHANGE**: **ttHandler.WaitFor(** renamed to **ttHandler.Wait(**. I'm
+experimenting with keeping the API at one word.
+
 ####v0.8.1 beta
 #####2016/04/26
 

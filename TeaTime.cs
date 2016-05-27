@@ -82,7 +82,7 @@ namespace matnesis.TeaTime
 		/// <summary>
 		/// Appends a delay to wait after the current callback execution.
 		/// </summary>
-		public void WaitFor(YieldInstruction yi)
+		public void Wait(YieldInstruction yi)
 		{
 			if (yieldsToWait == null)
 				yieldsToWait = new List<YieldInstruction>();
@@ -94,18 +94,18 @@ namespace matnesis.TeaTime
 		/// <summary>
 		/// Appends a delay to wait after the current callback execution.
 		/// </summary>
-		public void WaitFor(float time)
+		public void Wait(float time)
 		{
-			WaitFor(new WaitForSeconds(time));
+			Wait(new WaitForSeconds(time));
 		}
 
 
 		/// <summary>
 		/// Appends a delay to wait after the current callback execution.
 		/// </summary>
-		public void WaitFor(TeaTime tt)
+		public void Wait(TeaTime tt)
 		{
-			WaitFor(tt.WaitForCompletion());
+			Wait(tt.WaitForCompletion());
 		}
 	}
 
@@ -625,6 +625,7 @@ namespace matnesis.TeaTime
 			_tasks.Clear();
 			_currentTask = 0;
 			_executedCount = 0;
+			// _lastPlayExecutedCount = 0;
 
 			_isPlaying = false;
 			_isPaused = false;
@@ -921,3 +922,21 @@ namespace matnesis.TeaTime
 		}
 	}
 }
+
+// @
+// Lerp t Formulas <3
+
+// Ease out
+// t = Mathf.Sin(t * Mathf.PI * 0.5f);
+
+// Ease in
+// t = 1f - Mathf.Cos(t * Mathf.PI * 0.5f)
+
+// Exponential
+// t = t*t
+
+// Smoothstep
+// t = t*t * (3f - 2f*t)
+
+// Smootherstep
+// t = t*t*t * (t * (6f*t - 15f) + 10f)
