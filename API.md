@@ -1,31 +1,42 @@
+# TeaTime API
 
-###TeaTime API
+## Timed Callbacks
 
-**Timed Callbacks**
-- **.Add(**
-- **.Loop(**
+- .Add(
+- .Loop(
 
-**Queue Modes**
-- **.Immutable()**
-- **.Repeat()**
-- **.Consume()**
-- **.Reverse()**
-- **.Backward()**
-- **.Forward()**
-- **.Yoyo()**
+## Queue Modes
 
-**Control**
-- **.Pause()**
-- **.Stop()**
-- **.Play()**
-- **.Restart()**
-- **.Release()**
+- Immutable()
+- Repeat()
+- Consume()
+- Reverse()
+- Backward()
+- Forward()
+- Yoyo()
 
-**Destruction**
-- **.Reset()**
+## Control
 
-**Special**
-- **.If(Func<bool>)**
+- Pause()
+- Stop()
+- Play()
+- Restart()
+- Release()
 
-**Custom Yields**
-- **.WaitForCompletion()**
+## Destruction
+
+- Reset()
+
+## Special
+
+- If(Func \<bool>)
+- Wait(Func \<bool>)
+
+## Custom Yields
+
+- WaitForCompletion()
+
+## ttHandler
+
+- EndLoop()
+- Wait(
