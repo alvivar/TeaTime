@@ -69,6 +69,26 @@ public class TeaTimePatterns : MonoBehaviour
         });
 
 
+        // #todo Fix this pattern as example of a waiting loop
+        // Loading the first level!
+        // this.tt("@LoadUnload").Pause().Add((ttHandler t) =>
+        // {
+        //     if (levelToLoad >= 0)
+        //         loading = SceneManager.LoadSceneAsync(levelToLoad, LoadSceneMode.Additive);
+        // })
+        // .Loop((ttHandler t) =>
+        // {
+        //     if (loading == null || loading.isDone)
+        //         t.EndLoop();
+        // })
+        // .Add(1, () =>
+        // {
+        //     if (levelToUnload >= 0)
+        //         SceneManager.UnloadScene(levelToUnload);
+        // })
+        // .Immutable();
+
+
         //
         // More to come! Soon!
         //
