@@ -1,6 +1,6 @@
 
 // @
-// TeaTime v0.8.1 beta
+// TeaTime v0.8.2 beta
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
@@ -60,7 +60,6 @@ namespace matnesis.TeaTime
 	{
 		public TeaTime self; // Current TeaTime instance
 
-
 		public float t = 0;
 		public float deltaTime = 0;
 		public float timeSinceStart = 0;
@@ -71,7 +70,7 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Ends the current loop (.isLooping = false).
+		/// Ends the current loop.
 		/// </summary>
 		public void EndLoop()
 		{
@@ -96,6 +95,8 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public void Wait(float time)
 		{
+			if (time <= 0) return;
+
 			Wait(new WaitForSeconds(time));
 		}
 
@@ -644,8 +645,8 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Appends a boolean condition that stops the queue when isn't
-		/// fullfiled. On Repeat mode the queue is restarted.
+		/// The queue will stop if the condition isn't fullfiled, or restarted
+		/// on Repeat mode.
 		/// </summary>
 		public TeaTime If(Func<bool> condition)
 		{
@@ -662,6 +663,19 @@ namespace matnesis.TeaTime
 						this.Stop();
 					}
 				}
+			});
+		}
+
+
+		/// <summary>
+		/// The queue will wait until the boolean condition is fullfiled.
+		/// </summary>
+		public TeaTime Wait(Func<bool> untilCondition, float checkDelay = 0)
+		{
+			return this.Loop((ttHandler t) =>
+			{
+				if (untilCondition()) t.EndLoop();
+				t.Wait(checkDelay);
 			});
 		}
 
@@ -702,8 +716,8 @@ namespace matnesis.TeaTime
 			_isPlaying = true;
 
 
+			int lastTaskId = -1; // Important, this value needs to be reset to default on most queue changes
 			_lastPlayExecutedCount = 0;
-			int lastTaskId = -1;
 
 			while (_currentTask < _tasks.Count)
 			{
@@ -718,8 +732,7 @@ namespace matnesis.TeaTime
 
 				// Avoid executing a task twice when reversed and the queue
 				// hasn't reached the end
-				if (taskId == lastTaskId)
-					continue;
+				if (taskId == lastTaskId) continue;
 				lastTaskId = taskId;
 
 
@@ -735,7 +748,7 @@ namespace matnesis.TeaTime
 					// Holds the duration
 					float loopDuration = currentTask.time;
 
-					// Func<float> is added
+					// Func<float> added
 					if (currentTask.timeByFunc != null)
 						loopDuration += currentTask.timeByFunc();
 
@@ -831,7 +844,7 @@ namespace matnesis.TeaTime
 					// Holds the delay
 					float delayDuration = currentTask.time;
 
-					// Func<float> is added
+					// Func<float> added
 					if (currentTask.timeByFunc != null)
 						delayDuration += currentTask.timeByFunc();
 
@@ -887,12 +900,14 @@ namespace matnesis.TeaTime
 				}
 
 
-				// Consume mode removes the task after execution
-				// #todo Need to be tested with .Reverse() stuff
+				// Consume mode removes the task after execution #todo Need to
+				// be tested with .Reverse() stuff
 				if (_isConsuming)
 				{
 					_currentTask -= 1;
 					_tasks.Remove(currentTask);
+
+					lastTaskId = -1; // To default
 				}
 
 
@@ -901,6 +916,7 @@ namespace matnesis.TeaTime
 				if (_isYoyo && _currentTask >= _tasks.Count && (_lastPlayExecutedCount <= _tasks.Count || _isRepeating))
 				{
 					this.Reverse();
+
 					lastTaskId = -1; // To default
 				}
 
@@ -909,6 +925,7 @@ namespace matnesis.TeaTime
 				if (_isRepeating && _tasks.Count > 0 && _currentTask >= _tasks.Count)
 				{
 					_currentTask = 0;
+
 					lastTaskId = -1; // To default
 				}
 			}
@@ -923,8 +940,8 @@ namespace matnesis.TeaTime
 	}
 }
 
-// @
-// Lerp t Formulas <3
+// <3
+// Lerp t Formulas
 
 // Ease out
 // t = Mathf.Sin(t * Mathf.PI * 0.5f);
