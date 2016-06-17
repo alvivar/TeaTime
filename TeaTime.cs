@@ -1,6 +1,6 @@
 
 // @
-// TeaTime v0.8.2 beta
+// TeaTime v0.8.3 beta
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
@@ -79,7 +79,7 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Appends a delay to wait after the current callback execution.
+		/// Appends a YieldInstruction to wait after the current callback execution.
 		/// </summary>
 		public void Wait(YieldInstruction yi)
 		{
@@ -91,7 +91,7 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Appends a delay to wait after the current callback execution.
+		/// Appends a time delay to wait after the current callback execution.
 		/// </summary>
 		public void Wait(float time)
 		{
@@ -102,10 +102,14 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Appends a delay to wait after the current callback execution.
+		/// Appends a TeaTime to wait after the current callback execution that
+		/// is also affected by .Stop() and .Reset().
 		/// </summary>
 		public void Wait(TeaTime tt)
 		{
+			// Currently waiting
+			if (!self._waiting.Contains(tt)) self._waiting.Add(tt);
+
 			Wait(tt.WaitForCompletion());
 		}
 	}
@@ -218,6 +222,7 @@ namespace matnesis.TeaTime
 	{
 		// Queue
 		private List<ttTask> _tasks = new List<ttTask>(); // Tasks list used as a queue
+		internal List<TeaTime> _waiting = new List<TeaTime>(); // TeaTimes to wait by ttHandler.Wait(
 		private int _currentTask = 0; // Current task mark (to be executed)
 		private int _executedCount = 0; // Executed task count
 		private int _lastPlayExecutedCount = 0; // Executed task count during the last play
@@ -569,6 +574,12 @@ namespace matnesis.TeaTime
 			_isPlaying = false;
 
 
+			// Stop all TeaTimes on .Wait(
+			for (int i = 0, len = _waiting.Count; i < len; i++)
+				_waiting[i].Stop();
+			_waiting.Clear();
+
+
 			return this;
 		}
 
@@ -583,8 +594,10 @@ namespace matnesis.TeaTime
 
 
 			// Ignore if currently playing
-			if (_isPlaying)
-				return this;
+			if (_isPlaying) return this;
+
+			// or Empty?
+			if (_tasks.Count <= 0) return this;
 
 
 			// Restart if already finished
@@ -620,6 +633,7 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public TeaTime Reset()
 		{
+			// Reset current
 			if (_currentCoroutine != null)
 				_instance.StopCoroutine(_currentCoroutine);
 
@@ -636,7 +650,16 @@ namespace matnesis.TeaTime
 			_isRepeating = false;
 			_isConsuming = false;
 			_isYoyo = false;
-			return this.Forward();
+			this.Forward();
+
+
+			// Reset all TeaTimes on .Wait(
+			for (int i = 0, len = _waiting.Count; i < len; i++)
+				_waiting[i].Reset();
+			_waiting.Clear();
+
+
+			return this;
 		}
 
 
@@ -716,7 +739,7 @@ namespace matnesis.TeaTime
 			_isPlaying = true;
 
 
-			int lastTaskId = -1; // Important, this value needs to be reset to default on most queue changes
+			int reverseLastTask = -1; // Important: This value needs to be reset to default on most queue changes
 			_lastPlayExecutedCount = 0;
 
 			while (_currentTask < _tasks.Count)
@@ -732,8 +755,8 @@ namespace matnesis.TeaTime
 
 				// Avoid executing a task twice when reversed and the queue
 				// hasn't reached the end
-				if (taskId == lastTaskId) continue;
-				lastTaskId = taskId;
+				if (taskId == reverseLastTask) continue;
+				reverseLastTask = taskId;
 
 
 				// Let's wait
@@ -907,7 +930,7 @@ namespace matnesis.TeaTime
 					_currentTask -= 1;
 					_tasks.Remove(currentTask);
 
-					lastTaskId = -1; // To default
+					reverseLastTask = -1; // To default
 				}
 
 
@@ -917,7 +940,7 @@ namespace matnesis.TeaTime
 				{
 					this.Reverse();
 
-					lastTaskId = -1; // To default
+					reverseLastTask = -1; // To default
 				}
 
 
@@ -926,7 +949,15 @@ namespace matnesis.TeaTime
 				{
 					_currentTask = 0;
 
-					lastTaskId = -1; // To default
+					reverseLastTask = -1; // To default
+				}
+
+
+				// Just at the end of a complete queue execution
+				if (_tasks.Count > 0 && _currentTask >= _tasks.Count)
+				{
+					// A new cycle begins
+					_waiting.Clear();
 				}
 			}
 
