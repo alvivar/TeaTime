@@ -1,6 +1,6 @@
 
 // @
-// TeaTime v0.8.3 beta
+// TeaTime v0.8.4 beta
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
@@ -102,21 +102,32 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Appends a TeaTime to wait after the current callback execution that
-		/// is also affected by .Stop() and .Reset().
+		/// Appends a TeaTime to wait after the current callback execution. It's
+		/// also affected by .Stop() and .Reset() from the parent queue.
 		/// </summary>
 		public void Wait(TeaTime tt)
 		{
-			// Currently waiting
+			// A reference into the queue waiting list
 			if (!self._waiting.Contains(tt)) self._waiting.Add(tt);
 
 			Wait(tt.WaitForCompletion());
+		}
+
+
+		/// <summary>
+		/// Appends a boolean condition to wait until true after the current callback
+		/// execution.
+		/// </summary>
+		public void Wait(Func<bool> condition, float checkDelay)
+		{
+			// #todo A new TeaTime everytime doesn't seem healthy
+			Wait(self._instance.tt().Wait(condition, checkDelay));
 		}
 	}
 
 
 	/// <summary>
-	/// TeaTime extensions (Dark magic).
+	/// TeaTime core extensions (Dark magic).
 	/// </summary>
 	public static class TeaTimeExtensions
 	{
@@ -136,7 +147,7 @@ namespace matnesis.TeaTime
 		/// <summary>
 		/// Returns a TeaTime queue bounded to his name, unique per
 		/// MonoBehaviour instance, new on the first call. This allows you to
-		/// access queues without a formal definition. Dark magic, be careful.
+		/// access queues without a formal definition.
 		/// </summary>
 		public static TeaTime tt(this MonoBehaviour instance, string queueName)
 		{
@@ -229,7 +240,7 @@ namespace matnesis.TeaTime
 
 
 		// Dependencies
-		private MonoBehaviour _instance = null; // Required to access Unity coroutine fuctions
+		internal MonoBehaviour _instance = null; // Required to access Unity coroutine fuctions
 		private Coroutine _currentCoroutine = null; // Coroutine that holds the queue execution
 
 
@@ -640,7 +651,6 @@ namespace matnesis.TeaTime
 			_tasks.Clear();
 			_currentTask = 0;
 			_executedCount = 0;
-			// _lastPlayExecutedCount = 0;
 
 			_isPlaying = false;
 			_isPaused = false;
