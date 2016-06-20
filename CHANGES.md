@@ -1,15 +1,21 @@
 # CHANGE LOG
 
+## v0.8.4 beta 2016/06/18
+
+- **NEW FEATURE**: **ttHandler.Wait(Func\<bool>, checkDelay)** will wait until
+  the boolean condition is fullfiled after the current callback execution,
+  checking every **checkDelay**.
+
 ## v0.8.3 beta 2016/05/27
 
 - **NEW FEATURE**: **.Wait(Func\<bool>, checkDelay)** will wait until the
-  boolean condition is fullfiled, every **checkDelay**.
+  boolean condition is fullfiled, checkingevery **checkDelay**.
 
 - **CHANGE**: **ttHandler.WaitFor(** renamed to **ttHandler.Wait(**. I'm
   experimenting with keeping the API at one word.
 
 - **NEW FEATURE**: All TeaTimes on **ttHandler.Wait(** are affected by
-  **.Stop()** and **.Reset()**.
+  **.Stop()** and **.Reset()** from their parent.
 
 - **BUG FIX**: **.Consume()** wasn't working because of certain **.Reverse()**
   mode validation. It works now.

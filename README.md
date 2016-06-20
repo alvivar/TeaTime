@@ -1,4 +1,4 @@
-# TeaTime v0.8.3 beta
+# TeaTime v0.8.4 beta
 
 _[Download](http://github.com/alvivar/TeaTime/raw/master/TeaTime.zip)_ /
 _[Examples](http://github.com/alvivar/TeaTime/tree/master/Examples)_
