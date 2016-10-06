@@ -2,15 +2,16 @@
 
 - More and better examples
 - A decent stress test
-- Maybe a TeaTime manager will be a better choice
+- A TeaTime manager that runs everything
+- Pool cache support
 - Improve time precision ^
 - Use arrays instead of generic lists ^
 
 ## DONE
 
-- x Yoyo mode (Forward, Backward cycle)
-- x A good testing to Reverse/Backward/Forward mode
-- x Rewrite the main algorithm to optimize coroutine instantiation
-- x Replace Foreachs by For
-- x TeaTime should be able to wait other TeaTimes
-- x Lots of things before starting this to-do
+- Yoyo mode (Forward, Backward cycle)
+- A good testing to Reverse/Backward/Forward mode
+- Rewrite the main algorithm to optimize coroutine instantiation
+- Replace Foreachs by For
+- TeaTime should be able to wait other TeaTimes
+- Lots of things before starting this to-do
