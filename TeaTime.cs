@@ -58,7 +58,10 @@ namespace matnesis.TeaTime
 	/// </summary>
 	public class ttHandler
 	{
-		public TeaTime self; // Current TeaTime instance
+		/// <summary>
+		/// Current TeaTime queue.
+		/// </summary>
+		public TeaTime self;
 
 		public float t = 0;
 		public float deltaTime = 0;
@@ -102,15 +105,17 @@ namespace matnesis.TeaTime
 
 
 		/// <summary>
-		/// Appends a TeaTime to wait after the current callback execution. It's
-		/// also affected by .Stop() and .Reset() from the parent queue.
+		/// Appends a TeaTime to wait after the current callback execution that
+		/// is also affected by the queue .Stop() and .Reset().
 		/// </summary>
 		public void Wait(TeaTime tt)
 		{
-			// A reference into the queue waiting list
-			if (!self._waiting.Contains(tt)) self._waiting.Add(tt);
-
-			Wait(tt.WaitForCompletion());
+			// A reference to the waiting list
+			if (!self._waiting.Contains(tt))
+			{
+				self._waiting.Add(tt);
+				Wait(tt.WaitForCompletion());
+			}
 		}
 
 
@@ -120,14 +125,14 @@ namespace matnesis.TeaTime
 		/// </summary>
 		public void Wait(Func<bool> condition, float checkDelay)
 		{
-			// #todo A new TeaTime everytime doesn't seem healthy
+			// #todo This need to be cached somehow
 			Wait(self._instance.tt().Wait(condition, checkDelay));
 		}
 	}
 
 
 	/// <summary>
-	/// TeaTime core extensions (Dark magic).
+	/// TeaTime core extensions (static magic).
 	/// </summary>
 	public static class TeaTimeExtensions
 	{
@@ -233,7 +238,7 @@ namespace matnesis.TeaTime
 	{
 		// Queue
 		private List<ttTask> _tasks = new List<ttTask>(); // Tasks list used as a queue
-		internal List<TeaTime> _waiting = new List<TeaTime>(); // TeaTimes to wait by ttHandler.Wait(
+		internal List<TeaTime> _waiting = new List<TeaTime>(); // TeaTimes to wait via ttHandler.Wait(
 		private int _currentTask = 0; // Current task mark (to be executed)
 		private int _executedCount = 0; // Executed task count
 		private int _lastPlayExecutedCount = 0; // Executed task count during the last play
@@ -933,8 +938,8 @@ namespace matnesis.TeaTime
 				}
 
 
-				// Consume mode removes the task after execution #todo Need to
-				// be tested with .Reverse() stuff
+				// Consume mode removes the task after execution
+				// #todo Need to be tested with .Reverse() stuff
 				if (_isConsuming)
 				{
 					_currentTask -= 1;
@@ -966,7 +971,7 @@ namespace matnesis.TeaTime
 				// Just at the end of a complete queue execution
 				if (_tasks.Count > 0 && _currentTask >= _tasks.Count)
 				{
-					// A new cycle begins
+					// Forget current nested queues
 					_waiting.Clear();
 				}
 			}
@@ -981,8 +986,10 @@ namespace matnesis.TeaTime
 	}
 }
 
+
 // <3
 // Lerp t Formulas
+
 
 // Ease out
 // t = Mathf.Sin(t * Mathf.PI * 0.5f);
