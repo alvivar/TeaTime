@@ -1,5 +1,10 @@
 # CHANGE LOG
 
+## v0.8.5 beta 2016/06/18
+
+- **BUG FIX**: Nested TeaTimes inside another TeaTime on **Repeat** used to
+  fail. The **_waiting** list wasn't clear out properly.
+
 ## v0.8.4 beta 2016/06/18
 
 - **NEW FEATURE**: **ttHandler.Wait(Func\<bool>, checkDelay)** will wait until
