@@ -2,8 +2,8 @@
 
 ## Timed Callbacks
 
-- .Add(
-- .Loop(
+- Add(
+- Loop(
 
 ## Queue Modes
 
