@@ -3,9 +3,11 @@
 - More and better examples
 - A decent stress test
 - A TeaTime manager that runs everything
-- Pool cache support
+- Pool cache support ^
 - Improve time precision ^
 - Use arrays instead of generic lists ^
+- A way to allow parallel teatimes (.Now?)
+- The waitingList bug when a TeaTime waits another TeaTime
 
 ## DONE
 
