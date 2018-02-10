@@ -468,6 +468,24 @@ namespace matnesis.TeaTime
 
 
         // @
+        // INTERPOLATION
+
+        /// <summary>
+	    ///
+	    /// </summary>
+        public TeaTime Lerp(Vector3 from, Vector3 to, float time, Action<Vector3> callback, Func<float, float> easef = null)
+        {
+            return Loop(time, t =>
+            {
+                callback(Vector3.Lerp(
+                    from, to,
+                    easef != null ? easef(t.t) : t.t
+                ));
+            });
+        }
+
+
+        // @
         // QUEUE MODES
 
 
@@ -779,6 +797,14 @@ namespace matnesis.TeaTime
             int reverseLastTask = -1; // Important: This value needs to be reset to default on most queue changes
             _lastPlayExecutedCount = 0;
 
+
+            // :D!
+            // Let's wait
+            // 1 For secuencial Adds or Loops before their first execution
+            // 2 Maybe a callback is trying to modify his own queue
+            yield return ttYield.EndOfFrame;
+
+
             while (_currentTask < _tasks.Count)
             {
                 // Current task to be executed
@@ -796,10 +822,8 @@ namespace matnesis.TeaTime
                 reverseLastTask = taskId;
 
 
-                // Let's wait
-                // 1 For secuencial Adds or Loops before their first execution
-                // 2 Maybe a callback is trying to modify his own queue
-                yield return ttYield.EndOfFrame;
+                // :D?
+                // yield return ttYield.EndOfFrame;
 
 
                 // It's a loop
@@ -850,7 +874,7 @@ namespace matnesis.TeaTime
 
                         float unityDeltaTime = Time.deltaTime;
 
-                        // Completion% from 0 to 1
+                        // Completion % from 0 to 1
                         if (!isInfinite)
                             loopHandler.t += tRate * unityDeltaTime;
 
@@ -908,9 +932,18 @@ namespace matnesis.TeaTime
                     if (currentTask.timeByFunc != null)
                         delayDuration += currentTask.timeByFunc();
 
-                    // Time delay
-                    if (delayDuration > 0)
-                        yield return ttYield.Seconds(delayDuration);
+
+                    // // Time delay
+                    // if (delayDuration > 0)
+                    //     yield return ttYield.Seconds(delayDuration);
+
+                    // Is this more precise that the previous commented code?
+                    float time = 0;
+                    while (time < delayDuration)
+                    {
+                        time += Time.deltaTime;
+                        yield return null;
+                    }
 
 
                     // Pause?
