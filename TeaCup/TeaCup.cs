@@ -1,5 +1,5 @@
 
-// Experimental TeaTime prototype to research a better core algorithm.
+// The most awesome Action Timed Queue I can create!
 
 // @matnesis
 // 2016/11/12 07:31 PM
@@ -12,25 +12,17 @@ namespace matnesis.TeaCup
 {
     public class TeaCup
     {
-        public TeaCupTaskList tasks = new TeaCupTaskList();
-
-        public float elapsedTime = 0; // Time that has been running during the current execution
-        public float totalElapsedTime = 0; // Total time that has been running since the beginning
-        public int executedCount = 0; // Times that has been executed completely
-
-        public bool hasRepeatMode = false; // On true, the TeaCup will repeat again at the end
-        public bool hasUnscaledTime = false; // Use Time.unscaledDeltaTime instead of Time.delta to calculations.
-        public bool hasReverseMode = false; // Run backwards
+        public TeaCupQueue queue = new TeaCupQueue();
 
 
         /// <summary>
-        /// Adds everything.
+        /// Appends everything.
         /// </summary>
         private TeaCup Add(float timeDelay, float loopDuration, Action<TeaCupHandler> action)
         {
-            tasks.Add(timeDelay, loopDuration, action);
+            queue.Add(timeDelay, loopDuration, action);
 
-            return TeaCupCore.Init(this);
+            return TeaCupServer.Init(this);
         }
 
         /// <summary>
@@ -43,7 +35,7 @@ namespace matnesis.TeaCup
 
 
         /// <summary>
-        /// Appends an Action that itself constantly for a certain duration.
+        /// Appends an Action that loops itself constantly for a certain duration.
         /// </summary>
         public TeaCup Loop(float duration, Action<TeaCupHandler> action)
         {
@@ -52,22 +44,22 @@ namespace matnesis.TeaCup
 
 
         /// <summary>
-        /// [MODE] Repeat again at the end.
+        /// [MODE] Use Time.unscaledDeltaTime instead of Time.delta to calculations.
         /// </summary>
-        public TeaCup Repeat(bool value = true)
+        public TeaCup UnscaledTime(bool value = true)
         {
-            hasRepeatMode = value;
+            queue.isUnscaled = value;
 
             return this;
         }
 
 
         /// <summary>
-        /// [MODE] Use Time.unscaledDeltaTime instead of Time.delta to calculations.
+        /// [MODE] Repeat again at the end.
         /// </summary>
-        public TeaCup UnscaledTime(bool value = true)
+        public TeaCup Repeat(bool value = true)
         {
-            hasUnscaledTime = value;
+            queue.isRepeatable = value;
 
             return this;
         }
@@ -78,10 +70,9 @@ namespace matnesis.TeaCup
         /// </summary>
         public TeaCup Reverse(bool value = true)
         {
-            hasReverseMode = value;
+            queue.isReversed = value;
 
             return this;
         }
-
     }
 }
