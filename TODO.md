@@ -1,5 +1,8 @@
 # TO DO
 
+- this.tt() should be cacheable when ends
+- this.tt() should be collected so it can be handled by the manager
+
 - More and better examples
 - A decent stress test
 - A TeaTime manager that runs everything
