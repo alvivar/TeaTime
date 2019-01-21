@@ -1,16 +1,13 @@
-﻿
-// Useful TeaTime patterns!
+﻿// Useful TeaTime patterns!
 
 // 2016/03/18 06:15 PM
 
-
-using UnityEngine;
-using matnesis.TeaTime; // Add the namespace!
+using matnesis.TeaTime;
+using UnityEngine; // Add the namespace!
 
 public class TeaTimePatterns : MonoBehaviour
 {
     public bool doSomething = false;
-
 
     void Start()
     {
@@ -21,15 +18,13 @@ public class TeaTimePatterns : MonoBehaviour
             Debug.Log("simpleDelay: Two seconds later, just once!" + Time.time);
         });
 
-
         // @
         // Something that repeats itself every 3 seconds.
         TeaTime repeatDelay = this.tt().Add(() =>
-        {
-            Debug.Log("repeatDelay: Every 3 seconds, repeats forever! " + Time.time);
-        })
-        .Add(3).Repeat();
-
+            {
+                Debug.Log("repeatDelay: Every 3 seconds, repeats forever! " + Time.time);
+            })
+            .Add(3).Repeat();
 
         // @
         // A controlled frame by frame loop (update-like) with 1.5 seconds duration!
@@ -37,7 +32,6 @@ public class TeaTimePatterns : MonoBehaviour
         {
             Debug.Log("updateLike: Frame by frame during 1.5 seconds, just once! " + Time.time);
         });
-
 
         // @
         // A simple delay without autoplay.
@@ -48,26 +42,34 @@ public class TeaTimePatterns : MonoBehaviour
 
         somethingForLater.Play();
 
-
         // @
         // A tween-like with before and after setup.
         TeaTime tweenLike = this.tt().Add(() =>
-        {
-            Debug.Log("tweenLike: Just before the 4 seconds loop! " + Time.time);
-            transform.position = new Vector3(999, 999, 999);
-        })
-        .Loop(4, (ttHandler loop) =>
-        {
-            transform.position = Vector3.Lerp(
-                transform.position,
-                Vector3.zero,
-                loop.deltaTime);
-        })
-        .Add(() =>
-        {
-            Debug.Log("tweenLike: Just after the 4 seconds loop! " + Time.time);
-        });
+            {
+                Debug.Log("tweenLike: Just before the 4 seconds loop! " + Time.time);
+                transform.position = new Vector3(999, 999, 999);
+            })
+            .Loop(4, (ttHandler loop) =>
+            {
+                transform.position = Vector3.Lerp(
+                    transform.position,
+                    Vector3.zero,
+                    loop.deltaTime);
+            })
+            .Add(() =>
+            {
+                Debug.Log("tweenLike: Just after the 4 seconds loop! " + Time.time);
+            });
 
+        // @
+        // Something per second time lock.
+        var somethingPerSecond = this.tt()
+            .Add(() =>
+            {
+                Debug.Log("somethingPerSecond: This " + Time.time);
+            })
+            .Add(1, t => t.self.Reset())
+            .Immutable();
 
         // #todo Fix this pattern as example of a waiting loop
         // Loading the first level!
@@ -87,7 +89,6 @@ public class TeaTimePatterns : MonoBehaviour
         //         SceneManager.UnloadScene(levelToUnload);
         // })
         // .Immutable();
-
 
         //
         // More to come! Soon!
