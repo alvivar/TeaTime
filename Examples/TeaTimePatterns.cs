@@ -2,7 +2,6 @@
 
 // 2016/03/18 06:15 PM
 
-using matnesis.TeaTime;
 using UnityEngine; // Add the namespace!
 
 public class TeaTimePatterns : MonoBehaviour

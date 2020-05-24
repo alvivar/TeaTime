@@ -1,55 +1,50 @@
-
 // This tests a TeaTime that waits nested TeaTimes.
 
 // @matnesis
 // 2017/03/04 01:37 PM
 
-
 using UnityEngine;
-using matnesis.TeaTime;
 
 public class TeaTimeTestCase2 : MonoBehaviour
 {
     TeaTime queue;
 
-
     void Start()
     {
         queue = this.tt("@master").Pause().Add(t =>
-        {
-            TeaTime chosen = null;
-
-            switch (Random.Range(0, 3))
             {
-                case 0:
-                    chosen = this.tt("@1").Add(1, t2 =>
-                    {
-                        Debug.Log("Waits 1 " + Time.time);
-                    })
-                    .Immutable();
-                    break;
-                case 1:
-                    chosen = this.tt("@2").Add(2, t2 =>
-                    {
-                        Debug.Log("Waits 2 " + Time.time);
-                    })
-                    .Immutable();
-                    break;
-                case 2:
-                    chosen = this.tt("@3").Add(3, t2 =>
-                    {
-                        Debug.Log("Waits 3 " + Time.time);
-                    })
-                    .Immutable();
-                    break;
-            }
+                TeaTime chosen = null;
 
-            t.Wait(chosen);
-            Debug.Log("New cycle " + Time.time);
-        })
-        .Repeat();
+                switch (Random.Range(0, 3))
+                {
+                    case 0:
+                        chosen = this.tt("@1").Add(1, t2 =>
+                            {
+                                Debug.Log("Waits 1 " + Time.time);
+                            })
+                            .Immutable();
+                        break;
+                    case 1:
+                        chosen = this.tt("@2").Add(2, t2 =>
+                            {
+                                Debug.Log("Waits 2 " + Time.time);
+                            })
+                            .Immutable();
+                        break;
+                    case 2:
+                        chosen = this.tt("@3").Add(3, t2 =>
+                            {
+                                Debug.Log("Waits 3 " + Time.time);
+                            })
+                            .Immutable();
+                        break;
+                }
+
+                t.Wait(chosen);
+                Debug.Log("New cycle " + Time.time);
+            })
+            .Repeat();
     }
-
 
     void Update()
     {
