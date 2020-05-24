@@ -1,6 +1,10 @@
 # CHANGE LOG
 
-## v0.8.6 beta 2020/05/23
+## v0.8.7 beta
+
+- Working in progress!
+
+## v0.8.7 beta 2020/05/23
 
 - **CHANGE**: Namespace is out, just add the file to your project and use it
   right away.

@@ -7,6 +7,10 @@
 # Sublime
 *.sublime-workspace
 
+# FreeFileSync
+sync.ffs_db
+sync.ffs_db.meta
+
 # VS/MD
 *.booproj
 *.csproj
