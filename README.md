@@ -45,4 +45,4 @@ Feel free to ask me about it!
 By **[Andrés Villalobos](http://twitter.com/matnesis)**.
 
 
-> Created 2014/12/26 12:21 am ^ Rewritten 2015/09/15 12:28 pm
+> Created 2014/12/26 12:21 am | Rewritten 2015/09/15 12:28 pm
