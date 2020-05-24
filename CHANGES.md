@@ -1,5 +1,12 @@
 # CHANGE LOG
 
+## v0.8.6 beta 2020/05/23
+
+- **CHANGE**: Namespace is out, just add the file to your project and use it
+  right away.
+
+- **COMMENTS**: Removed Summary from comments.
+
 ## v0.8.5 beta 2016/06/18
 
 - **BUG FIX**: Nested TeaTimes inside another TeaTime on **Repeat** used to
