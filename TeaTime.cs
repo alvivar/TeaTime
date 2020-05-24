@@ -352,19 +352,6 @@ public class TeaTime
         return Loop(-1, null, callback);
     }
 
-    // INTERPOLATION
-
-    public TeaTime Lerp(Vector3 from, Vector3 to, float time, Action<Vector3> callback, Func<float, float> easef = null)
-    {
-        return Loop(time, t =>
-        {
-            callback(Vector3.Lerp(
-                from, to,
-                easef != null ? easef(t.t) : t.t
-            ));
-        });
-    }
-
     // QUEUE MODES
 
     /// Enables Immutable mode, the queue will ignore new appends (.Add
