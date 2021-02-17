@@ -1,22 +1,19 @@
-﻿// Queue of tweens example 2
+﻿// A queue of tweens.
 
 // 2015/10/05 05:54:55 PM
 
 using UnityEngine;
 
-public class TeaTimeTweenQueue2 : MonoBehaviour
+public class TweenQueue2 : MonoBehaviour
 {
     public Transform cube;
     public Renderer cubeRen;
 
-    // Declare your queue
     TeaTime queue;
 
     void Start()
     {
-        // Instantiate
         queue = new TeaTime(this);
-        // or you can use this shortcut: 'queue = this.tt();' (special MonoBehaviour extension)
 
         // Adds a one second callback loop that lerps to a random color.
         queue.Loop(1f, (ttHandler t) =>

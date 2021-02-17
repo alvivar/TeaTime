@@ -7,7 +7,7 @@
 
 using UnityEngine;
 
-public class TeaTimeStressTest1 : MonoBehaviour
+public class StressTest : MonoBehaviour
 {
     public float addFrameCount = 0;
     public float loopFrameCount = 0;

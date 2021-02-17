@@ -6,28 +6,24 @@
 
 using UnityEngine;
 
-public class TeaTimeReverse1 : MonoBehaviour
+public class ReverseLerp : MonoBehaviour
 {
     public Renderer cubeRen;
 
     private bool lastCompletion = false;
 
-    // Declare your queue
     TeaTime queue;
 
     void Start()
     {
-        // Instantiate
         queue = new TeaTime(this);
-        // or you can use this shortcut: 'queue = this.tt();' (special
-        // MonoBehaviour extension)
 
         // Adds a one second callback loop that lerps to a random color.
         queue
             .Add(() => Debug.Log("Queue Beginning " + Time.time))
             .Loop(1, (ttHandler t) =>
             {
-                // From white to black, using .t (completion float from 0.0 to 1.0)
+                // From white to black, using .t (completion float from 0.0 to 1.0).
                 cubeRen.material.color = Color.Lerp(
                     Color.white,
                     Color.black,
@@ -42,8 +38,9 @@ public class TeaTimeReverse1 : MonoBehaviour
             })
             .Add(() => Debug.Log("Queue End " + Time.time))
             .Yoyo();
+
         // Yoyo mode will .Reverse() the queue execution order when the queue is
-        // completed
+        // completed.
     }
 
     void Update()
