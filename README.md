@@ -26,15 +26,14 @@ coroutines patterns in Unity games.
     .Repeat(); // Repeats forever!
 
     // And more!
-    queue.Pause();
-    queue.Immutable();
+    queue.Reverse();
+    queue.Yoyo();
     queue.Immutable();
     queue.Play();
+    queue.Pause();  
     queue.Stop();
 
 Check out the _[examples](https://github.com/alvivar/TeaTime/tree/master/Examples)_ and the _[API](https://github.com/alvivar/TeaTime/tree/master/API.md)_.
-
-Feel free to ask me about it!
 
 By **[Andrés Villalobos](https://twitter.com/matnesis)**.
 
