@@ -38,5 +38,5 @@
 
 ## ttHandler
 
-- EndLoop()
+- Break()
 - Wait(

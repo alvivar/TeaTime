@@ -1,8 +1,10 @@
 # CHANGE LOG
 
-## v0.8.7 beta
+## v0.8.8 beta 2021.02.17
 
-- Working in progress!
+- **REVISION**: Experimental optimizations.
+
+- **CHANGE**: ttHandler.EndLoop( renamed to .Break(. More natural and classic.
 
 ## v0.8.7 beta 2020/05/23
 
@@ -14,7 +16,7 @@
 ## v0.8.5 beta 2016/06/18
 
 - **BUG FIX**: Nested TeaTimes inside another TeaTime on **Repeat** used to
-  fail. The **_waiting** list wasn't clear out properly.
+  fail. The **\_waiting** list wasn't clear out properly.
 
 ## v0.8.4 beta 2016/06/18
 
@@ -44,7 +46,7 @@
 ## v0.8 beta 2016/04/26
 
 - **NEW FEATURES**: **.Backward()** **.Forward()** and **.Reverse()** allows you
-  give a direction to the queue execution!**
+  give a direction to the queue execution!\*\*
 
 **_[Thank you Xerios!](http://github.com/alvivar/TeaTime/pull/8)_**
 
