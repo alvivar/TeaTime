@@ -32,8 +32,7 @@ coroutines patterns in Unity games.
     queue.Play();
     queue.Stop();
 
-_[Examples](https://github.com/alvivar/TeaTime/tree/master/Examples)_!
-_[API](https://github.com/alvivar/TeaTime/tree/master/API.md)_
+Check out the _[examples](https://github.com/alvivar/TeaTime/tree/master/Examples)_ and the _[API](https://github.com/alvivar/TeaTime/tree/master/API.md)_.
 
 Feel free to ask me about it!
 
