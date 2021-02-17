@@ -4,6 +4,8 @@
 
 - Add(
 - Loop(
+- If(Func \<bool>)
+- Wait(Func \<bool>)
 
 ## Queue Modes
 
@@ -26,11 +28,6 @@
 ## Destruction
 
 - Reset()
-
-## Special
-
-- If(Func \<bool>)
-- Wait(Func \<bool>)
 
 ## Custom Yields
 
