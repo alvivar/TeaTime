@@ -29,9 +29,6 @@ coroutines patterns in Unity games.
     queue.Reverse();
     queue.Yoyo();
     queue.Immutable();
-    queue.Play();
-    queue.Pause();  
-    queue.Stop();
 
 Check out the _[examples](https://github.com/alvivar/TeaTime/tree/master/Examples)_ and the _[API](https://github.com/alvivar/TeaTime/tree/master/API.md)_.
 
