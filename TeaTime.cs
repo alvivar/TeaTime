@@ -398,7 +398,9 @@ public class TeaTime
     /// other.
     public TeaTime Forward()
     {
-        if (_isReversed) return this.Reverse();
+        if (_isReversed)
+            return this.Reverse();
+
         return this;
     }
 
@@ -485,7 +487,10 @@ public class TeaTime
     {
         // Reset current
         if (_currentCoroutine != null)
+        {
             _instance.StopCoroutine(_currentCoroutine);
+            _currentCoroutine = null;
+        }
 
         _tasks.Clear();
         _currentTask = 0;

@@ -1,9 +1,6 @@
-
 // Easing functions <3
 
-// @matnesis
 // 2016/06/18 01:17 AM
-
 
 using UnityEngine;
 
