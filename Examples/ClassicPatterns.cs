@@ -6,33 +6,31 @@ using UnityEngine;
 
 public class ClassicPatterns : MonoBehaviour
 {
-    public bool doSomething = false;
-
     void Start()
     {
         // A simple 2 seconds delay.
         TeaTime simpleDelay = this.tt().Add(2, () =>
         {
-            Debug.Log("simpleDelay: Two seconds later, just once!" + Time.time);
+            Debug.Log($"simpleDelay: Two seconds later, just once! {Time.time}");
         });
 
         // Something that repeats itself every 3 seconds.
         TeaTime repeatDelay = this.tt().Add(() =>
             {
-                Debug.Log("repeatDelay: Every 3 seconds, repeats forever! " + Time.time);
+                Debug.Log($"repeatDelay: Every 3 seconds, repeats forever! {Time.time}");
             })
             .Add(3).Repeat();
 
         // A controlled frame by frame loop (update-like) with 1.5 seconds duration!
         TeaTime updateLike = this.tt().Loop(1.5f, (ttHandler loop) =>
         {
-            Debug.Log("updateLike: Frame by frame during 1.5 seconds, just once! " + Time.time);
+            Debug.Log($"updateLike: Frame by frame during 1.5 seconds, just once! {Time.time}");
         });
 
         // A simple delay without autoplay.
         TeaTime somethingForLater = this.tt().Pause().Add(3, () =>
         {
-            Debug.Log("somethingForLater: Someone called 'somethingForLater.Play()' 3 second ago! " + Time.time);
+            Debug.Log($"somethingForLater: Someone called 'somethingForLater.Play()' 3 second ago! {Time.time}");
         });
 
         somethingForLater.Play();
@@ -40,7 +38,7 @@ public class ClassicPatterns : MonoBehaviour
         // A tween-like with before and after setup.
         TeaTime tweenLike = this.tt().Add(() =>
             {
-                Debug.Log("tweenLike: Just before the 4 seconds loop! " + Time.time);
+                Debug.Log($"tweenLike: Just before the 4 seconds loop! {Time.time}");
                 transform.position = new Vector3(999, 999, 999);
             })
             .Loop(4, (ttHandler loop) =>
@@ -52,26 +50,13 @@ public class ClassicPatterns : MonoBehaviour
             })
             .Add(() =>
             {
-                Debug.Log("tweenLike: Just after the 4 seconds loop! " + Time.time);
+                Debug.Log($"tweenLike: Just after the 4 seconds loop! {Time.time}");
             });
-
-        // Something per second time lock.
-        var somethingPerSecond = this.tt()
-            .Add(() =>
-            {
-                Debug.Log("somethingPerSecond: This " + Time.time);
-            })
-            .Add(1, t => t.self.Reset())
-            .Immutable();
-
-        //
-        // Work in progress. More to come!
-        //
     }
 }
 
-// @todo Fix this pattern as example of a waiting loop
-// Loading the first level!
+// @todo Fix this pattern as example of a waiting loop Loading the first level.
+
 // this.tt("@LoadUnload").Pause().Add((ttHandler t) =>
 // {
 //     if (levelToLoad >= 0)
