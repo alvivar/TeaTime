@@ -24,16 +24,13 @@
 - Play()
 - Restart()
 - Release()
-
-## Destruction
-
 - Reset()
 
 ## Custom Yields
 
 - WaitForCompletion()
 
-## ttHandler
+## TeaHandler
 
 - Break()
 - Wait(

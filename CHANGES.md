@@ -1,10 +1,22 @@
-# CHANGE LOG
+# Change Log
 
-## v0.8.8 beta 2021.02.17
+## v0.9 2021/10/03
+
+- **REVISION**: Bug hunt, code clean up, aesthetic and better examples. It's no
+  longer **beta**.
+
+- **CHANGE**: **.Add(** can wait other TeaTimes, instead of **TeaHandler.Wait(**
+  that no longer waits TeaTimes.
+
+- **BUG FIX**: **.Reverse()** works correctly when a TeaTime starts reversed
+  from the beginning.
+
+## v0.8.8 beta 2021/02/17
 
 - **REVISION**: Experimental optimizations.
 
-- **CHANGE**: ttHandler.EndLoop( renamed to .Break(. More natural and classic.
+- **CHANGE**: **TeaHandler.EndLoop(** renamed to **.Break(**. More natural and
+  classic.
 
 ## v0.8.7 beta 2020/05/23
 
@@ -20,7 +32,7 @@
 
 ## v0.8.4 beta 2016/06/18
 
-- **NEW FEATURE**: **ttHandler.Wait(Func\<bool>, checkDelay)** will wait until
+- **NEW FEATURE**: **TeaHandler.Wait(Func\<bool>, checkDelay)** will wait until
   the boolean condition is fullfiled after the current callback execution,
   checking every **checkDelay**.
 
@@ -29,10 +41,10 @@
 - **NEW FEATURE**: **.Wait(Func\<bool>, checkDelay)** will wait until the
   boolean condition is fullfiled, checkingevery **checkDelay**.
 
-- **CHANGE**: **ttHandler.WaitFor(** renamed to **ttHandler.Wait(**. I'm
+- **CHANGE**: **TeaHandler.WaitFor(** renamed to **TeaHandler.Wait(**. I'm
   experimenting with keeping the API at one word.
 
-- **NEW FEATURE**: All TeaTimes on **ttHandler.Wait(** are affected by
+- **NEW FEATURE**: All TeaTimes on **TeaHandler.Wait(** are affected by
   **.Stop()** and **.Reset()** from their parent.
 
 - **BUG FIX**: **.Consume()** wasn't working because of certain **.Reverse()**
@@ -59,9 +71,9 @@
 ## v0.7.7 beta 2016/04/24
 
 - **NEW**: **.WaitForCompletion()** returns a YieldInstruction, this way TeaTime
-  can **ttHandler.WaitFor** other TeaTimes.
+  can **TeaHandler.WaitFor** other TeaTimes.
 
-- **CHANGE**: **ttHandler.Break()** renamed to .EndLoop, clarity +1
+- **CHANGE**: **TeaHandler.Break()** renamed to .EndLoop, clarity +1
 
 - **BUG FIX**: Using a Func\<float> as time wasn't working as expected, it's
   awesome now.
@@ -86,7 +98,7 @@
 
 ## v0.7.3 beta 2015/12/14
 
-- **NEW**: **ttHandler** now holds a reference to itselfs (**.self**).
+- **NEW**: **TeaHandler** now holds a reference to itselfs (**.self**).
 
 ## v0.7.2 beta 2015/10/19
 
@@ -137,7 +149,7 @@
 
 ## v0.6.5.3
 
-- **UPGRADE** .WaitFor() from ttHandler now queues his arguments every time is
+- **UPGRADE** .WaitFor() from TeaHandler now queues his arguments every time is
   called, it also executes and waits IEnumerators.
 
 - **UPGRADE** .ttAdd() now supports single YieldInstructions.
@@ -207,7 +219,7 @@
 
 ## v0.5.8
 
-- **NEW**: ttHandler.t has returned. It contains the completion percentage
+- **NEW**: TeaHandler.t has returned. It contains the completion percentage
   expresed from 0 to 1 for timed loops (i.e. On half duration t = 0.5).
 
 ## v0.5.7
@@ -218,7 +230,7 @@
 
 ## v0.5.4
 
-- **CHANGE**: ttHandler.t renamed to ttHandler.deltaTime (algorithm greatly
+- **CHANGE**: TeaHandler.t renamed to TeaHandler.deltaTime (algorithm greatly
   improved!).
 
 ## v0.5.2
@@ -242,9 +254,9 @@
 
 ## v0.5
 
-- **NEW**: ttHandler now supports Append(.
+- **NEW**: TeaHandler now supports Append(.
 
-- **NEW**: ttHandler 'WaitFor(', waits for a yield or time after the current
+- **NEW**: TeaHandler 'WaitFor(', waits for a yield or time after the current
   callback execution, just before the next queued callback.
 
 ## v0.4
@@ -252,7 +264,7 @@
 - **NEW**: AppendLoop(, appends a callback that runs frame by frame for his
   duration (or infinite) into a queue.
 
-- **NEW**: ttHandler, supports and manage AppendLoop with 't' (completion rate
+- **NEW**: TeaHandler, supports and manage AppendLoop with 't' (completion rate
   from 0 to 1), 'timeSinceStart' and 'Break()'.
 
 - **CHANGE**: ttNow( renamed to ttInvoke.

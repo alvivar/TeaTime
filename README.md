@@ -1,7 +1,6 @@
 # TeaTime
 
-TeaTime is a fast & simple queue for timed callbacks, focused on solving common
-coroutines patterns in Unity games.
+TeaTime is a fast & simple queue for timed callbacks, focused on solving common coroutines patterns in Unity games.
 
     // Inside MonoBehaviours
     TeaTime queue = this.tt().Add(1, () =>
@@ -9,7 +8,7 @@ coroutines patterns in Unity games.
         // The queue autoplays by default
         Debug.Log($"One second later! {Time.time}");
     })
-    .Loop(3, (ttHandler loop) =>
+    .Loop(3, (TeaHandler loop) =>
     {
         // This callback is repeated per frame during the loop duration
         transform.position =
@@ -31,7 +30,3 @@ coroutines patterns in Unity games.
     queue.Immutable();
 
 Check out the _[examples](https://github.com/alvivar/TeaTime/tree/master/Examples)_ and the _[API](https://github.com/alvivar/TeaTime/tree/master/API.md)_.
-
-By **[Andrés Villalobos](https://twitter.com/matnesis)**.
-
-> Created 2014/12/26 12:21 am ~ Rewritten 2015/09/15 12:28 pm ~ Last revision 2021.02.16 11.53 pm
