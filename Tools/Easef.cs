@@ -1,7 +1,3 @@
-// Easing functions <3
-
-// 2016/06/18 01:17 AM
-
 using UnityEngine;
 
 public static class Easef
@@ -31,3 +27,5 @@ public static class Easef
         return 1f - Mathf.Cos(t * Mathf.PI * 0.5f);
     }
 }
+
+// 2016/06/18 01:17 AM
