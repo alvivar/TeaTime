@@ -1,11 +1,11 @@
 // If every Debug.Log follows in order one after the other, with 1 second
-// between them, then everything is fine! It's different on reverse tho.
+// between them, then everything is fine!
 
-// 2015/09/15 12:47:29 PM
+// It's a different test on reverse.
 
 using UnityEngine;
 
-public class TestingWaiting : MonoBehaviour
+public class OneSecondDelay : MonoBehaviour
 {
     TeaTime queue;
 
@@ -24,7 +24,7 @@ public class TestingWaiting : MonoBehaviour
             {
                 Debug.Log("Step 2 " + Time.time);
             })
-            .Add(1, (ttHandler t) =>
+            .Add(1, (TeaHandler t) =>
             {
                 Debug.Log("Step 3 " + Time.time);
                 t.Wait(1);
@@ -33,7 +33,7 @@ public class TestingWaiting : MonoBehaviour
             {
                 Debug.Log("Step 4 " + Time.time);
             })
-            .Loop(1, (ttHandler t) =>
+            .Loop(1, (TeaHandler t) =>
             {
 
             })
@@ -41,7 +41,7 @@ public class TestingWaiting : MonoBehaviour
             {
                 Debug.Log("Step 5 " + Time.time);
             })
-            .Loop((ttHandler t) =>
+            .Loop((TeaHandler t) =>
             {
                 if (t.timeSinceStart >= 1)
                     t.Break();
@@ -50,7 +50,7 @@ public class TestingWaiting : MonoBehaviour
             {
                 Debug.Log("Step 6 " + Time.time);
             })
-            .Loop(0, (ttHandler t) =>
+            .Loop(0, (TeaHandler t) =>
             {
                 // Ignorable loop
             })
@@ -58,11 +58,11 @@ public class TestingWaiting : MonoBehaviour
             {
                 Debug.Log("Step 7 " + Time.time);
             })
-            .Add((ttHandler t) =>
+            .Add((TeaHandler t) =>
             {
                 // WaitFor a Loop and an Add
                 t.Wait(this.tt()
-                    .Loop(0.5f, (ttHandler) => { })
+                    .Loop(0.5f, (TeaHandler) => { })
                     .Add(0.5f, () =>
                     {
                         Debug.Log($"Step 8 {Time.time}");
@@ -119,3 +119,5 @@ public class TestingWaiting : MonoBehaviour
         }
     }
 }
+
+// 2015/09/15 12:47:29 PM

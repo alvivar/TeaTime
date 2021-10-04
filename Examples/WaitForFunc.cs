@@ -1,41 +1,42 @@
-﻿// Wait!
+﻿// Wait for a dynamic delay.
 
 using UnityEngine;
 
 public class WaitForFunc : MonoBehaviour
 {
-    public bool something = false;
+    public bool dynamicDelay = false;
 
     void Start()
     {
         TeaTime untilTrueFunc = this.tt()
-            .Wait(() => something, 0.1f)
+            .Wait(() => dynamicDelay, 0.1f)
             .Add(() =>
             {
-                Debug.Log($"Prelude at {Time.time}");
+                Debug.Log($"Prelude A at {Time.time}");
             })
             .Loop(0.1f, t =>
             {
-                Debug.Log($"Action! at {Time.time}");
+                Debug.Log($"Action A at {Time.time}");
             });
 
-        // Both are equivalent. Wait( is syntactic sugar.
+        // Both are equivalent. Wait( is syntactic sugar of a Break inside a
+        // loop.
 
         TeaTime waitIsSyntacticSugar = this.tt()
-            .Loop((ttHandler t) =>
+            .Loop((TeaHandler t) =>
             {
-                if (something)
+                if (dynamicDelay)
                     t.Break();
 
                 t.Wait(0.1f);
             })
             .Add(() =>
             {
-                Debug.Log($"Prelude at {Time.time}");
+                Debug.Log($"Prelude B at {Time.time}");
             })
             .Loop(0.1f, t =>
             {
-                Debug.Log($"Action! at {Time.time}");
+                Debug.Log($"Action B at {Time.time}");
             });
     }
 }

@@ -1,9 +1,4 @@
-﻿// Some day this will be a good stress test for TeaTime.
-
-// Just add the script into a new scene, hit play, watch the profiler and make a
-// guess!
-
-// 2016/04/26 04:37 PM
+﻿// Check the profiler!
 
 using UnityEngine;
 
@@ -23,11 +18,11 @@ public class StressTest : MonoBehaviour
                 for (int i = 0; i < 10000; i++)
                 {
                     // Call them quick
-                    queue.Add(0.10f, (ttHandler t) =>
+                    queue.Add(0.10f, (TeaHandler t) =>
                         {
                             addFrameCount += 1;
                         })
-                        .Loop(0.10f, (ttHandler t) =>
+                        .Loop(0.10f, (TeaHandler t) =>
                         {
                             loopFrameCount += 1;
                         });
@@ -37,3 +32,5 @@ public class StressTest : MonoBehaviour
             .Repeat();
     }
 }
+
+// 2016/04/26 04:37 PM
