@@ -143,17 +143,33 @@ public static class TeaYield
 {
     private class FloatComparer : IEqualityComparer<float>
     {
-        bool IEqualityComparer<float>.Equals(float x, float y) { return x == y; }
-        int IEqualityComparer<float>.GetHashCode(float obj) { return obj.GetHashCode(); }
+        bool IEqualityComparer<float>.Equals(float x, float y)
+        {
+            return x == y;
+        }
+
+        int IEqualityComparer<float>.GetHashCode(float obj)
+        {
+            return obj.GetHashCode();
+        }
     }
 
-    private static Dictionary<float, WaitForSeconds> secondsCache = new Dictionary<float, WaitForSeconds>(new FloatComparer());
+    private static Dictionary<float, WaitForSeconds> secondsCache = new Dictionary<
+        float,
+        WaitForSeconds
+    >(new FloatComparer());
 
     private static WaitForEndOfFrame endOfFrame = new WaitForEndOfFrame();
-    public static WaitForEndOfFrame EndOfFrame { get { return endOfFrame; } }
+    public static WaitForEndOfFrame EndOfFrame
+    {
+        get { return endOfFrame; }
+    }
 
     private static WaitForFixedUpdate fixedUpdate = new WaitForFixedUpdate();
-    public static WaitForFixedUpdate FixedUpdate { get { return fixedUpdate; } }
+    public static WaitForFixedUpdate FixedUpdate
+    {
+        get { return fixedUpdate; }
+    }
 
     public static WaitForSeconds WaitForSeconds(float seconds)
     {
@@ -229,7 +245,12 @@ public class TeaTime
     // ADD
 
     /// Appends a new TeaTask.
-    private TeaTime Add(float timeDelay, Func<float> timeDelayByFunc, Action callback, Action<TeaHandler> callbackWithHandler)
+    private TeaTime Add(
+        float timeDelay,
+        Func<float> timeDelayByFunc,
+        Action callback,
+        Action<TeaHandler> callbackWithHandler
+    )
     {
         // Ignores appends on Immutable mode
         if (!isImmutable)
@@ -556,13 +577,15 @@ public class TeaTime
     /// every tick.
     public TeaTime Wait(Func<bool> until, float tick = 0)
     {
-        return Loop((TeaHandler t) =>
-        {
-            if (until())
-                t.Break();
+        return Loop(
+            (TeaHandler t) =>
+            {
+                if (until())
+                    t.Break();
 
-            t.Wait(tick);
-        });
+                t.Wait(tick);
+            }
+        );
     }
 
     // CUSTOM YIELDS
@@ -570,7 +593,8 @@ public class TeaTime
     /// IEnumerator that waits the completion of a TeaTime.
     private IEnumerator WaitForCompletion(TeaTime tt)
     {
-        while (!tt.IsCompleted) yield return null;
+        while (!tt.IsCompleted)
+            yield return null;
     }
 
     /// Returns a YieldInstruction that waits until the queue is completed.
@@ -659,7 +683,10 @@ public class TeaTime
                 }
 
                 // While looping and, until time or infinite
-                while (task.handler.isLooping && (task.handler.isReversed ? task.handler.t >= 0 : task.handler.t <= 1))
+                while (
+                    task.handler.isLooping
+                    && (task.handler.isReversed ? task.handler.t >= 0 : task.handler.t <= 1)
+                )
                 {
                     // Check for queue reversal
                     if (isReversed != task.handler.isReversed)
@@ -676,10 +703,9 @@ public class TeaTime
 
                     // On finite loops this .deltaTime is sincronized with the
                     // exact loop duration
-                    task.handler.deltaTime =
-                        isInfinite ?
-                        unityDeltaTime :
-                        1 / (loopDuration - task.handler.timeSinceStart) * unityDeltaTime;
+                    task.handler.deltaTime = isInfinite
+                        ? unityDeltaTime
+                        : 1 / (loopDuration - task.handler.timeSinceStart) * unityDeltaTime;
 
                     // .deltaTime is also reversed
                     if (task.handler.isReversed)
@@ -704,7 +730,8 @@ public class TeaTime
                         task.handler.yields.Clear();
                     }
                     // Minimum sane delay
-                    else yield return null;
+                    else
+                        yield return null;
                 }
 
                 // Executed +1
@@ -796,7 +823,11 @@ public class TeaTime
 
             // On Yoyo mode the queue is reversed at the end, only once per play
             // without Repeat mode
-            if (isYoyo && taskIndex >= tasks.Count && (lastPlayExecutedCount <= tasks.Count || isRepeating))
+            if (
+                isYoyo
+                && taskIndex >= tasks.Count
+                && (lastPlayExecutedCount <= tasks.Count || isRepeating)
+            )
             {
                 Reverse();
 
