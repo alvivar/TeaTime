@@ -25,12 +25,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// Timed Task node.
+// Timed Task node.
 public class TeaTask
 {
     public bool isLoop = false;
@@ -44,10 +45,10 @@ public class TeaTask
     public TeaHandler handler = null;
 }
 
-/// TeaTime handler for callbacks.
+// TeaTime handler for callbacks.
 public class TeaHandler
 {
-    /// Current TeaTime queue.
+    // Current TeaTime queue.
     public TeaTime self;
 
     public float t = 0;
@@ -58,13 +59,13 @@ public class TeaHandler
     public bool isReversed = false;
     public List<YieldInstruction> yields = null;
 
-    /// Ends the current loop.
+    // Ends the current loop.
     public void Break()
     {
         isLooping = false;
     }
 
-    /// Appends a YieldInstruction to wait after the current callback execution.
+    // Appends a YieldInstruction to wait after the current callback execution.
     public void Wait(YieldInstruction yi)
     {
         if (yields == null)
@@ -73,7 +74,7 @@ public class TeaHandler
         yields.Add(yi);
     }
 
-    /// Appends a time delay to wait after the current callback execution.
+    // Appends a time delay to wait after the current callback execution.
     public void Wait(float time)
     {
         if (time <= 0)
@@ -82,8 +83,8 @@ public class TeaHandler
         Wait(TeaYield.WaitForSeconds(time));
     }
 
-    /// Appends a TeaTime to wait after the current callback execution that is
-    /// also affected by the queue .Stop() and .Reset().
+    // Appends a TeaTime to wait after the current callback execution that is
+    // also affected by the queue .Stop() and .Reset().
     public void Wait(TeaTime tt)
     {
         // A reference to the waiting list
@@ -94,8 +95,8 @@ public class TeaHandler
         }
     }
 
-    /// Appends a boolean condition to wait until true after the current
-    /// callback execution.
+    // Appends a boolean condition to wait until true after the current callback
+    // execution.
     public void Wait(Func<bool> condition, float checkDelay)
     {
         // @todo This need to be cached somehow
@@ -103,21 +104,21 @@ public class TeaHandler
     }
 }
 
-/// TeaTime core extensions (static magic).
+// TeaTime core extensions (static magic).
 public static class TeaTimeExtensions
 {
     private static Dictionary<MonoBehaviour, Dictionary<string, TeaTime>> register; // Queues bounded by 'tt(string)'
 
-    /// Returns a new TeaTime queue ready to be used. This is basically a
-    /// shorcut to 'new TeaTime(this);' in MonoBehaviours.
+    // Returns a new TeaTime queue ready to be used. This is basically a shorcut
+    // to 'new TeaTime(this);' in MonoBehaviours.
     public static TeaTime tt(this MonoBehaviour instance)
     {
         return new TeaTime(instance);
     }
 
-    /// Returns a TeaTime queue bounded to his name, unique per MonoBehaviour
-    /// instance, new on the first call. This allows you to access queues
-    /// without a formal definition.
+    // Returns a TeaTime queue bounded to his name, unique per MonoBehaviour
+    // instance, new on the first call. This allows you to access queues without
+    // a formal definition.
     public static TeaTime tt(this MonoBehaviour instance, string queueName)
     {
         // @todo 'register' will (probably) need an auto clean up from time to
@@ -137,8 +138,8 @@ public static class TeaTimeExtensions
     }
 }
 
-/// YieldInstruction static cache! Found here:
-/// http://forum.unity3d.com/threads/c-coroutine-waitforseconds-garbage-collection-tip.224878/
+// YieldInstruction static cache! Found here:
+// http://forum.unity3d.com/threads/c-coroutine-waitforseconds-garbage-collection-tip.224878/
 public static class TeaYield
 {
     private class FloatComparer : IEqualityComparer<float>
@@ -182,8 +183,8 @@ public static class TeaYield
     }
 }
 
-/// TeaTime is a fast & simple queue for timed callbacks, focused on solving
-/// common coroutines patterns in Unity games.
+// TeaTime is a fast & simple queue for timed callbacks, focused on solving
+// common coroutines patterns in Unity games.
 public class TeaTime
 {
     // Queue
@@ -206,37 +207,38 @@ public class TeaTime
     private bool isReversed = false; // On .Reverse() Backward() Forward() mode
     private bool isYoyo = false; // On .Yoyo() mode
 
-    /// True while the queue is being executed.
+    // True while the queue is being executed.
     public bool IsPlaying
     {
         get { return isPlaying; }
     }
 
-    /// True if the queue execution is done.
+    // True if the queue execution is done.
     public bool IsCompleted
     {
         get { return taskIndex >= tasks.Count && !isPlaying; }
     }
 
-    /// Queue count.
+    // Queue count.
     public int Count
     {
         get { return tasks.Count; }
     }
 
-    /// Current queue position to be executed.
+    // Current queue position to be executed.
     public int Current
     {
         get { return taskIndex; }
     }
 
-    /// Executed callback count.
+    // Executed callback count.
     public int ExecutedCount
     {
         get { return executedCount; }
     }
 
-    /// A TeaTime queue requires a MonoBehaviour instance to access his coroutine fuctions.
+    // A TeaTime queue requires a MonoBehaviour instance to access his coroutine
+    // fuctions.
     public TeaTime(MonoBehaviour instance)
     {
         monoBehaviour = instance;
@@ -244,7 +246,7 @@ public class TeaTime
 
     // ADD
 
-    /// Appends a new TeaTask.
+    // Appends a new TeaTask.
     private TeaTime Add(
         float timeDelay,
         Func<float> timeDelayByFunc,
@@ -268,55 +270,55 @@ public class TeaTime
         return isPaused || isPlaying ? this : Play();
     }
 
-    /// Appends a timed callback.
+    // Appends a timed callback.
     public TeaTime Add(float timeDelay, Action callback)
     {
         return Add(timeDelay, null, callback, null);
     }
 
-    /// Appends a timed callback.
+    // Appends a timed callback.
     public TeaTime Add(Func<float> timeByFunc, Action callback)
     {
         return Add(0, timeByFunc, callback, null);
     }
 
-    /// Appends a timed callback.
+    // Appends a timed callback.
     public TeaTime Add(float timeDelay, Action<TeaHandler> callback)
     {
         return Add(timeDelay, null, null, callback);
     }
 
-    /// Appends a timed callback.
+    // Appends a timed callback.
     public TeaTime Add(Func<float> timeByFunc, Action<TeaHandler> callback)
     {
         return Add(0, timeByFunc, null, callback);
     }
 
-    /// Appends a time delay.
+    // Appends a time delay.
     public TeaTime Add(float timeDelay)
     {
         return Add(timeDelay, null, null, null);
     }
 
-    /// Appends a time delay.
+    // Appends a time delay.
     public TeaTime Add(Func<float> timeByFunc)
     {
         return Add(0, timeByFunc, null, null);
     }
 
-    /// Appends a callback.
+    // Appends a callback.
     public TeaTime Add(Action callback)
     {
         return Add(0, null, callback, null);
     }
 
-    /// Appends a callback.
+    // Appends a callback.
     public TeaTime Add(Action<TeaHandler> callback)
     {
         return Add(0, null, null, callback);
     }
 
-    /// Appends a TeaTime.
+    // Appends a TeaTime.
     public TeaTime Add(TeaTime tt)
     {
         return Add((TeaHandler t) => t.Wait(tt));
@@ -324,7 +326,8 @@ public class TeaTime
 
     // LOOP
 
-    /// Appends a callback loop (if duration is less than 0, the loop runs infinitely).
+    // Appends a callback loop (if duration is less than 0, the loop runs
+    // infinitely).
     private TeaTime Loop(float duration, Func<float> durationByFunc, Action<TeaHandler> callback)
     {
         // Ignores appends on Immutable mode
@@ -343,21 +346,21 @@ public class TeaTime
         return isPaused || isPlaying ? this : Play();
     }
 
-    /// Appends a callback loop (if duration is less than 0, the loop runs
-    /// infinitely).
+    // Appends a callback loop (if duration is less than 0, the loop runs
+    // infinitely).
     public TeaTime Loop(float duration, Action<TeaHandler> callback)
     {
         return Loop(duration, null, callback);
     }
 
-    /// Appends a callback loop (if duration is less than 0, the loop runs
-    /// infinitely).
+    // Appends a callback loop (if duration is less than 0, the loop runs
+    // infinitely).
     public TeaTime Loop(Func<float> durationByFunc, Action<TeaHandler> callback)
     {
         return Loop(0, durationByFunc, callback);
     }
 
-    /// Appends an infinite callback loop.
+    // Appends an infinite callback loop.
     public TeaTime Loop(Action<TeaHandler> callback)
     {
         return Loop(-1, null, callback);
@@ -365,8 +368,8 @@ public class TeaTime
 
     // QUEUE MODES
 
-    /// Enables Immutable mode, the queue will ignore new appends (.Add .Loop
-    /// .If)
+    // Enables Immutable mode, the queue will ignore new appends (.Add .Loop
+    // .If)
     public TeaTime Immutable()
     {
         isImmutable = true;
@@ -374,7 +377,7 @@ public class TeaTime
         return this;
     }
 
-    /// Enables Repeat mode, the queue will always be restarted on completion.
+    // Enables Repeat mode, the queue will always be restarted on completion.
     public TeaTime Repeat()
     {
         isRepeating = true;
@@ -382,8 +385,8 @@ public class TeaTime
         return this;
     }
 
-    /// Enables Consume mode, the queue will remove each callback after
-    /// execution.
+    // Enables Consume mode, the queue will remove each callback after
+    // execution.
     public TeaTime Consume()
     {
         isConsuming = true;
@@ -391,8 +394,8 @@ public class TeaTime
         return this;
     }
 
-    /// Reverses the callback execution order (From .Forward() to .Backward()
-    /// mode and viceversa).
+    // Reverses the callback execution order (From .Forward() to .Backward()
+    // mode and viceversa).
     public TeaTime Reverse()
     {
         isReversed = !isReversed;
@@ -411,8 +414,8 @@ public class TeaTime
         return this;
     }
 
-    /// Enables Backward mode, executing callbacks on reverse order (including
-    /// Loops).
+    // Enables Backward mode, executing callbacks on reverse order (including
+    // Loops).
     public TeaTime Backward()
     {
         if (!isReversed)
@@ -421,8 +424,8 @@ public class TeaTime
         return this;
     }
 
-    /// Enables Forward mode (the default), executing callbacks one after the
-    /// other.
+    // Enables Forward mode (the default), executing callbacks one after the
+    // other.
     public TeaTime Forward()
     {
         if (isReversed)
@@ -431,8 +434,8 @@ public class TeaTime
         return this;
     }
 
-    /// Enables Yoyo mode, that will .Reverse() the callback execution order
-    /// when the queue is completed. Only once per play without Repeat mode.
+    // Enables Yoyo mode, that will .Reverse() the callback execution order when
+    // the queue is completed. Only once per play without Repeat mode.
     public TeaTime Yoyo()
     {
         isYoyo = true;
@@ -440,8 +443,8 @@ public class TeaTime
         return this;
     }
 
-    /// Disables all modes (Immutable, Repeat, Consume, Backward, Yoyo). Just
-    /// like new.
+    // Disables all modes (Immutable, Repeat, Consume, Backward, Yoyo). Just
+    // like new.
     public TeaTime Release()
     {
         isImmutable = isRepeating = isConsuming = isYoyo = false;
@@ -451,7 +454,7 @@ public class TeaTime
 
     // CONTROL
 
-    /// Pauses the queue execution (use .Play() to resume).
+    // Pauses the queue execution (use .Play() to resume).
     public TeaTime Pause()
     {
         isPaused = true;
@@ -459,7 +462,7 @@ public class TeaTime
         return this;
     }
 
-    /// Stops the queue execution (use .Play() to start over).
+    // Stops the queue execution (use .Play() to start over).
     public TeaTime Stop()
     {
         if (currentCoroutine != null)
@@ -476,7 +479,7 @@ public class TeaTime
         return this;
     }
 
-    /// Starts or resumes the queue execution.
+    // Starts or resumes the queue execution.
     public TeaTime Play()
     {
         // Unpause always
@@ -500,7 +503,7 @@ public class TeaTime
         return this;
     }
 
-    /// Restarts the queue execution (.Stop().Play()).
+    // Restarts the queue execution (.Stop().Play()).
     public TeaTime Restart()
     {
         // Alias
@@ -509,8 +512,8 @@ public class TeaTime
 
     // DESTRUCTION
 
-    /// Stops and cleans the queue, turning off all modes (Immutable, Repeat,
-    /// Consume, Backward, Yoyo). Just like new.
+    // Stops and cleans the queue, turning off all modes (Immutable, Repeat,
+    // Consume, Backward, Yoyo). Just like new.
     public TeaTime Reset()
     {
         // Reset current
@@ -553,8 +556,8 @@ public class TeaTime
     // TeaTime runs, because the Yield reference can't be used again when a
     // TeaTime is replayed.
 
-    /// The queue will stop if the condition isn't fullfiled, or restarted on
-    /// Repeat mode.
+    // The queue will stop if the condition isn't fullfiled, or restarted on
+    // Repeat mode.
     public TeaTime If(Func<bool> condition)
     {
         return Add(() =>
@@ -573,8 +576,8 @@ public class TeaTime
         });
     }
 
-    /// The queue will wait until the boolean condition is fullfiled, checking
-    /// every tick.
+    // The queue will wait until the boolean condition is fullfiled, checking
+    // every tick.
     public TeaTime Wait(Func<bool> until, float tick = 0)
     {
         return Loop(
@@ -590,14 +593,14 @@ public class TeaTime
 
     // CUSTOM YIELDS
 
-    /// IEnumerator that waits the completion of a TeaTime.
+    // IEnumerator that waits the completion of a TeaTime.
     private IEnumerator WaitForCompletion(TeaTime tt)
     {
         while (!tt.IsCompleted)
             yield return null;
     }
 
-    /// Returns a YieldInstruction that waits until the queue is completed.
+    // Returns a YieldInstruction that waits until the queue is completed.
     public YieldInstruction WaitForCompletion()
     {
         // @todo Could this be cached somehow?
@@ -689,8 +692,8 @@ public class TeaTime
             if (!isInfinite)
                 handler.t += tRate * unityDeltaTime;
 
-            // On finite loops this .deltaTime is sincronized with the
-            // exact loop duration
+            // On finite loops this .deltaTime is sincronized with the exact
+            // loop duration
             handler.deltaTime = isInfinite
                 ? unityDeltaTime
                 : 1 / (loopDuration - handler.timeSinceStart) * unityDeltaTime;
@@ -710,10 +713,10 @@ public class TeaTime
             task.callbackWithHandler(handler);
 
             // Handler .WaitFor(
-            // Count-aware check: after waits are consumed the list is
-            // cleared but kept allocated (non-null, Count == 0).
-            // Empty means no waits queued on this frame, so we still
-            // need a fallback yield to avoid tight loops/freezes.
+            // Count-aware check: after waits are consumed the list is cleared
+            // but kept allocated (non-null, Count == 0). Empty means no waits
+            // queued on this frame, so we still need a fallback yield to avoid
+            // tight loops/freezes.
             if (handler.yields != null && handler.yields.Count > 0)
             {
                 for (int i = 0, len = handler.yields.Count; i < len; i++)
@@ -765,8 +768,8 @@ public class TeaTime
             task.callbackWithHandler(handler);
 
             // Handler WaitFor
-            // Same count-aware behavior as loop callbacks. Empty list
-            // should behave as no pending waits.
+            // Same count-aware behavior as loop callbacks. Empty list should
+            // behave as no pending waits.
             if (handler.yields != null && handler.yields.Count > 0)
             {
                 for (int i = 0, len = handler.yields.Count; i < len; i++)
@@ -797,8 +800,8 @@ public class TeaTime
             waiting.Clear();
         }
 
-        // Consume mode removes the task after execution
-        // @todo Need to be tested with .Reverse() stuff
+        // Consume mode removes the task after execution @todo Need to be tested
+        // with .Reverse() stuff
         if (isConsuming)
         {
             taskIndex -= 1;
@@ -829,8 +832,8 @@ public class TeaTime
         }
     }
 
-    /// This is the main algorithm. Executes all tasks, one after the other,
-    /// calling their callbacks according to type, time and config.
+    // This is the main algorithm. Executes all tasks, one after the other,
+    // calling their callbacks according to type, time and config.
     private IEnumerator ExecuteQueue()
     {
         isPlaying = true;
@@ -874,23 +877,6 @@ public class TeaTime
     }
 }
 
-// <3
-// Lerp Formulas
-
-// Ease out
-// t = Mathf.Sin(t * Mathf.PI * 0.5f);
-
-// Ease in
-// t = 1f - Mathf.Cos(t * Mathf.PI * 0.5f)
-
-// Exponential
-// t = t*t
-
-// Smoothstep
-// t = t*t * (3f - 2f*t)
-
-// Smootherstep
-// t = t*t*t * (t * (6f*t - 15f) + 10f)
 
 // Created       2014/12/26 12:21 am
 // Rewritten     2015/09/15 12:28 pm
