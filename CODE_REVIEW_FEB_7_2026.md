@@ -65,12 +65,13 @@ Use count-aware checks:
 And in callback path, replace `task.handler.yields == null` logic with `task.handler.yields == null || task.handler.yields.Count == 0`.
 
 **Status (current code fix)**
+
 - ✅ Implemented in `TeaTime.cs`.
 - Loop handler wait now uses count-aware check:
-  - `task.handler.yields != null && task.handler.yields.Count > 0`
+    - `task.handler.yields != null && task.handler.yields.Count > 0`
 - Timed callback handler wait now uses the same count-aware check.
 - Minimum-delay fallback now treats null and empty lists as equivalent:
-  - `task.handler.yields == null || task.handler.yields.Count == 0`
+    - `task.handler.yields == null || task.handler.yields.Count == 0`
 - Added inline comments near both sites documenting why this is required (to avoid tight-loop/freeze after `Clear()`).
 
 ---
