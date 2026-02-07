@@ -1,290 +1,196 @@
-# Change Log
+# Changelog
 
-## v0.9 2021/10/03
+All notable changes to TeaTime are documented in this file.
+Versions are listed from newest to oldest.
 
-- **REVISION**: Bug hunt, code clean up, aesthetic and better examples. It's no
-  longer **beta**.
+## [v0.9] - 2021-10-03
 
-- **CHANGE**: **.Add(** can wait other TeaTimes, instead of **TeaHandler.Wait(**
-  that no longer waits TeaTimes.
+- **Revision:** Bug hunt, code cleanup, visual polish, and better examples. TeaTime is no longer **beta**.
+- **Changed:** `.Add(...)` can now wait for other TeaTimes. `TeaHandler.Wait(...)` no longer waits TeaTimes.
+- **Fixed:** `.Reverse()` now works correctly when a TeaTime starts reversed from the beginning.
 
-- **BUG FIX**: **.Reverse()** works correctly when a TeaTime starts reversed
-  from the beginning.
+## [v0.8.8 beta] - 2021-02-17
 
-## v0.8.8 beta 2021/02/17
+- **Revision:** Experimental optimizations.
+- **Changed:** `TeaHandler.EndLoop(...)` was renamed to `.Break(...)` (more natural/classic naming).
 
-- **REVISION**: Experimental optimizations.
+## [v0.8.7 beta] - 2020-05-23
 
-- **CHANGE**: **TeaHandler.EndLoop(** renamed to **.Break(**. More natural and
-  classic.
+- **Changed:** The namespace was removed; just add the file to your project and use it directly.
+- **Docs:** Removed `Summary` entries from comments.
 
-## v0.8.7 beta 2020/05/23
+## [v0.8.5 beta] - 2016-06-18
 
-- **CHANGE**: Namespace is out, just add the file to your project and use it
-  right away.
+- **Fixed:** Nested TeaTimes inside another TeaTime in `Repeat` mode could fail. The `_waiting` list was not being cleared properly.
 
-- **COMMENTS**: Removed Summary from comments.
+## [v0.8.4 beta] - 2016-06-18
 
-## v0.8.5 beta 2016/06/18
+- **Added:** `TeaHandler.Wait(Func<bool>, checkDelay)` now waits until the boolean condition is fulfilled after the current callback execution, checking every `checkDelay`.
 
-- **BUG FIX**: Nested TeaTimes inside another TeaTime on **Repeat** used to
-  fail. The **\_waiting** list wasn't clear out properly.
+## [v0.8.3 beta] - 2016-05-27
 
-## v0.8.4 beta 2016/06/18
+- **Added:** `.Wait(Func<bool>, checkDelay)` now waits until the boolean condition is fulfilled, checking every `checkDelay`.
+- **Changed:** `TeaHandler.WaitFor(...)` was renamed to `TeaHandler.Wait(...)` (API simplification).
+- **Added:** All TeaTimes waiting in `TeaHandler.Wait(...)` are now affected by their parent `.Stop()` and `.Reset()`.
+- **Fixed:** `.Consume()` was not working because of `.Reverse()` mode validation.
 
-- **NEW FEATURE**: **TeaHandler.Wait(Func\<bool>, checkDelay)** will wait until
-  the boolean condition is fullfiled after the current callback execution,
-  checking every **checkDelay**.
+## [v0.8.1 beta] - 2016-04-26
 
-## v0.8.3 beta 2016/05/27
+- **Added:** `.Yoyo()` mode reverses execution order when the queue completes (once per play when not in `Repeat` mode).
 
-- **NEW FEATURE**: **.Wait(Func\<bool>, checkDelay)** will wait until the
-  boolean condition is fullfiled, checkingevery **checkDelay**.
+## [v0.8 beta] - 2016-04-26
 
-- **CHANGE**: **TeaHandler.WaitFor(** renamed to **TeaHandler.Wait(**. I'm
-  experimenting with keeping the API at one word.
+- **Added:** `.Backward()`, `.Forward()`, and `.Reverse()` to control queue execution direction.
 
-- **NEW FEATURE**: All TeaTimes on **TeaHandler.Wait(** are affected by
-  **.Stop()** and **.Reset()** from their parent.
+_Thanks [Xerios](http://github.com/alvivar/TeaTime/pull/8)!_
 
-- **BUG FIX**: **.Consume()** wasn't working because of certain **.Reverse()**
-  mode validation. It works now.
+## [v0.7.9 beta] - 2016-04-26
 
-## v0.8.1 beta 2016/04/26
+- **Performance:** `YieldInstruction`s like `WaitForEndOfFrame` and `WaitForSeconds` are now cached.
+- **Performance:** Calls to `StartCoroutine` were reduced significantly.
+- **Performance:** Removed `foreach` usage and added minor optimizations.
 
-- **NEW FEATURE**: **.Yoyo()** mode will **.Reverse()** the execution order when
-  the queue is completed. Only once per play without **Repeat** mode.
+## [v0.7.7 beta] - 2016-04-24
 
-## v0.8 beta 2016/04/26
+- **Added:** `.WaitForCompletion()` now returns a `YieldInstruction`, allowing TeaTime to `TeaHandler.WaitFor(...)` other TeaTimes.
+- **Changed:** `TeaHandler.Break()` was renamed to `.EndLoop(...)`.
+- **Fixed:** Using a `Func<float>` as time was not working as expected.
 
-- **NEW FEATURES**: **.Backward()** **.Forward()** and **.Reverse()** allows you
-  give a direction to the queue execution!\*\*
+## [v0.7.4 beta] - 2016-03-17
 
-**_[Thank you Xerios!](http://github.com/alvivar/TeaTime/pull/8)_**
+- **Changed:** `.Wait()` was renamed to `.Immutable()`.
+- **Changed:** `.Add(...)` and `.Loop(...)` can now use a `Func<float>` as time.
+- **Changed:** `.Reset()` now also turns off all queue modes.
+- **Changed:** `.Unlock()` (which turns off all queue modes) was renamed to `.Release()`.
+- **Changed:** `.Add(...)` no longer uses `YieldInstruction` as time.
+- **Changed:** `.Stop()` no longer pauses the queue.
 
-## v0.7.9 beta 2016/04/26
+## [v0.7.3.1 beta] - 2016-02-08
 
-- **Optimizations +1**: **YieldInstruction**s like WaitForEndOfFrame,
-  WaitForSeconds are cached now, calls to StarCoroutine were decreased a lot, no
-  more foreachs, other minor optimizations.
+- **Changed:** `.Stop()` also pauses the queue.
 
-## v0.7.7 beta 2016/04/24
+## [v0.7.3 beta] - 2015-12-14
 
-- **NEW**: **.WaitForCompletion()** returns a YieldInstruction, this way TeaTime
-  can **TeaHandler.WaitFor** other TeaTimes.
+- **Added:** `TeaHandler` now holds a reference to itself (`.self`).
 
-- **CHANGE**: **TeaHandler.Break()** renamed to .EndLoop, clarity +1
+## [v0.7.2 beta] - 2015-10-19
 
-- **BUG FIX**: Using a Func\<float> as time wasn't working as expected, it's
-  awesome now.
+- **Added:** `.If(Func<bool>)` appends a boolean condition that stops the queue when the condition is not fulfilled. In `Repeat` mode, the queue restarts. This interruption also affects `Consume` mode (no execution, no removal).
+- **Changed:** `.Repeat()` mode no longer ignores newly appended callbacks. That behavior is now exclusive to `.Wait()`.
 
-## v0.7.4 beta 2016/03/17
+## [v0.7 beta] - 2015-10-10
 
-- **CHANGE**: **.Wait()** renamed to **.Immutable()**.
+- Total code rewrite: same pattern, but faster, cleaner, and fully C#-compliant.
+- **Changed:** `TeaTime` is now a normal instantiable object: `TeaTime queue = new TeaTime(MonoBehaviour);`
+- **Changed:** `this.tt()` (MonoBehaviour extension) returns a new TeaTime queue ready to use.
+- **Changed:** `this.tt("queueName")` returns a TeaTime queue bound to the given name (unique per instance, created on first call), enabling queue access without formal field definitions.
+- **Changed:** Each TeaTime queue now handles itself (one coroutine per queue). There are no global controls yet; only per-queue controls.
+- **Performance:** Callbacks are saved permanently by default.
+- **Rule:** Calling `.Add(...)` or `.Loop(...)` activates stopped queues, even during `.Wait()` or `.Repeat()` modes, unless they are `.Pause()`d.
+- **Added:** `Consume` mode (callbacks are removed from the queue after execution; non-accumulative).
+- **Added:** `.IsPlaying` property (`true` during execution).
+- **Added:** `.IsCompleted` property (`true` when queue execution is done).
+- **Added:** Queue `.Count` property.
+- **Added:** `.Current` property (current queue position to execute).
 
-- **CHANGE**: **.Add(** and **.Loop(** can use a Func\<float> as time!
+## [v0.6.5.4]
 
-- **CHANGE**: **.Reset()** also turn off all queue modes.
+- `.ttPlay(...)` can now restart a queue even if it has already finished.
 
-- **CHANGE**: **.Unlock()** (that turns off all queue modes) renamed to **Release()**.
+## [v0.6.5.3]
 
-- **CHANGE**: **.Add(** no longer uses YieldInstruction as time.
-
-- **CHANGE**: **.Stop()** no longer pauses the queue. Purity +1
-
-## v0.7.3.1 beta 2016/02/08
-
-- **CHANGE**: **.Stop()** also pauses the queue.
-
-## v0.7.3 beta 2015/12/14
-
-- **NEW**: **TeaHandler** now holds a reference to itselfs (**.self**).
-
-## v0.7.2 beta 2015/10/19
-
-- **NEW**: .If(Func\<bool>) Appends a boolean condition that stops the queue
-  when isn't fullfiled. On Repeat mode the queue is restarted. The
-  interruption also affects Consume mode (no execution, no removal).
-
-- **CHANGE**: .Repeat() mode no longer ignores new appends. That's exclusive
-  to .Wait().
-
-## v0.7 beta 2015/10/10
-
-- Total code rewrite. The same pattern but faster, **C#** compliant, cleaner,
-  better!
-
-- **CHANGE**: TeaTime is a normal instantiable Object now i.e: **TeaTime queue
-  = new TeaTime(MonoBehaviour);**
-
-- **CHANGE**: **this.tt()** (MonoBehaviour extension) returns a new TeaTime
-  queue ready to be used.
-
-- **CHANGE**: **this.tt("queueName")** returns a TeaTime queue bounded to his
-  name, unique per instance, new on the first call. This allows you to access
-  queues without a formal definition (as usual). Dark magic.
-
-- **CHANGE**: Each TeaTime queue handles itself (one coroutine per queue).
-  There is no global controls yet, only per queue.
-
-- **OPTIMIZATION**: Callbacks are saved permanently by default.
-
-- **NEW RULE**: Calling **.Add(** or **.Loop(** activates stopped queues even
-  during **.Wait()** or **.Repeat()** modes unless they are **.Pause()**.
-
-- **NEW**: **Consume mode**, each callback is removed from the queue after
-  execution (non accumulative).
-
-- **NEW**: **.IsPlaying** property, true during execution.
-
-- **NEW**: **.IsCompleted** property, true if the queue execution is done.
-
-- **NEW**: Queue **.Count** property.
-
-- **NEW**: **.Current** property, current queue position to be executed.
-
-## v0.6.5.4
-
-- .ttPlay is now able to restart a queue if it's already finished.
-
-## v0.6.5.3
-
-- **UPGRADE** .WaitFor() from TeaHandler now queues his arguments every time is
-  called, it also executes and waits IEnumerators.
-
-- **UPGRADE** .ttAdd() now supports single YieldInstructions.
-
+- **Changed:** `TeaHandler.WaitFor()` now queues its arguments on each call and can execute/wait `IEnumerator`s.
+- **Changed:** `.ttAdd()` now supports single `YieldInstruction`s.
 - Minor optimizations.
 
-## v0.6.5.1
+## [v0.6.5.1]
 
-- **BUG FIXED**: Using a TeaTime queue inside a TeaTime queue used to cause a
-  problem with the queue name reference. It's fixed now.
+- **Fixed:** Using a TeaTime queue inside another TeaTime queue caused queue-name reference issues.
 
-## v0.6.5
+## [v0.6.5]
 
-- **CHANGE**: .ttRepeat default parameter changed to -1 (n = -1) for infinite
-  repetition (used to be 1).
+- **Changed:** `.ttRepeat(...)` default parameter changed to `-1` (`n = -1`) for infinite repetition (used to be `1`).
+- **Added:** `ttPause(...)`, `ttStop(...)`, and `ttPlay(...)`.
+- **Added:** Play/Pause/Stop example.
+- Minor optimizations and code cleanup.
 
-- **NEW**: ttPause(, ttStop( and ttPlay( are done and they work exactly as you
-  would think.
+## [v0.6.2]
 
-- **NEW**: Play, Pause, Stop example.
-
-- Minor optimizations & code cleanup.
-
-## v0.6.2
-
-- **NEW**: ttReset is back, it stops and resets the current queue.
-
-- **CHANGE**: tt( optional parameter can't reset a queue anymore (use ttReset
-  after tt( instead).
-
+- **Added:** `ttReset(...)` is back; it stops and resets the current queue.
+- **Changed:** The optional parameter in `tt(...)` can no longer reset a queue (use `ttReset(...)` after `tt(...)` instead).
 - Minor optimizations.
-
 - Deprecated code cleanup.
-
 - Updated examples.
 
-## v0.6
+## [v0.6]
 
-- **NEW**: .ttRepeat(n), repeats the current queue n times or infinite (n <=
-  -1).
+- **Added:** `.ttRepeat(n)` repeats the current queue `n` times or infinitely (`n <= -1`).
+- **Changed:** `ttAdd(...)` and `ttLoop(...)` can no longer create/change the current queue; use `tt(...)` instead.
+- **Added:** Better examples.
 
-- **CHANGE**: ttAdd( & ttLoop(, can't create/change the current queue now, use
-  tt( instead.
+## [v0.5.9]
 
-- **NEW**: Better examples!
+- **Changed:** `ttNew(...)` was upgraded to `tt(...)` and can now change the current queue. It can also optionally reset the content of an existing queue. When used without a name, the queue is anonymous (immune to `ttWait(...)`).
 
-## v0.5.9
+## [v0.5.8.4]
 
-- **CHANGE**: ttNew( upgraded to tt( and now is able to change the current
-  queue. It can also reset the content of an existent queue (optional). When
-  used without name, the queue will be anonymous (i.e. immune to ttWait).
+- **Added:** `ttNew(...)` creates or changes the current queue using a unique anonymous identifier.
+- **Changed:** `ttNow(...)` was removed. Fast/safe timers can be created with `ttNew(...)` at the start of a queue (with both `ttAdd(...)` and `ttLoop(...)`).
 
-## v0.5.8.4
+## [v0.5.8.3]
 
-- **NEW**: ttNew( create or change a queue the current queue, using an unique
-  anonymous identifier.
+- **Changed:** `ttReset(...)` was upgraded to `TeaTime.Reset(...)` (can stop and reset queues).
+- **Added:** `TeaTime.ResetAll(...)` stops and clears all queues in all instances.
 
-- **CHANGE**: ttNow( does not exists anymore, you can create fast & safe
-  timers using ttNew( at the beginning of the queue (both ttAdd( & ttLoop().
+## [v0.5.8]
 
-## v0.5.8.3
+- **Added:** `TeaHandler.t` returned. It contains loop completion percentage from `0` to `1` for timed loops (for example, half duration => `t = 0.5`).
 
-- **CHANGE**: ttReset( upgraded to TeaTime.Reset(, able to stop and reset
-  queues.
+## [v0.5.7]
 
-- **NEW**: TeaTime.ResetAll( stop and clean all queues in all instances.
+- **Added:** `ttReset(...)` stops and resets a queue.
+- **Changed:** `ttWaitForCompletion(...)` was renamed to `ttWait(...)`.
 
-## v0.5.8
+## [v0.5.4]
 
-- **NEW**: TeaHandler.t has returned. It contains the completion percentage
-  expresed from 0 to 1 for timed loops (i.e. On half duration t = 0.5).
+- **Changed:** `TeaHandler.t` was renamed to `TeaHandler.deltaTime` (algorithm greatly improved).
 
-## v0.5.7
+## [v0.5.2]
 
-- **NEW**: ttReset( stops and resets a queue.
+- **Changed:** `ttAppend(...)` was renamed to `ttAdd(...)`.
+- **Changed:** `ttAppendLoop(...)` was renamed to `ttLoop(...)`.
+- **Changed:** `ttInvoke(...)` was renamed to `ttNow(...)`.
+- **Changed:** `ttLock(...)` was renamed to `ttWaitForCompletion(...)`.
 
-- **CHANGE**: ttWaitForCompletion( renamed to ttWait(.
+## [v0.5.1]
 
-## v0.5.4
-
-- **CHANGE**: TeaHandler.t renamed to TeaHandler.deltaTime (algorithm greatly
-  improved!).
-
-## v0.5.2
-
-- **CHANGE**: ttAppend( renamed to ttAdd(.
-
-- **CHANGE**: ttAppendLoop( renamed to ttLoop(.
-
-- **CHANGE**: ttInvoke( renamed to ttNow(.
-
-- **CHANGE**: ttLock( renamed to ttWaitForCompletion(.
-
-## v0.5.1
-
-- TeaTimer was renamed to TeaTime! :D +1
-
-- **BUG FIXED**: On concurrent environments, AppendLoop with a manual Break()
-  used to append wrong his next chained callback.
-
+- `TeaTimer` was renamed to `TeaTime`.
+- **Fixed:** In concurrent environments, `AppendLoop(...)` with a manual `Break()` could append the wrong next chained callback.
 - Minor optimizations.
 
-## v0.5
+## [v0.5]
 
-- **NEW**: TeaHandler now supports Append(.
+- **Added:** `TeaHandler` now supports `Append(...)`.
+- **Added:** `TeaHandler.WaitFor(...)` waits for a yield or time after the current callback execution, before the next queued callback.
 
-- **NEW**: TeaHandler 'WaitFor(', waits for a yield or time after the current
-  callback execution, just before the next queued callback.
+## [v0.4]
 
-## v0.4
+- **Added:** `AppendLoop(...)` appends a callback that runs frame by frame for its duration (or infinitely) into a queue.
+- **Added:** `TeaHandler` supports/manages `AppendLoop(...)` with `t` (completion rate from `0` to `1`), `timeSinceStart`, and `Break()`.
+- **Changed:** `ttNow(...)` was renamed to `ttInvoke(...)`.
 
-- **NEW**: AppendLoop(, appends a callback that runs frame by frame for his
-  duration (or infinite) into a queue.
+_Thanks [@tzamora](http://github.com/tzamora) for the loop code._
 
-- **NEW**: TeaHandler, supports and manage AppendLoop with 't' (completion rate
-  from 0 to 1), 'timeSinceStart' and 'Break()'.
+## [v0.3]
 
-- **CHANGE**: ttNow( renamed to ttInvoke.
+- **Added:** `ttLock(...)` locks the current queue until all previous callbacks are done (safe during arbitrary cycles such as `Update()`).
+- **Changed:** `ttInsert(...)` was renamed to `ttNow(...)`.
 
-**_[Thanks you @tzamora!](http://github.com/tzamora)_** (Loop code)
+## [v0.2]
 
-## v0.3
+- **Added:** `ttAppend(...)` can name queues (different queues can coexist at the same time).
 
-- **NEW**: ttLock(, locks the current queue until all his previous callbacks
-  are done (safe to run during arbitrary cycles e.g. Update()).
+## [v0.1]
 
-- **CHANGE**: ttInsert( renamed to ttNow.
-
-## v0.2
-
-- **NEW**: ttAppend( can name queues (different queues can coexist at the same
-  time).
-
-## v0.1
-
-- **NEW**: ttAppend(, appends a timed callback into a queue.
-
-- **NEW**: ttInsert(, executes a timed callback.
+- **Added:** `ttAppend(...)` appends a timed callback into a queue.
+- **Added:** `ttInsert(...)` executes a timed callback.
