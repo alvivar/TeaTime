@@ -606,6 +606,229 @@ public class TeaTime
 
     // THE COROUTINE
 
+    private float ResolveTaskDuration(TeaTask task)
+    {
+        float duration = task.time;
+
+        if (task.timeByFunc != null)
+            duration += task.timeByFunc();
+
+        return duration;
+    }
+
+    private TeaHandler GetOrCreateHandler(TeaTask task)
+    {
+        if (task.handler == null)
+        {
+            task.handler = new TeaHandler();
+            task.handler.self = this;
+        }
+
+        return task.handler;
+    }
+
+    private bool TryAdvanceToNextTask(ref int reverseLastTask, out TeaTask task)
+    {
+        int taskId = taskIndex;
+
+        if (isReversed)
+            taskId = tasks.Count - 1 - taskIndex;
+
+        task = tasks[taskId];
+
+        // Next task (or previous if the queue is backward)
+        taskIndex++;
+
+        // Avoid executing a task twice when reversed and the queue hasn't
+        // reached the end
+        if (taskId == reverseLastTask)
+            return false;
+
+        reverseLastTask = taskId;
+
+        return true;
+    }
+
+    private IEnumerator RunLoopTask(TeaTask task, float loopDuration)
+    {
+        TeaHandler handler = GetOrCreateHandler(task);
+
+        // Reset handler to defaults
+        handler.t = 0;
+        handler.timeSinceStart = 0;
+
+        handler.isReversed = isReversed;
+        handler.isLooping = true;
+
+        // Negative time means the loop is infinite
+        bool isInfinite = loopDuration < 0;
+
+        // T quotient
+        float tRate = isInfinite ? 0 : 1 / loopDuration;
+
+        // Progresion depends on current direction
+        if (handler.isReversed)
+        {
+            handler.t = 1f;
+            tRate = -tRate;
+        }
+
+        // While looping and, until time or infinite
+        while (handler.isLooping && (handler.isReversed ? handler.t >= 0 : handler.t <= 1))
+        {
+            // Check for queue reversal
+            if (isReversed != handler.isReversed)
+            {
+                tRate = -tRate;
+                handler.isReversed = isReversed;
+            }
+
+            float unityDeltaTime = Time.deltaTime;
+
+            // Completion % from 0 to 1
+            if (!isInfinite)
+                handler.t += tRate * unityDeltaTime;
+
+            // On finite loops this .deltaTime is sincronized with the
+            // exact loop duration
+            handler.deltaTime = isInfinite
+                ? unityDeltaTime
+                : 1 / (loopDuration - handler.timeSinceStart) * unityDeltaTime;
+
+            // .deltaTime is also reversed
+            if (handler.isReversed)
+                handler.deltaTime = -handler.deltaTime;
+
+            // A classic
+            handler.timeSinceStart += unityDeltaTime;
+
+            // Pause?
+            while (isPaused)
+                yield return null;
+
+            // Loops will always have a callback with a handler
+            task.callbackWithHandler(handler);
+
+            // Handler .WaitFor(
+            // Count-aware check: after waits are consumed the list is
+            // cleared but kept allocated (non-null, Count == 0).
+            // Empty means no waits queued on this frame, so we still
+            // need a fallback yield to avoid tight loops/freezes.
+            if (handler.yields != null && handler.yields.Count > 0)
+            {
+                for (int i = 0, len = handler.yields.Count; i < len; i++)
+                    yield return handler.yields[i];
+
+                handler.yields.Clear();
+            }
+            // Minimum sane delay
+            else
+                yield return null;
+        }
+
+        // Executed +1
+        executedCount += 1;
+        lastPlayExecutedCount += 1;
+    }
+
+    private IEnumerator RunTimedTask(TeaTask task, float delayDuration)
+    {
+        // Time delay
+        if (delayDuration > 0)
+            yield return TeaYield.WaitForSeconds(delayDuration);
+
+        // Is this more precise that the previous code?
+        // float time = 0;
+        // while (time < delayDuration)
+        // {
+        //     time += Time.deltaTime;
+        //     yield return null;
+        // }
+
+        // Pause?
+        while (isPaused)
+            yield return null;
+
+        // Normal callback
+        if (task.callback != null)
+            task.callback();
+
+        // Callback with handler
+        if (task.callbackWithHandler != null)
+        {
+            TeaHandler handler = GetOrCreateHandler(task);
+
+            handler.t = 1;
+            handler.deltaTime = Time.deltaTime;
+            handler.timeSinceStart = delayDuration;
+
+            task.callbackWithHandler(handler);
+
+            // Handler WaitFor
+            // Same count-aware behavior as loop callbacks. Empty list
+            // should behave as no pending waits.
+            if (handler.yields != null && handler.yields.Count > 0)
+            {
+                for (int i = 0, len = handler.yields.Count; i < len; i++)
+                    yield return handler.yields[i];
+
+                handler.yields.Clear();
+            }
+
+            // Minimum sane delay
+            // Treat null and empty as equivalent: no waits queued.
+            if (delayDuration <= 0 && (handler.yields == null || handler.yields.Count == 0))
+                yield return null;
+        }
+        else if (delayDuration <= 0)
+            yield return null;
+
+        // Executed +1
+        executedCount += 1;
+        lastPlayExecutedCount += 1;
+    }
+
+    private void ApplyPostTaskModes(TeaTask task, ref int reverseLastTask)
+    {
+        // Just at the end of a complete queue execution
+        if (tasks.Count > 0 && taskIndex >= tasks.Count)
+        {
+            // Forget current nested queues
+            waiting.Clear();
+        }
+
+        // Consume mode removes the task after execution
+        // @todo Need to be tested with .Reverse() stuff
+        if (isConsuming)
+        {
+            taskIndex -= 1;
+            tasks.Remove(task);
+
+            reverseLastTask = -1; // To default
+        }
+
+        // On Yoyo mode the queue is reversed at the end, only once per play
+        // without Repeat mode
+        if (
+            isYoyo
+            && taskIndex >= tasks.Count
+            && (lastPlayExecutedCount <= tasks.Count || isRepeating)
+        )
+        {
+            Reverse();
+
+            reverseLastTask = -1; // To default
+        }
+
+        // Repeats on Repeat mode
+        if (isRepeating && tasks.Count > 0 && taskIndex >= tasks.Count)
+        {
+            taskIndex = 0;
+
+            reverseLastTask = -1; // To default
+        }
+    }
+
     /// This is the main algorithm. Executes all tasks, one after the other,
     /// calling their callbacks according to type, time and config.
     private IEnumerator ExecuteQueue()
@@ -623,234 +846,27 @@ public class TeaTime
 
         while (taskIndex < tasks.Count)
         {
-            // Current task to be executed
-            int taskId = taskIndex;
+            TeaTask task;
 
-            if (isReversed)
-                taskId = tasks.Count - 1 - taskIndex;
-
-            TeaTask task = tasks[taskId];
-
-            // Next task (or previous if the queue is backward)
-            taskIndex++;
-
-            // Avoid executing a task twice when reversed and the queue hasn't
-            // reached the end
-            if (taskId == reverseLastTask)
+            if (!TryAdvanceToNextTask(ref reverseLastTask, out task))
                 continue;
 
-            reverseLastTask = taskId;
+            float taskDuration = ResolveTaskDuration(task);
 
-            // It's a loop
             if (task.isLoop)
             {
-                // Holds the duration
-                float loopDuration = task.time;
-
-                // Func<float> added
-                if (task.timeByFunc != null)
-                    loopDuration += task.timeByFunc();
-
                 // Nothing to do, skip
-                if (loopDuration == 0)
+                if (taskDuration == 0)
                     continue;
 
-                // Loops always need a handler
-                if (task.handler == null)
-                {
-                    task.handler = new TeaHandler();
-                    task.handler.self = this;
-                }
-
-                // Reset handler to defaults
-                task.handler.t = 0;
-                task.handler.timeSinceStart = 0;
-
-                task.handler.isReversed = isReversed;
-                task.handler.isLooping = true;
-
-                // Negative time means the loop is infinite
-                bool isInfinite = loopDuration < 0;
-
-                // T quotient
-                float tRate = isInfinite ? 0 : 1 / loopDuration;
-
-                // Progresion depends on current direction
-                if (task.handler.isReversed)
-                {
-                    task.handler.t = 1f;
-                    tRate = -tRate;
-                }
-
-                // While looping and, until time or infinite
-                while (
-                    task.handler.isLooping
-                    && (task.handler.isReversed ? task.handler.t >= 0 : task.handler.t <= 1)
-                )
-                {
-                    // Check for queue reversal
-                    if (isReversed != task.handler.isReversed)
-                    {
-                        tRate = -tRate;
-                        task.handler.isReversed = isReversed;
-                    }
-
-                    float unityDeltaTime = Time.deltaTime;
-
-                    // Completion % from 0 to 1
-                    if (!isInfinite)
-                        task.handler.t += tRate * unityDeltaTime;
-
-                    // On finite loops this .deltaTime is sincronized with the
-                    // exact loop duration
-                    task.handler.deltaTime = isInfinite
-                        ? unityDeltaTime
-                        : 1 / (loopDuration - task.handler.timeSinceStart) * unityDeltaTime;
-
-                    // .deltaTime is also reversed
-                    if (task.handler.isReversed)
-                        task.handler.deltaTime = -task.handler.deltaTime;
-
-                    // A classic
-                    task.handler.timeSinceStart += unityDeltaTime;
-
-                    // Pause?
-                    while (isPaused)
-                        yield return null;
-
-                    // Loops will always have a callback with a handler
-                    task.callbackWithHandler(task.handler);
-
-                    // Handler .WaitFor(
-                    // Count-aware check: after waits are consumed the list is
-                    // cleared but kept allocated (non-null, Count == 0).
-                    // Empty means no waits queued on this frame, so we still
-                    // need a fallback yield to avoid tight loops/freezes.
-                    if (task.handler.yields != null && task.handler.yields.Count > 0)
-                    {
-                        for (int i = 0, len = task.handler.yields.Count; i < len; i++)
-                            yield return task.handler.yields[i];
-
-                        task.handler.yields.Clear();
-                    }
-                    // Minimum sane delay
-                    else
-                        yield return null;
-                }
-
-                // Executed +1
-                executedCount += 1;
-                lastPlayExecutedCount += 1;
+                yield return RunLoopTask(task, taskDuration);
             }
-            // It's a timed callback
             else
             {
-                // Holds the delay
-                float delayDuration = task.time;
-
-                // Func<float> added
-                if (task.timeByFunc != null)
-                    delayDuration += task.timeByFunc();
-
-                // Time delay
-                if (delayDuration > 0)
-                    yield return TeaYield.WaitForSeconds(delayDuration);
-
-                // Is this more precise that the previous code?
-                // float time = 0;
-                // while (time < delayDuration)
-                // {
-                //     time += Time.deltaTime;
-                //     yield return null;
-                // }
-
-                // Pause?
-                while (isPaused)
-                    yield return null;
-
-                // Normal callback
-                if (task.callback != null)
-                    task.callback();
-
-                // Callback with handler
-                if (task.callbackWithHandler != null)
-                {
-                    if (task.handler == null)
-                    {
-                        task.handler = new TeaHandler();
-                        task.handler.self = this;
-                    }
-
-                    task.handler.t = 1;
-                    task.handler.deltaTime = Time.deltaTime;
-                    task.handler.timeSinceStart = delayDuration;
-
-                    task.callbackWithHandler(task.handler);
-
-                    // Handler WaitFor
-                    // Same count-aware behavior as loop callbacks. Empty list
-                    // should behave as no pending waits.
-                    if (task.handler.yields != null && task.handler.yields.Count > 0)
-                    {
-                        for (int i = 0, len = task.handler.yields.Count; i < len; i++)
-                            yield return task.handler.yields[i];
-
-                        task.handler.yields.Clear();
-                    }
-
-                    // Minimum sane delay
-                    // Treat null and empty as equivalent: no waits queued.
-                    if (
-                        delayDuration <= 0
-                        && (task.handler.yields == null || task.handler.yields.Count == 0)
-                    )
-                        yield return null;
-                }
-                else if (delayDuration <= 0)
-                    yield return null;
-
-                // Executed +1
-                executedCount += 1;
-                lastPlayExecutedCount += 1;
+                yield return RunTimedTask(task, taskDuration);
             }
 
-            // Just at the end of a complete queue execution
-            if (tasks.Count > 0 && taskIndex >= tasks.Count)
-            {
-                // Forget current nested queues
-                waiting.Clear();
-            }
-
-            // Consume mode removes the task after execution
-            // @todo Need to be tested with .Reverse() stuff
-            if (isConsuming)
-            {
-                taskIndex -= 1;
-                tasks.Remove(task);
-
-                reverseLastTask = -1; // To default
-            }
-
-            // On Yoyo mode the queue is reversed at the end, only once per play
-            // without Repeat mode
-            if (
-                isYoyo
-                && taskIndex >= tasks.Count
-                && (lastPlayExecutedCount <= tasks.Count || isRepeating)
-            )
-            {
-                Reverse();
-
-                reverseLastTask = -1; // To default
-            }
-
-            // Repeats on Repeat mode
-            if (isRepeating && tasks.Count > 0 && taskIndex >= tasks.Count)
-            {
-                taskIndex = 0;
-
-                reverseLastTask = -1; // To default
-            }
+            ApplyPostTaskModes(task, ref reverseLastTask);
         }
 
         // Done!
