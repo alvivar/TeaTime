@@ -3,9 +3,8 @@
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
 // common coroutines patterns in Unity games.
 
-// Author: Andrés Villalobos | andresalvivar@gmail.com | github.com/alvivar
 
-// Copyright (c) 2014/12/26 andresalvivar@gmail.com
+// Copyright (c) 2014/12/26 Andrés Villalobos andresalvivar@gmail.com github.com/alvivar
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
