@@ -722,7 +722,11 @@ public class TeaTime
                     task.callbackWithHandler(task.handler);
 
                     // Handler .WaitFor(
-                    if (task.handler.yields != null)
+                    // Count-aware check: after waits are consumed the list is
+                    // cleared but kept allocated (non-null, Count == 0).
+                    // Empty means no waits queued on this frame, so we still
+                    // need a fallback yield to avoid tight loops/freezes.
+                    if (task.handler.yields != null && task.handler.yields.Count > 0)
                     {
                         for (int i = 0, len = task.handler.yields.Count; i < len; i++)
                             yield return task.handler.yields[i];
@@ -784,7 +788,9 @@ public class TeaTime
                     task.callbackWithHandler(task.handler);
 
                     // Handler WaitFor
-                    if (task.handler.yields != null)
+                    // Same count-aware behavior as loop callbacks. Empty list
+                    // should behave as no pending waits.
+                    if (task.handler.yields != null && task.handler.yields.Count > 0)
                     {
                         for (int i = 0, len = task.handler.yields.Count; i < len; i++)
                             yield return task.handler.yields[i];
@@ -793,7 +799,11 @@ public class TeaTime
                     }
 
                     // Minimum sane delay
-                    if (delayDuration <= 0 && task.handler.yields == null)
+                    // Treat null and empty as equivalent: no waits queued.
+                    if (
+                        delayDuration <= 0
+                        && (task.handler.yields == null || task.handler.yields.Count == 0)
+                    )
                         yield return null;
                 }
                 else if (delayDuration <= 0)
