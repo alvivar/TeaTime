@@ -1,7 +1,7 @@
 ﻿// TeaTime v0.9
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
-// common coroutines patterns in Unity games.
+// common coroutine patterns in Unity games.
 
 
 // Copyright (c) 2014/12/26 Andrés Villalobos andresalvivar@gmail.com github.com/alvivar
@@ -30,7 +30,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Timed Task node.
+// Timed task node.
 public class TeaTask
 {
     public bool isLoop = false;
@@ -82,11 +82,11 @@ public class TeaHandler
         Wait(TeaYield.WaitForSeconds(time));
     }
 
-    // Appends a TeaTime to wait after the current callback execution that is
-    // also affected by the queue .Stop() and .Reset().
+    // Appends a TeaTime to wait for after the current callback execution;
+    // this wait is also affected by the queue's .Stop() and .Reset().
     public void Wait(TeaTime tt)
     {
-        // A reference to the waiting list
+        // Keep a reference in the waiting list
         if (!self.waiting.Contains(tt))
         {
             self.waiting.Add(tt);
@@ -98,7 +98,7 @@ public class TeaHandler
     // execution.
     public void Wait(Func<bool> condition, float checkDelay)
     {
-        // @todo This need to be cached somehow
+        // @todo This needs to be cached somehow.
         Wait(self.monoBehaviour.tt().Wait(condition, checkDelay));
     }
 }
@@ -106,22 +106,22 @@ public class TeaHandler
 // TeaTime core extensions (static magic).
 public static class TeaTimeExtensions
 {
-    private static Dictionary<MonoBehaviour, Dictionary<string, TeaTime>> register; // Queues bounded by 'tt(string)'
+    private static Dictionary<MonoBehaviour, Dictionary<string, TeaTime>> register; // Queues bound by 'tt(string)'
 
-    // Returns a new TeaTime queue ready to be used. This is basically a shorcut
+    // Returns a new TeaTime queue ready to be used. This is basically a shortcut
     // to 'new TeaTime(this);' in MonoBehaviours.
     public static TeaTime tt(this MonoBehaviour instance)
     {
         return new TeaTime(instance);
     }
 
-    // Returns a TeaTime queue bounded to his name, unique per MonoBehaviour
-    // instance, new on the first call. This allows you to access queues without
-    // a formal definition.
+    // Returns a TeaTime queue bound to its name, unique per MonoBehaviour
+    // instance, and created on the first call. This allows you to access queues
+    // without a formal definition.
     public static TeaTime tt(this MonoBehaviour instance, string queueName)
     {
-        // @todo 'register' will (probably) need an auto clean up from time to
-        // time if this technique is used in volatile GameObjects.
+        // @todo 'register' will (probably) need auto-cleanup from time to time
+        // if this technique is used with volatile GameObjects.
 
         // First time
         if (register == null)
@@ -183,27 +183,27 @@ public static class TeaYield
 }
 
 // TeaTime is a fast & simple queue for timed callbacks, focused on solving
-// common coroutines patterns in Unity games.
+// common coroutine patterns in Unity games.
 public class TeaTime
 {
     // Queue
     private List<TeaTask> tasks = new List<TeaTask>(); // Tasks list used as a queue
-    public List<TeaTime> waiting = new List<TeaTime>(); // TeaTimes to wait via TeaHandler.Wait(
-    private int taskIndex = 0; // Current task mark (to be executed)
+    public List<TeaTime> waiting = new List<TeaTime>(); // TeaTimes queued via TeaHandler.Wait(...)
+    private int taskIndex = 0; // Current task index (to be executed)
     private int executedCount = 0; // Executed task count
     private int lastPlayExecutedCount = 0; // Executed task count during the last play
 
     // Dependencies
-    public MonoBehaviour monoBehaviour = null; // Required to access Unity coroutine fuctions
+    public MonoBehaviour monoBehaviour = null; // Required to access Unity coroutine functions
     private Coroutine currentCoroutine = null; // Coroutine that holds the queue execution
 
     // States
-    private bool isPlaying = false; // True while queue execution
+    private bool isPlaying = false; // True while the queue is executing
     private bool isPaused = false; // On .Pause()
     private bool isImmutable = false; // On .Immutable() mode
     private bool isRepeating = false; // On .Repeat() mode
     private bool isConsuming = false; // On .Consume() mode
-    private bool isReversed = false; // On .Reverse() Backward() Forward() mode
+    private bool isReversed = false; // In .Reverse()/.Backward()/.Forward() mode
     private bool isYoyo = false; // On .Yoyo() mode
 
     // True while the queue is being executed.
@@ -236,8 +236,8 @@ public class TeaTime
         get { return executedCount; }
     }
 
-    // A TeaTime queue requires a MonoBehaviour instance to access his coroutine
-    // fuctions.
+    // A TeaTime queue requires a MonoBehaviour instance to access its coroutine
+    // functions.
     public TeaTime(MonoBehaviour instance)
     {
         monoBehaviour = instance;
@@ -253,7 +253,7 @@ public class TeaTime
         Action<TeaHandler> callbackWithHandler
     )
     {
-        // Ignores appends on Immutable mode
+        // Ignores appends in Immutable mode
         if (!isImmutable)
         {
             TeaTask newTask = new TeaTask();
@@ -265,7 +265,7 @@ public class TeaTime
             tasks.Add(newTask);
         }
 
-        // Autoplay if not paused or playing
+        // Autoplay unless paused or already playing
         return isPaused || isPlaying ? this : Play();
     }
 
@@ -329,7 +329,7 @@ public class TeaTime
     // infinitely).
     private TeaTime Loop(float duration, Func<float> durationByFunc, Action<TeaHandler> callback)
     {
-        // Ignores appends on Immutable mode
+        // Ignores appends in Immutable mode
         if (!isImmutable)
         {
             TeaTask newTask = new TeaTask();
@@ -341,7 +341,7 @@ public class TeaTime
             tasks.Add(newTask);
         }
 
-        // Autoplay if not paused or playing
+        // Autoplay unless paused or already playing
         return isPaused || isPlaying ? this : Play();
     }
 
@@ -367,8 +367,8 @@ public class TeaTime
 
     // QUEUE MODES
 
-    // Enables Immutable mode, the queue will ignore new appends (.Add .Loop
-    // .If)
+    // Enables Immutable mode; the queue will ignore new additions (.Add,
+    // .Loop, .If)
     public TeaTime Immutable()
     {
         isImmutable = true;
@@ -393,14 +393,14 @@ public class TeaTime
         return this;
     }
 
-    // Reverses the callback execution order (From .Forward() to .Backward()
-    // mode and viceversa).
+    // Reverses the callback execution order (from .Forward() to .Backward()
+    // mode and vice versa).
     public TeaTime Reverse()
     {
         isReversed = !isReversed;
 
         // 1 I don't remember why IsPlaying is needed to allow reversing the
-        // index, probably en edge case? @todo Or maybe I need to remove it and
+        // index, probably an edge case? @todo Or maybe I should remove it and
         // test everything again.
 
         // 2 ...But taskIndex != 0 is important when Reverse() is called before
@@ -413,8 +413,8 @@ public class TeaTime
         return this;
     }
 
-    // Enables Backward mode, executing callbacks on reverse order (including
-    // Loops).
+    // Enables Backward mode, executing callbacks in reverse order (including
+    // loops).
     public TeaTime Backward()
     {
         if (!isReversed)
@@ -433,8 +433,8 @@ public class TeaTime
         return this;
     }
 
-    // Enables Yoyo mode, that will .Reverse() the callback execution order when
-    // the queue is completed. Only once per play without Repeat mode.
+    // Enables Yoyo mode, which will .Reverse() callback execution when the
+    // queue completes. Only once per play without Repeat mode.
     public TeaTime Yoyo()
     {
         isYoyo = true;
@@ -442,8 +442,8 @@ public class TeaTime
         return this;
     }
 
-    // Disables all modes (Immutable, Repeat, Consume, Backward, Yoyo). Just
-    // like new.
+    // Disables all modes (Immutable, Repeat, Consume, Backward, Yoyo), just
+    // like a new instance.
     public TeaTime Release()
     {
         isImmutable = isRepeating = isConsuming = isYoyo = false;
@@ -470,7 +470,7 @@ public class TeaTime
         taskIndex = 0;
         isPlaying = false;
 
-        // Stop all TeaTimes on .Wait(
+        // Stop all TeaTimes in .Wait(...)
         for (int i = 0, len = waiting.Count; i < len; i++)
             waiting[i].Stop();
         waiting.Clear();
@@ -488,7 +488,7 @@ public class TeaTime
         if (isPlaying)
             return this;
 
-        // or empty?
+        // Or empty?
         if (tasks.Count <= 0)
             return this;
 
@@ -512,7 +512,7 @@ public class TeaTime
     // DESTRUCTION
 
     // Stops and cleans the queue, turning off all modes (Immutable, Repeat,
-    // Consume, Backward, Yoyo). Just like new.
+    // Consume, Backward, Yoyo), just like a new instance.
     public TeaTime Reset()
     {
         // Reset current
@@ -536,7 +536,7 @@ public class TeaTime
         isYoyo = false;
         Forward();
 
-        // Reset all TeaTimes on .Wait(
+        // Reset all TeaTimes in .Wait(...)
         for (int i = 0, len = waiting.Count; i < len; i++)
             waiting[i].Reset();
         waiting.Clear();
@@ -548,15 +548,15 @@ public class TeaTime
 
     // A note about .Wait(
 
-    // 1 It would be redundant to add a .Wait(time) because there is an
-    // Add(time) currently. The same with .Wait(TeaTime).
+    // 1 It would be redundant to add .Wait(time) because Add(time) already
+    // exists. The same applies to .Wait(TeaTime).
 
-    // 2 A Wait(YieldInstruction) would be useless after the first time a
-    // TeaTime runs, because the Yield reference can't be used again when a
+    // 2 A .Wait(YieldInstruction) would be useless after the first time a
+    // TeaTime runs, because the yield reference can't be used again when a
     // TeaTime is replayed.
 
-    // The queue will stop if the condition isn't fullfiled, or restarted on
-    // Repeat mode.
+    // The queue will stop if the condition isn't met, or restart in Repeat
+    // mode.
     public TeaTime If(Func<bool> condition)
     {
         return Add(() =>
@@ -575,8 +575,8 @@ public class TeaTime
         });
     }
 
-    // The queue will wait until the boolean condition is fullfiled, checking
-    // every tick.
+    // The queue will wait until the boolean condition is met, checking every
+    // tick.
     public TeaTime Wait(Func<bool> until, float tick = 0)
     {
         return Loop(
@@ -592,7 +592,7 @@ public class TeaTime
 
     // CUSTOM YIELDS
 
-    // IEnumerator that waits the completion of a TeaTime.
+    // IEnumerator that waits for the completion of a TeaTime.
     private IEnumerator WaitForCompletion(TeaTime tt)
     {
         while (!tt.IsCompleted)
@@ -668,14 +668,14 @@ public class TeaTime
         // T quotient
         float tRate = isInfinite ? 0 : 1 / loopDuration;
 
-        // Progresion depends on current direction
+        // Progression depends on current direction
         if (handler.isReversed)
         {
             handler.t = 1f;
             tRate = -tRate;
         }
 
-        // While looping and, until time or infinite
+        // Keep looping while active and within bounds (or infinitely)
         while (handler.isLooping && (handler.isReversed ? handler.t >= 0 : handler.t <= 1))
         {
             // Check for queue reversal
@@ -691,7 +691,7 @@ public class TeaTime
             if (!isInfinite)
                 handler.t += tRate * unityDeltaTime;
 
-            // On finite loops this .deltaTime is sincronized with the exact
+            // On finite loops this .deltaTime is synchronized with the exact
             // loop duration
             handler.deltaTime = isInfinite
                 ? unityDeltaTime
@@ -711,7 +711,7 @@ public class TeaTime
             // Loops will always have a callback with a handler
             task.callbackWithHandler(handler);
 
-            // Handler .WaitFor(
+            // Handler .Wait(...)
             // Count-aware check: after waits are consumed the list is cleared
             // but kept allocated (non-null, Count == 0). Empty means no waits
             // queued on this frame, so we still need a fallback yield to avoid
@@ -739,7 +739,7 @@ public class TeaTime
         if (delayDuration > 0)
             yield return TeaYield.WaitForSeconds(delayDuration);
 
-        // Is this more precise that the previous code?
+        // Is this more precise than the previous code?
         // float time = 0;
         // while (time < delayDuration)
         // {
@@ -766,10 +766,12 @@ public class TeaTime
 
             task.callbackWithHandler(handler);
 
-            // Handler WaitFor
+            // Handler .Wait(...)
             // Same count-aware behavior as loop callbacks. Empty list should
             // behave as no pending waits.
-            if (handler.yields != null && handler.yields.Count > 0)
+            bool hadWaits = handler.yields != null && handler.yields.Count > 0;
+
+            if (hadWaits)
             {
                 for (int i = 0, len = handler.yields.Count; i < len; i++)
                     yield return handler.yields[i];
@@ -778,8 +780,8 @@ public class TeaTime
             }
 
             // Minimum sane delay
-            // Treat null and empty as equivalent: no waits queued.
-            if (delayDuration <= 0 && (handler.yields == null || handler.yields.Count == 0))
+            // Only fallback when no waits were queued by this callback.
+            if (delayDuration <= 0 && !hadWaits)
                 yield return null;
         }
         else if (delayDuration <= 0)
@@ -792,21 +794,21 @@ public class TeaTime
 
     private void ApplyPostTaskModes(TeaTask task, ref int reverseLastTask)
     {
-        // Just at the end of a complete queue execution
+        // Only at the end of a full queue execution
         if (tasks.Count > 0 && taskIndex >= tasks.Count)
         {
             // Forget current nested queues
             waiting.Clear();
         }
 
-        // Consume mode removes the task after execution @todo Need to be tested
-        // with .Reverse() stuff
+        // Consume mode removes the task after execution. @todo This needs to
+        // be tested with .Reverse().
         if (isConsuming)
         {
             taskIndex -= 1;
             tasks.Remove(task);
 
-            reverseLastTask = -1; // To default
+            reverseLastTask = -1; // Reset to default
         }
 
         // On Yoyo mode the queue is reversed at the end, only once per play
@@ -819,31 +821,31 @@ public class TeaTime
         {
             Reverse();
 
-            reverseLastTask = -1; // To default
+            reverseLastTask = -1; // Reset to default
         }
 
-        // Repeats on Repeat mode
+        // Restart in Repeat mode
         if (isRepeating && tasks.Count > 0 && taskIndex >= tasks.Count)
         {
             taskIndex = 0;
 
-            reverseLastTask = -1; // To default
+            reverseLastTask = -1; // Reset to default
         }
     }
 
-    // This is the main algorithm. Executes all tasks, one after the other,
-    // calling their callbacks according to type, time and config.
+    // This is the main algorithm. It executes all tasks, one after the other,
+    // calling their callbacks according to type, time, and configuration.
     private IEnumerator ExecuteQueue()
     {
         isPlaying = true;
 
-        int reverseLastTask = -1; // Important: This value needs to be reset to default on most queue changes
+        int reverseLastTask = -1; // Important: this value needs to be reset to its default on most queue changes
 
         lastPlayExecutedCount = 0;
 
         // Let's wait a frame
-        // 1 For secuencial Adds or Loops before their first execution
-        // 2 Maybe a callback is trying to modify his own queue
+        // 1 For sequential Adds or Loops before their first execution
+        // 2 Maybe a callback is trying to modify its own queue
         yield return null;
 
         while (taskIndex < tasks.Count)
